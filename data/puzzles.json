@@ -1,0 +1,736 @@
+[
+  {
+    "id": "m1-001",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/8/8/2K5/1Q6/1k6 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Kb3#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Kb3# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-002",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/4Q3/8/3K4/8/3k4 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qa1#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qa1# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-003",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/k1K5/8/8/8/4Q3 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qa1#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qa1# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-004",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "2k5/8/2K5/8/8/8/4R3/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Re8#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Re8# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-005",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/k1K5/8/8/7R/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Ra2#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Ra2# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-006",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "k1K5/8/8/8/8/8/6R1/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Ra2#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Ra2# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-007",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/k7/8/7R/8/8/1R1K4/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Ra5#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Ra5# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-008",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "6k1/4R3/8/8/4K3/8/R7/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Ra8#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Ra8# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-009",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/6R1/k7/8/1K6/8/2R5/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Rc6#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Rc6# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-010",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/8/8/Q7/7R/4K2k w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qg3#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qg3# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-011",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/5Q2/8/2K5/8/k1R5/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qb3#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qb3# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-012",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/3Q4/8/3K4/3R4/6k1 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qg2#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qg2# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-013",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "6k1/8/6K1/8/8/8/8/1Q3N2 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qb8#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qb8# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-014",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "3KNQk1/8/8/8/8/8/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qg7#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qg7# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-015",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/8/8/8/8/k3Q3/3N2K1 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qb2#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Qb2# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-016",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/5B2/4K2k/7R/8/8/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Kf6#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Kf6# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-017",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "8/8/5B2/8/8/5K1k/8/R7 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Rh1#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Rh1# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m1-018",
+    "theme": "mat1",
+    "themeLabel": "Mat en 1",
+    "difficulty": 1,
+    "fen": "2B4k/5K2/8/8/8/8/8/5R2 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Rh1#"
+    ],
+    "instruction": "Trouvez le mat en 1 coup pour les Blancs.",
+    "explanation": "Rh1# délivre échec et mat : le roi noir n'a aucune case de fuite ni aucun moyen de parer l'échec."
+  },
+  {
+    "id": "m2-001",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "4k3/8/8/RK6/8/7R/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Ra7",
+      "Kf8",
+      "Rh8#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kf8",
+        "mate": "Rh8#"
+      },
+      {
+        "reply": "Kd8",
+        "mate": "Rh8#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Ra7 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kf8 Rh8##)."
+  },
+  {
+    "id": "m2-002",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/8/7k/4K3/8/8/4R1R1/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Re3",
+      "Kh7",
+      "Rh3#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kh7",
+        "mate": "Rh3#"
+      },
+      {
+        "reply": "Kh5",
+        "mate": "Rh3#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Re3 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kh7 Rh3##)."
+  },
+  {
+    "id": "m2-003",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/k7/8/2K1R3/8/8/8/1R6 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Kc6",
+      "Ka8",
+      "Ra5#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Ka8",
+        "mate": "Ra5#"
+      },
+      {
+        "reply": "Ka6",
+        "mate": "Ra1#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Kc6 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Ka8 Ra5##)."
+  },
+  {
+    "id": "m2-004",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "1R6/R7/8/8/2K5/7k/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Rg8",
+      "Kh4",
+      "Rh7#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kh4",
+        "mate": "Rh7#"
+      },
+      {
+        "reply": "Kh2",
+        "mate": "Rh7#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Rg8 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kh4 Rh7##)."
+  },
+  {
+    "id": "m2-005",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "4R3/7Q/8/6K1/8/8/7k/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Re2+",
+      "Kg3",
+      "Qd3#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kg3",
+        "mate": "Qd3#"
+      },
+      {
+        "reply": "Kg1",
+        "mate": "Qb1#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Re2+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kg3 Qd3##)."
+  },
+  {
+    "id": "m2-006",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "7Q/8/8/8/8/2K5/8/1kR5 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qh7+",
+      "Ka2",
+      "Qa7#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Ka2",
+        "mate": "Qa7#"
+      },
+      {
+        "reply": "Kxc1",
+        "mate": "Qh1#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Qh7+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Ka2 Qa7##)."
+  },
+  {
+    "id": "m2-007",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/8/2R5/8/8/k5Q1/8/7K w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qb8",
+      "Ka4",
+      "Ra6#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Ka4",
+        "mate": "Ra6#"
+      },
+      {
+        "reply": "Ka2",
+        "mate": "Ra6#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Qb8 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Ka4 Ra6##)."
+  },
+  {
+    "id": "m2-008",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/4K3/8/8/8/8/1R4k1/4Q3 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qc3+",
+      "Kh1",
+      "Qe1#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kh1",
+        "mate": "Qe1#"
+      },
+      {
+        "reply": "Kg1",
+        "mate": "Qe1#"
+      },
+      {
+        "reply": "Kf1",
+        "mate": "Qc1#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Qc3+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kh1 Qe1##)."
+  },
+  {
+    "id": "m2-009",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/8/3N4/8/k1Q5/8/3K4/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Kc3+",
+      "Ka5",
+      "Qb5#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Ka5",
+        "mate": "Qb5#"
+      },
+      {
+        "reply": "Ka3",
+        "mate": "Nb5#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Kc3+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Ka5 Qb5##)."
+  },
+  {
+    "id": "m2-010",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/8/8/8/8/2Q5/4N1K1/4k3 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Kf3+",
+      "Kf1",
+      "Qc1#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kf1",
+        "mate": "Qc1#"
+      },
+      {
+        "reply": "Kd1",
+        "mate": "Qc1#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Kf3+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kf1 Qc1##)."
+  },
+  {
+    "id": "m2-011",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "8/5k2/5Q2/4K3/3N4/8/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Nf5+",
+      "Ke8",
+      "Qe7#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Ke8",
+        "mate": "Qe7#"
+      },
+      {
+        "reply": "Kg8",
+        "mate": "Qg7#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Nf5+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Ke8 Qe7##)."
+  },
+  {
+    "id": "m2-012",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "6k1/8/3K1N2/1Q6/8/8/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qb7+",
+      "Kh8",
+      "Qh7#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kh8",
+        "mate": "Qh7#"
+      },
+      {
+        "reply": "Kf8",
+        "mate": "Qe7#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Qb7+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kh8 Qh7##)."
+  },
+  {
+    "id": "m2-013",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "1B1k4/Q7/8/8/8/1K6/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Bd6",
+      "Ke8",
+      "Qe7#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Ke8",
+        "mate": "Qe7#"
+      },
+      {
+        "reply": "Kc8",
+        "mate": "Qc7#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Bd6 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Ke8 Qe7##)."
+  },
+  {
+    "id": "m2-014",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "5B2/2K5/8/8/1Q6/8/8/1k6 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qb3+",
+      "Kc1",
+      "Bh6#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kc1",
+        "mate": "Bh6#"
+      },
+      {
+        "reply": "Ka1",
+        "mate": "Bg7#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Qb3+ force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kc1 Bh6##)."
+  },
+  {
+    "id": "m2-015",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "6K1/1Q6/8/8/8/8/5B1k/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Qg7",
+      "Kh3",
+      "Qg3#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kh3",
+        "mate": "Qg3#"
+      },
+      {
+        "reply": "Kh1",
+        "mate": "Qg1#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Qg7 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kh3 Qg3##)."
+  },
+  {
+    "id": "m2-016",
+    "theme": "mat2",
+    "themeLabel": "Mat en 2",
+    "difficulty": 2,
+    "fen": "1k6/7Q/8/1K6/8/8/8/4B3 w - - 0 1",
+    "toMove": "blancs",
+    "solution": [
+      "Kb6",
+      "Kc8",
+      "Qc7#"
+    ],
+    "allReplies": [
+      {
+        "reply": "Kc8",
+        "mate": "Qc7#"
+      },
+      {
+        "reply": "Ka8",
+        "mate": "Qg8#"
+      }
+    ],
+    "instruction": "Trouvez le mat en 2 coups pour les Blancs (quelle que soit la défense noire).",
+    "explanation": "1.Kb6 force la position : quelle que soit la réponse des Noirs, les Blancs matent au coup suivant (ici Kc8 Qc7##)."
+  },
+  {
+    "id": "fk-001",
+    "theme": "fourchette",
+    "themeLabel": "Fourchette",
+    "difficulty": 1,
+    "fen": "8/8/3k4/1r6/2q5/N5K1/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": null,
+    "forkSquare": "a3",
+    "targets": [
+      "b5",
+      "c4"
+    ],
+    "instruction": "Trouvez le coup de Cavalier qui attaque deux pièces noires à la fois (fourchette).",
+    "explanation": "Le Cavalier saute en a3 et attaque simultanément deux pièces noires sans pouvoir être repris : c'est une fourchette, l'une des deux pièces sera gagnée."
+  },
+  {
+    "id": "fk-002",
+    "theme": "fourchette",
+    "themeLabel": "Fourchette",
+    "difficulty": 1,
+    "fen": "4K3/8/8/8/6q1/5r2/7N/3k4 w - - 0 1",
+    "toMove": "blancs",
+    "solution": null,
+    "forkSquare": "h2",
+    "targets": [
+      "f3",
+      "g4"
+    ],
+    "instruction": "Trouvez le coup de Cavalier qui attaque deux pièces noires à la fois (fourchette).",
+    "explanation": "Le Cavalier saute en h2 et attaque simultanément deux pièces noires sans pouvoir être repris : c'est une fourchette, l'une des deux pièces sera gagnée."
+  },
+  {
+    "id": "fk-003",
+    "theme": "fourchette",
+    "themeLabel": "Fourchette",
+    "difficulty": 1,
+    "fen": "3K4/5q2/3N4/5rk1/8/8/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": null,
+    "forkSquare": "d6",
+    "targets": [
+      "f5",
+      "f7"
+    ],
+    "instruction": "Trouvez le coup de Cavalier qui attaque deux pièces noires à la fois (fourchette).",
+    "explanation": "Le Cavalier saute en d6 et attaque simultanément deux pièces noires sans pouvoir être repris : c'est une fourchette, l'une des deux pièces sera gagnée."
+  },
+  {
+    "id": "fk-004",
+    "theme": "fourchette",
+    "themeLabel": "Fourchette",
+    "difficulty": 1,
+    "fen": "8/8/6k1/8/7q/4r3/K5N1/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": null,
+    "forkSquare": "g2",
+    "targets": [
+      "e3",
+      "h4"
+    ],
+    "instruction": "Trouvez le coup de Cavalier qui attaque deux pièces noires à la fois (fourchette).",
+    "explanation": "Le Cavalier saute en g2 et attaque simultanément deux pièces noires sans pouvoir être repris : c'est une fourchette, l'une des deux pièces sera gagnée."
+  },
+  {
+    "id": "fk-005",
+    "theme": "fourchette",
+    "themeLabel": "Fourchette",
+    "difficulty": 1,
+    "fen": "7N/5q2/6r1/6k1/8/4K3/8/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": null,
+    "forkSquare": "h8",
+    "targets": [
+      "g6",
+      "f7"
+    ],
+    "instruction": "Trouvez le coup de Cavalier qui attaque deux pièces noires à la fois (fourchette).",
+    "explanation": "Le Cavalier saute en h8 et attaque simultanément deux pièces noires sans pouvoir être repris : c'est une fourchette, l'une des deux pièces sera gagnée."
+  },
+  {
+    "id": "fk-006",
+    "theme": "fourchette",
+    "themeLabel": "Fourchette",
+    "difficulty": 1,
+    "fen": "8/8/8/3K3N/5q2/6r1/6k1/8 w - - 0 1",
+    "toMove": "blancs",
+    "solution": null,
+    "forkSquare": "h5",
+    "targets": [
+      "g3",
+      "f4"
+    ],
+    "instruction": "Trouvez le coup de Cavalier qui attaque deux pièces noires à la fois (fourchette).",
+    "explanation": "Le Cavalier saute en h5 et attaque simultanément deux pièces noires sans pouvoir être repris : c'est une fourchette, l'une des deux pièces sera gagnée."
+  }
+]

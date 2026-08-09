@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<defs>
+  <linearGradient id="pcWoodLight" x1="0.1" y1="0" x2="0.85" y2="1">
+    <stop offset="0%" stop-color="#FFFBF0"/>
+    <stop offset="35%" stop-color="#EDDCB8"/>
+    <stop offset="75%" stop-color="#CBA372"/>
+    <stop offset="100%" stop-color="#A9865A"/>
+  </linearGradient>
+  <linearGradient id="pcWoodDark" x1="0.1" y1="0" x2="0.85" y2="1">
+    <stop offset="0%" stop-color="#6B4A30"/>
+    <stop offset="35%" stop-color="#4A3220"/>
+    <stop offset="75%" stop-color="#2E1E12"/>
+    <stop offset="100%" stop-color="#1A0F08"/>
+  </linearGradient>
+  <radialGradient id="pcHighlight" cx="0.35" cy="0.3" r="0.6">
+    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85"/>
+    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="pcShadow" cx="0.7" cy="0.65" r="0.55">
+    <stop offset="0%" stop-color="#000000" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+
+  <g id="pcBaseLight" fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+    <rect x="12" y="110" width="56" height="8" rx="2"/>
+    <path d="M6 118 q34 14 68 0 l4 14 q-38 16 -76 0 Z"/>
+    <rect x="0" y="132" width="80" height="10" rx="3"/>
+  </g>
+  <g id="pcBaseDark" fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+    <rect x="12" y="110" width="56" height="8" rx="2"/>
+    <path d="M6 118 q34 14 68 0 l4 14 q-38 16 -76 0 Z"/>
+    <rect x="0" y="132" width="80" height="10" rx="3"/>
+  </g>
+  <g stroke-linecap="round">
+    <line x1="14" y1="114" x2="66" y2="114" stroke="#00000030" stroke-width="0.8"/>
+    <line x1="8" y1="126" x2="72" y2="126" stroke="#00000025" stroke-width="0.8"/>
+    <line x1="2" y1="137" x2="78" y2="137" stroke="#00000025" stroke-width="0.8"/>
+  </g>
+
+<symbol id="pc-wK" viewBox="0 0 80 160"><use href="#pcBaseLight"/>
+<g fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+<rect x="37" y="4" width="6" height="18"/>
+<rect x="29" y="10" width="22" height="6"/>
+<rect x="28" y="26" width="24" height="8" rx="2"/>
+<path d="M17 40 Q40 28 63 40 Q70 58 58 76 Q70 94 60 110 L18 110 Q8 94 20 76 Q10 58 17 40 Z"/>
+</g>
+<clipPath id="clip-wK-0"><path d="M17 40 Q40 28 63 40 Q70 58 58 76 Q70 94 60 110 L18 110 Q8 94 20 76 Q10 58 17 40 Z"/></clipPath>
+<g clip-path="url(#clip-wK-0)"><ellipse cx="29" cy="68" rx="15" ry="38" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wK-0)"><ellipse cx="39.0" cy="82.0" rx="15" ry="38" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-bK" viewBox="0 0 80 160"><use href="#pcBaseDark"/>
+<g fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+<rect x="37" y="4" width="6" height="18"/>
+<rect x="29" y="10" width="22" height="6"/>
+<rect x="28" y="26" width="24" height="8" rx="2"/>
+<path d="M17 40 Q40 28 63 40 Q70 58 58 76 Q70 94 60 110 L18 110 Q8 94 20 76 Q10 58 17 40 Z"/>
+</g>
+<clipPath id="clip-bK-0"><path d="M17 40 Q40 28 63 40 Q70 58 58 76 Q70 94 60 110 L18 110 Q8 94 20 76 Q10 58 17 40 Z"/></clipPath>
+<g clip-path="url(#clip-bK-0)"><ellipse cx="29" cy="68" rx="15" ry="38" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bK-0)"><ellipse cx="39.0" cy="82.0" rx="15" ry="38" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-wQ" viewBox="0 0 80 160"><use href="#pcBaseLight"/>
+<g fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+<path d="M16 26 L16 16 L21.5 26 L26 8 L30.5 26 L35 4 L39.5 26 L44 8 L48.5 26 L54 16 L54 26 L48 42 L22 42 Z"/>
+<circle cx="16" cy="16" r="2.6"/>
+<circle cx="26" cy="8" r="2.8"/>
+<circle cx="35" cy="4" r="3"/>
+<circle cx="44" cy="8" r="2.8"/>
+<circle cx="54" cy="16" r="2.6"/>
+<path d="M16 42 Q42 28 68 42 Q73 60 60 76 Q71 94 60 110 L16 110 Q5 94 16 76 Q1 60 16 42 Z"/>
+<g stroke="#33220f" stroke-width="0.9"><circle cx="27" cy="34" r="1.9" fill="#FFFBF0"/><rect x="32.5" y="31.5" width="4.2" height="4.2" transform="rotate(45 34.6 33.6)" fill="#5c4429"/><circle cx="43" cy="34" r="1.9" fill="#FFFBF0"/></g>
+</g>
+<clipPath id="clip-wQ-0"><path d="M16 42 Q42 28 68 42 Q73 60 60 76 Q71 94 60 110 L16 110 Q5 94 16 76 Q1 60 16 42 Z"/></clipPath><clipPath id="clip-wQ-1"><path d="M16 26 L16 16 L21.5 26 L26 8 L30.5 26 L35 4 L39.5 26 L44 8 L48.5 26 L54 16 L54 26 L48 42 L22 42 Z"/></clipPath>
+<g clip-path="url(#clip-wQ-0)"><ellipse cx="28" cy="70" rx="16" ry="38" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wQ-0)"><ellipse cx="38.0" cy="84.0" rx="16" ry="38" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-wQ-1)"><ellipse cx="26" cy="20" rx="9" ry="9" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wQ-1)"><ellipse cx="36.0" cy="34.0" rx="9" ry="9" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-bQ" viewBox="0 0 80 160"><use href="#pcBaseDark"/>
+<g fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+<path d="M16 26 L16 16 L21.5 26 L26 8 L30.5 26 L35 4 L39.5 26 L44 8 L48.5 26 L54 16 L54 26 L48 42 L22 42 Z"/>
+<circle cx="16" cy="16" r="2.6"/>
+<circle cx="26" cy="8" r="2.8"/>
+<circle cx="35" cy="4" r="3"/>
+<circle cx="44" cy="8" r="2.8"/>
+<circle cx="54" cy="16" r="2.6"/>
+<path d="M16 42 Q42 28 68 42 Q73 60 60 76 Q71 94 60 110 L16 110 Q5 94 16 76 Q1 60 16 42 Z"/>
+<g stroke="#0d0805" stroke-width="0.9"><circle cx="27" cy="34" r="1.9" fill="#E9D9B8"/><rect x="32.5" y="31.5" width="4.2" height="4.2" transform="rotate(45 34.6 33.6)" fill="#120a05"/><circle cx="43" cy="34" r="1.9" fill="#E9D9B8"/></g>
+</g>
+<clipPath id="clip-bQ-0"><path d="M16 42 Q42 28 68 42 Q73 60 60 76 Q71 94 60 110 L16 110 Q5 94 16 76 Q1 60 16 42 Z"/></clipPath><clipPath id="clip-bQ-1"><path d="M16 26 L16 16 L21.5 26 L26 8 L30.5 26 L35 4 L39.5 26 L44 8 L48.5 26 L54 16 L54 26 L48 42 L22 42 Z"/></clipPath>
+<g clip-path="url(#clip-bQ-0)"><ellipse cx="28" cy="70" rx="16" ry="38" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bQ-0)"><ellipse cx="38.0" cy="84.0" rx="16" ry="38" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-bQ-1)"><ellipse cx="26" cy="20" rx="9" ry="9" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bQ-1)"><ellipse cx="36.0" cy="34.0" rx="9" ry="9" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-wR" viewBox="0 0 80 160"><use href="#pcBaseLight"/>
+<g fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+<rect x="19" y="30" width="6" height="14"/>
+<rect x="32" y="24" width="6" height="20"/>
+<rect x="45" y="24" width="6" height="20"/>
+<rect x="58" y="24" width="6" height="20"/>
+<rect x="19" y="42" width="45" height="10"/>
+<path d="M22 52 L61 52 L57 108 L26 108 Z"/>
+</g>
+<clipPath id="clip-wR-0"><path d="M22 52 L61 52 L57 108 L26 108 Z"/></clipPath><clipPath id="clip-wR-1"><rect x="19" y="42" width="45" height="10"/></clipPath>
+<g clip-path="url(#clip-wR-0)"><ellipse cx="33" cy="70" rx="12" ry="32" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wR-0)"><ellipse cx="43.0" cy="84.0" rx="12" ry="32" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-wR-1)"><ellipse cx="30" cy="46" rx="9" ry="6" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wR-1)"><ellipse cx="40.0" cy="60.0" rx="9" ry="6" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-bR" viewBox="0 0 80 160"><use href="#pcBaseDark"/>
+<g fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+<rect x="19" y="30" width="6" height="14"/>
+<rect x="32" y="24" width="6" height="20"/>
+<rect x="45" y="24" width="6" height="20"/>
+<rect x="58" y="24" width="6" height="20"/>
+<rect x="19" y="42" width="45" height="10"/>
+<path d="M22 52 L61 52 L57 108 L26 108 Z"/>
+</g>
+<clipPath id="clip-bR-0"><path d="M22 52 L61 52 L57 108 L26 108 Z"/></clipPath><clipPath id="clip-bR-1"><rect x="19" y="42" width="45" height="10"/></clipPath>
+<g clip-path="url(#clip-bR-0)"><ellipse cx="33" cy="70" rx="12" ry="32" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bR-0)"><ellipse cx="43.0" cy="84.0" rx="12" ry="32" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-bR-1)"><ellipse cx="30" cy="46" rx="9" ry="6" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bR-1)"><ellipse cx="40.0" cy="60.0" rx="9" ry="6" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-wB" viewBox="0 0 80 160"><use href="#pcBaseLight"/>
+<g fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+<path d="M19 42 Q40 26 61 42 Q68 58 56 74 Q68 92 61 110 L19 110 Q12 92 24 74 Q12 58 19 42 Z"/>
+<rect x="36" y="24" width="8" height="8"/>
+<circle cx="40" cy="18" r="7"/>
+<line stroke="#33220f" x1="27" y1="48" x2="41" y2="62" stroke-width="3"/>
+</g>
+<clipPath id="clip-wB-0"><path d="M19 42 Q40 26 61 42 Q68 58 56 74 Q68 92 61 110 L19 110 Q12 92 24 74 Q12 58 19 42 Z"/></clipPath><clipPath id="clip-wB-1"><circle cx="40" cy="18" r="7"/></clipPath>
+<g clip-path="url(#clip-wB-0)"><ellipse cx="30" cy="68" rx="15" ry="38" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wB-0)"><ellipse cx="40.0" cy="82.0" rx="15" ry="38" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-wB-1)"><ellipse cx="37" cy="15" rx="4" ry="4" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wB-1)"><ellipse cx="47.0" cy="29.0" rx="4" ry="4" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-bB" viewBox="0 0 80 160"><use href="#pcBaseDark"/>
+<g fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+<path d="M19 42 Q40 26 61 42 Q68 58 56 74 Q68 92 61 110 L19 110 Q12 92 24 74 Q12 58 19 42 Z"/>
+<rect x="36" y="24" width="8" height="8"/>
+<circle cx="40" cy="18" r="7"/>
+<line stroke="#e9d9b8" x1="27" y1="48" x2="41" y2="62" stroke-width="3"/>
+</g>
+<clipPath id="clip-bB-0"><path d="M19 42 Q40 26 61 42 Q68 58 56 74 Q68 92 61 110 L19 110 Q12 92 24 74 Q12 58 19 42 Z"/></clipPath><clipPath id="clip-bB-1"><circle cx="40" cy="18" r="7"/></clipPath>
+<g clip-path="url(#clip-bB-0)"><ellipse cx="30" cy="68" rx="15" ry="38" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bB-0)"><ellipse cx="40.0" cy="82.0" rx="15" ry="38" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-bB-1)"><ellipse cx="37" cy="15" rx="4" ry="4" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bB-1)"><ellipse cx="47.0" cy="29.0" rx="4" ry="4" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-wN" viewBox="0 0 80 160"><use href="#pcBaseLight"/>
+<g fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+<path d="M36 20 L20 44 Q10 52 16 58 Q22 56 24 62 Q30 70 22 78 Q16 90 22 100 L20 108 L60 108 L58 90 Q62 76 68 66 L58 60 L66 50 L56 44 Q54 30 50 22 L44 6 L58 20 Q48 17 36 20 Z"/>
+<circle cx="30" cy="34" r="2.2" fill="#33220f" stroke="none"/>
+</g>
+<clipPath id="clip-wN-0"><path d="M36 20 L20 44 Q10 52 16 58 Q22 56 24 62 Q30 70 22 78 Q16 90 22 100 L20 108 L60 108 L58 90 Q62 76 68 66 L58 60 L66 50 L56 44 Q54 30 50 22 L44 6 L58 20 Q48 17 36 20 Z"/></clipPath>
+<g clip-path="url(#clip-wN-0)"><ellipse cx="30" cy="55" rx="14" ry="36" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wN-0)"><ellipse cx="40.0" cy="69.0" rx="14" ry="36" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-bN" viewBox="0 0 80 160"><use href="#pcBaseDark"/>
+<g fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+<path d="M36 20 L20 44 Q10 52 16 58 Q22 56 24 62 Q30 70 22 78 Q16 90 22 100 L20 108 L60 108 L58 90 Q62 76 68 66 L58 60 L66 50 L56 44 Q54 30 50 22 L44 6 L58 20 Q48 17 36 20 Z"/>
+<circle cx="30" cy="34" r="2.2" fill="#e9d9b8" stroke="none"/>
+</g>
+<clipPath id="clip-bN-0"><path d="M36 20 L20 44 Q10 52 16 58 Q22 56 24 62 Q30 70 22 78 Q16 90 22 100 L20 108 L60 108 L58 90 Q62 76 68 66 L58 60 L66 50 L56 44 Q54 30 50 22 L44 6 L58 20 Q48 17 36 20 Z"/></clipPath>
+<g clip-path="url(#clip-bN-0)"><ellipse cx="30" cy="55" rx="14" ry="36" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bN-0)"><ellipse cx="40.0" cy="69.0" rx="14" ry="36" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-wP" viewBox="0 0 80 160"><use href="#pcBaseLight"/>
+<g fill="url(#pcWoodLight)" stroke="#33220f" stroke-width="1.3">
+<path d="M27 60 q11 30 -7 50 l60 0 q-18 -20 -7 -50 Z"/>
+<path d="M32 46 q8 8 16 0 l6 14 q-14 8 -28 0 Z"/>
+<circle cx="40" cy="33" r="13"/>
+</g>
+<clipPath id="clip-wP-0"><path d="M27 60 q11 30 -7 50 l60 0 q-18 -20 -7 -50 Z"/><path d="M32 46 q8 8 16 0 l6 14 q-14 8 -28 0 Z"/></clipPath><clipPath id="clip-wP-1"><circle cx="40" cy="33" r="13"/></clipPath>
+<g clip-path="url(#clip-wP-0)"><ellipse cx="30" cy="72" rx="17" ry="40" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wP-0)"><ellipse cx="40.0" cy="86.0" rx="17" ry="40" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-wP-1)"><ellipse cx="35" cy="27" rx="7" ry="7" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-wP-1)"><ellipse cx="45.0" cy="41.0" rx="7" ry="7" fill="url(#pcShadow)"/></g>
+</symbol>
+<symbol id="pc-bP" viewBox="0 0 80 160"><use href="#pcBaseDark"/>
+<g fill="url(#pcWoodDark)" stroke="#0d0805" stroke-width="1.3">
+<path d="M27 60 q11 30 -7 50 l60 0 q-18 -20 -7 -50 Z"/>
+<path d="M32 46 q8 8 16 0 l6 14 q-14 8 -28 0 Z"/>
+<circle cx="40" cy="33" r="13"/>
+</g>
+<clipPath id="clip-bP-0"><path d="M27 60 q11 30 -7 50 l60 0 q-18 -20 -7 -50 Z"/><path d="M32 46 q8 8 16 0 l6 14 q-14 8 -28 0 Z"/></clipPath><clipPath id="clip-bP-1"><circle cx="40" cy="33" r="13"/></clipPath>
+<g clip-path="url(#clip-bP-0)"><ellipse cx="30" cy="72" rx="17" ry="40" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bP-0)"><ellipse cx="40.0" cy="86.0" rx="17" ry="40" fill="url(#pcShadow)"/></g><g clip-path="url(#clip-bP-1)"><ellipse cx="35" cy="27" rx="7" ry="7" fill="url(#pcHighlight)"/></g><g clip-path="url(#clip-bP-1)"><ellipse cx="45.0" cy="41.0" rx="7" ry="7" fill="url(#pcShadow)"/></g>
+</symbol>
+</defs>
+</svg>

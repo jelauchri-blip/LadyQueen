@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#1B1F1D">
+<title>Échiquier — Académie | Cours d'échecs gratuit en français, puzzles et analyse</title>
+<meta name="description" content="Apprends les échecs gratuitement en français : 12 leçons interactives, puzzles tactiques vérifiés, analyse de partie par moteur d'échecs, et une partie contre l'ordinateur au niveau réglable. Application installable, utilisable hors-ligne.">
+<link rel="canonical" href="https://flourishing-semolina-177de0.netlify.app/">
+
+<!-- Open Graph / réseaux sociaux -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Échiquier — Académie">
+<meta property="og:title" content="Échiquier — Académie | Cours d'échecs gratuit en français">
+<meta property="og:description" content="Règles interactives, puzzles tactiques, analyse par moteur d'échecs et partie contre l'ordinateur — gratuit, en français, installable sur mobile.">
+<meta property="og:image" content="https://flourishing-semolina-177de0.netlify.app/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Échiquier — Académie">
+<meta name="twitter:description" content="Cours d'échecs gratuit en français : leçons, puzzles, analyse par moteur d'échecs.">
+<meta name="twitter:image" content="https://flourishing-semolina-177de0.netlify.app/icons/og-image.png">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "Échiquier — Académie",
+  "description": "Application pédagogique gratuite pour apprendre les échecs en français : règles, puzzles tactiques et analyse par moteur d'échecs.",
+  "inLanguage": "fr",
+  "applicationCategory": "EducationalApplication"
+}
+</script>
+</head>
+<body>
+
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-glyph">♞</span>
+      <div class="brand-text">
+        <h1>LadyQueen</h1>
+      </div>
+    </div>
+    <button id="installBtn" class="install-btn" hidden>Installer</button>
+    <button id="soundToggleBtn" class="theme-btn" title="Activer/couper le son" aria-label="Activer ou couper le son">🔊</button>
+    <div class="theme-picker">
+      <button id="themeBtn" class="theme-btn" title="Thème du plateau" aria-label="Changer le thème du plateau">🎨</button>
+      <div id="themePanel" class="theme-panel" hidden>
+        <p class="theme-panel-title">Thème du plateau</p>
+        <button class="theme-swatch-btn" data-theme="noyer">
+          <span class="swatch"><i style="background:#E8DCC3"></i><i style="background:#6E4A32"></i></span> Noyer & laiton
+        </button>
+        <button class="theme-swatch-btn" data-theme="vert">
+          <span class="swatch"><i style="background:#EEEED2"></i><i style="background:#6F9152"></i></span> Tournoi vert
+        </button>
+        <button class="theme-swatch-btn" data-theme="bleu">
+          <span class="swatch"><i style="background:#DCE4EE"></i><i style="background:#3F5878"></i></span> Bleu marine
+        </button>
+        <button class="theme-swatch-btn" data-theme="rouge">
+          <span class="swatch"><i style="background:#F0E2D4"></i><i style="background:#7A3030"></i></span> Rouge
+        </button>
+        <div class="brightness-row">
+          <label for="brightnessSlider">Luminosité du plateau</label>
+          <input type="range" id="brightnessSlider" min="60" max="140" value="100" step="5">
+          <span class="brightness-value" id="brightnessValue">100%</span>
+        </div>
+        <div class="brightness-row">
+          <label for="coordSizeSlider">Taille des repères (a-h, 1-8)</label>
+          <input type="range" id="coordSizeSlider" min="7" max="16" value="9" step="1">
+          <span class="brightness-value" id="coordSizeValue">9px</span>
+        </div>
+        <div class="brightness-row">
+          <label for="coordContrastSlider">Contraste des repères</label>
+          <input type="range" id="coordContrastSlider" min="30" max="100" value="55" step="5">
+          <span class="brightness-value" id="coordContrastValue">55%</span>
+        </div>
+        <p class="theme-panel-title" style="margin-top:10px;">Style des pièces</p>
+        <button class="piece-style-btn" data-style="maison">Dessin maison</button>
+        <button class="piece-style-btn" data-style="cburnett-classic">Cburnett — classique</button>
+        <button class="piece-style-btn" data-style="cburnett-wood">Cburnett — bois</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Navigation principale">
+    <button class="tab-btn active" data-tab="accueil">
+      <span class="tab-num">I</span> Accueil
+    </button>
+    <button class="tab-btn" data-tab="analyse">
+      <span class="tab-num">II</span> Analyse
+    </button>
+    <div class="tab-dropdown" id="apprendreDropdown">
+      <button class="tab-btn" id="apprendreBtn" aria-haspopup="true" aria-expanded="false">
+        <span class="tab-num">III</span> Apprendre <span class="tab-caret">▾</span>
+      </button>
+      <div class="tab-submenu">
+        <button data-tab="regles">Initiation</button>
+        <button data-tab="tactique">Puzzle</button>
+      </div>
+    </div>
+    <button class="tab-btn" data-tab="bibliotheque">
+      <span class="tab-num">IV</span> Bibliothèque
+    </button>
+  </nav>
+
+  <main id="views">
+
+    <!-- ACCUEIL -->
+    <section id="view-accueil" class="view active">
+      <div class="home-layout">
+        <div class="game-panel">
+          <div id="homeBoardMount"></div>
+          <p class="game-status" id="homeGameStatus">Blancs à vous — nouvelle partie</p>
+          <button class="btn-primary" id="homePlayBtn">▶ Jouer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGLES -->
+    <section id="view-regles" class="view">
+      <div class="lesson-layout">
+        <aside class="lesson-nav" id="lessonNav" aria-label="Liste des leçons"></aside>
+        <div class="lesson-content" id="lessonContent"></div>
+      </div>
+    </section>
+
+    <!-- TACTIQUE -->
+    <section id="view-tactique" class="view">
+      <div class="puzzle-header">
+        <div class="puzzle-filters" id="puzzleFilters">
+          <button class="filter-chip active" data-theme="all">Tous</button>
+          <button class="filter-chip" data-theme="mat1">Mat en 1</button>
+          <button class="filter-chip" data-theme="mat2">Mat en 2</button>
+          <button class="filter-chip" data-theme="fourchette">Fourchette</button>
+        </div>
+        <div class="puzzle-elo-filter">
+          <label for="puzzleEloFilter">Difficulté (Elo max.)</label>
+          <select id="puzzleEloFilter"></select>
+        </div>
+        <button class="btn-ghost" id="lichessLoadBtn">↓ Charger depuis Lichess</button>
+      </div>
+
+      <div class="puzzle-layout">
+        <div class="puzzle-board-col">
+          <div id="puzzleBoardMount"></div>
+          <div class="puzzle-status" id="puzzleStatus"></div>
+        </div>
+        <div class="puzzle-side-col">
+          <span class="theme-pill" id="puzzleTheme">—</span>
+          <p class="puzzle-instruction" id="puzzleInstruction">Chargement…</p>
+          <div class="puzzle-actions">
+            <button class="btn-ghost" id="hintBtn">Indice</button>
+            <button class="btn-ghost" id="resetPuzzleBtn">Recommencer</button>
+            <button class="btn-primary" id="nextPuzzleBtn">Puzzle suivant →</button>
+          </div>
+          <div class="puzzle-explanation" id="puzzleExplanation" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYSE -->
+    <section id="view-analyse" class="view">
+      <div class="analyse-layout">
+        <div class="analyse-board-col">
+          <div class="board-wrap">
+            <div id="analyseBoardMount"></div>
+            <div id="gameResultOverlay" class="game-result-overlay" hidden>
+              <div class="game-result-card">
+                <span class="game-result-icon" id="gameResultIcon">🏆</span>
+                <span class="game-result-title" id="gameResultTitle">Vous gagnez !</span>
+                <span class="game-result-sub" id="gameResultSub"></span>
+                <button class="btn-ghost game-result-close" id="gameResultCloseBtn">Fermer</button>
+              </div>
+            </div>
+          </div>
+          <div id="gameResultBanner" class="game-result-banner" hidden></div>
+          <div class="analyse-controls">
+            <button class="btn-ghost" id="flipBtn">↕ Retourner</button>
+            <button class="btn-ghost" id="resetBoardBtn">Position initiale</button>
+            <button class="btn-ghost" id="clearBoardBtn">Vider</button>
+            <button class="btn-ghost" id="saveGameBtn">💾 Enregistrer</button>
+          </div>
+          <div class="nav-controls">
+            <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
+            <button class="btn-ghost nav-btn" id="navPrevBtn" title="Coup précédent">◀</button>
+            <span class="nav-position" id="navPosition">Début de partie</span>
+            <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
+            <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
+          </div>
+          <button class="btn-primary editor-open-btn" id="openEditorBtn">✎ Créer une position (étude libre)</button>
+          <div id="editorMount" class="editor-mount" hidden></div>
+          <details id="setupControls" class="setup-controls side-section">
+            <summary>Position de départ (FEN / PGN)</summary>
+            <div class="fen-row">
+              <label for="fenInput">FEN</label>
+              <input type="text" id="fenInput" spellcheck="false" autocomplete="off">
+              <button class="btn-ghost" id="loadFenBtn">Charger</button>
+            </div>
+            <div class="pgn-row">
+              <label for="pgnInput">Coller une partie (PGN)</label>
+              <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
+              <button class="btn-ghost" id="loadPgnBtn">Charger la partie</button>
+            </div>
+          </details>
+        </div>
+        <div class="analyse-side-col">
+          <details class="side-section" id="opponentSection" open>
+          <summary>Adversaire</summary>
+          <div class="opponent-panel">
+            <div class="opponent-mode-row">
+              <label><input type="radio" name="opponentMode" value="libre" checked> Libre (je déplace les deux camps)</label>
+              <label><input type="radio" name="opponentMode" value="ordinateur"> Contre l'ordinateur</label>
+            </div>
+            <div id="opponentOptions" class="opponent-options" hidden>
+              <div class="opponent-row">
+                <span>Je joue</span>
+                <select id="opponentSideSelect">
+                  <option value="w">les Blancs</option>
+                  <option value="b">les Noirs</option>
+                </select>
+              </div>
+              <div class="opponent-row">
+                <span>Force</span>
+                <select id="opponentEloSelect"></select>
+              </div>
+              <p class="opponent-hint" id="opponentEloHint"></p>
+              <div class="opponent-vsmode-row">
+                <label><input type="radio" name="vsComputerBehavior" value="defi" checked> Mode Défi — pas de retour en arrière</label>
+                <label><input type="radio" name="vsComputerBehavior" value="coach"> Mode Coach — retour en arrière possible</label>
+              </div>
+              <div class="opponent-row">
+                <span>Cadence</span>
+                <select id="timeControlSelect">
+                  <option value="0">Illimité</option>
+                  <option value="1">1 min</option>
+                  <option value="3">3 min</option>
+                  <option value="5">5 min</option>
+                  <option value="10">10 min</option>
+                  <option value="15">15 min</option>
+                  <option value="30">30 min</option>
+                </select>
+              </div>
+              <div class="opponent-row">
+                <span>Incrément (par coup)</span>
+                <select id="incrementSelect">
+                  <option value="0">+0 s</option>
+                  <option value="1">+1 s</option>
+                  <option value="2">+2 s</option>
+                  <option value="3">+3 s</option>
+                  <option value="4">+4 s</option>
+                  <option value="5">+5 s</option>
+                </select>
+              </div>
+              <button class="btn-primary" id="startVsComputerBtn">▶ Nouvelle partie contre l'ordinateur</button>
+              <div class="clock-row" id="clockRow" hidden>
+                <div class="clock-box" id="clockWhite"><span class="clock-label">Blancs</span><span class="clock-time">—</span></div>
+                <div class="clock-box" id="clockBlack"><span class="clock-label">Noirs</span><span class="clock-time">—</span></div>
+              </div>
+              <button class="btn-ghost resign-btn" id="resignBtn" hidden>🏳 Abandonner</button>
+            </div>
+          </div>
+          </details>
+
+          <details class="side-section">
+          <summary>Moteur &amp; coach</summary>
+          <div class="engine-toggle-row">
+            <span>Moteur d'analyse</span>
+            <label class="switch">
+              <input type="checkbox" id="engineToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="depth-row">
+            <span>Profondeur</span>
+            <select id="depthSelect">
+              <option value="rapide">Rapide — ≈ 1 s / position</option>
+              <option value="equilibre">Équilibré — ≈ 3 s / position</option>
+              <option value="approfondi">Approfondi — ≈ 10 s / position</option>
+            </select>
+          </div>
+          <div class="engine-toggle-row">
+            <span>🎙️ Coach en direct (commente chaque coup)</span>
+            <label class="switch">
+              <input type="checkbox" id="liveCoachToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="engineStatus" class="engine-status">Moteur désactivé</div>
+          <div id="evalBar" class="eval-bar" hidden>
+            <div class="eval-bar-fill" id="evalBarFill"></div>
+          </div>
+          <div id="engineOutput" class="engine-output"></div>
+          <div class="help-row">
+            <button class="btn-ghost help-btn" id="helpMoveBtn">💡 Aide : quelle est la meilleure solution ?</button>
+            <button class="btn-ghost coach-btn" id="helpSpeakBtn" hidden title="Écouter l'explication">🔊</button>
+          </div>
+          <div id="moveExplanation" class="move-explanation" hidden></div>
+          </details>
+
+          <details class="side-section">
+          <summary>Analyse complète de la partie</summary>
+          <div class="fullgame-panel">
+            <div class="fullgame-controls">
+              <select id="playerSideSelect">
+                <option value="w">Estimer le niveau des Blancs</option>
+                <option value="b">Estimer le niveau des Noirs</option>
+                <option value="both">Estimer les deux camps</option>
+              </select>
+              <button class="btn-primary" id="analyzeGameBtn">Analyser coup par coup</button>
+            </div>
+            <div id="fullgameProgress" class="fullgame-progress" hidden></div>
+            <div id="fullgameResults" class="fullgame-results"></div>
+          </div>
+          </details>
+        </div>
+
+        <div class="movelist-wrap">
+          <p class="eyebrow">Coups joués</p>
+          <ol id="moveList" class="movelist"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- BIBLIOTHEQUE -->
+    <section id="view-bibliotheque" class="view">
+      <p class="eyebrow">Parties enregistrées</p>
+      <div id="libraryList" class="library-list"></div>
+
+      <div class="backup-panel">
+        <p class="eyebrow">Sauvegarde des données</p>
+        <p class="backup-desc">Progression des leçons, puzzles résolus, bibliothèque de parties et préférences — tout reste stocké uniquement sur cet appareil. Exporte un fichier de sauvegarde avant de changer de téléphone ou de vider ton navigateur.</p>
+        <div class="backup-actions">
+          <button class="btn-ghost" id="exportDataBtn">⬇ Exporter mes données</button>
+          <button class="btn-ghost" id="importDataBtn">⬆ Importer une sauvegarde</button>
+          <input type="file" id="importDataInput" accept="application/json" hidden>
+        </div>
+        <p class="backup-status" id="backupStatus"></p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Pièces d'échecs « Cburnett » : Colin M.L. Burnett, sous licence BSD 3 clauses / CC BY-SA 3.0 / GFDL — <a href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces" target="_blank" rel="noopener">source</a>.</p>
+    <p>Moteur d'analyse Stockfish, sous licence GPL-3.0 — <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noopener">code source</a>.</p>
+  </footer>
+
+  <div id="onboardingOverlay" class="onboarding-overlay" hidden>
+    <div class="onboarding-card">
+      <div class="onboarding-brand"><span class="brand-glyph">♞</span> Bienvenue</div>
+      <h2>Échiquier — Académie</h2>
+      <p class="onboarding-intro">Une application complète pour apprendre, t'entraîner et progresser aux échecs, à ton rythme.</p>
+      <ul class="onboarding-list">
+        <li><b>Règles</b> — 12 leçons interactives, des bases aux règles spéciales.</li>
+        <li><b>Tactique</b> — des puzzles vérifiés, filtrables par niveau (Elo).</li>
+        <li><b>Analyse</b> — plateau libre, moteur d'échecs, coach vocal, et une partie contre l'ordinateur à la force réglable.</li>
+        <li><b>Bibliothèque</b> — retrouve tes parties enregistrées et sauvegarde tes données.</li>
+      </ul>
+      <button class="btn-primary" id="onboardingCloseBtn">Commencer →</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
