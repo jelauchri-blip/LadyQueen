@@ -60,12 +60,36 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   display: flex; flex-direction: column;
 }
 
-/* The Analyse tab needs real breathing room on wide screens for its 3-column
-   layout (board / adversaire / coups) — the app-wide 980px cap left large
-   swaths of empty space unused instead of showing everything at once.
-   Widened via a JS-toggled class on #app (see app.js) rather than a CSS-only
-   breakout trick, which caused spurious horizontal scrollbars on some setups. */
-body.wide-view #app { max-width: 1500px; }
+.content-col { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0; }
+
+/* ---------- SIDEBAR LAYOUT (desktop) ----------
+   Below 861px the app keeps its original phone/tablet layout: topbar row
+   + horizontal tab strip, both stacked above the views, #app capped at
+   980px. At 861px+ there's room for a permanent left-hand nav column
+   (like chess.com) instead of top tabs, and the whole app can use much
+   more of the screen instead of sitting in a narrow centered strip. */
+@media (min-width: 861px) {
+  #app { max-width: 1600px; flex-direction: row; align-items: stretch; }
+  .sidebar {
+    width: 220px; flex: none; display: flex; flex-direction: column;
+    background: var(--bg-panel); border-right: 1px solid var(--border-soft);
+    overflow-y: auto;
+  }
+  .topbar { flex-wrap: wrap; row-gap: 10px; padding: 12px 14px 10px; }
+  .topbar .brand { width: 100%; }
+  .tabs {
+    flex-direction: column; gap: 2px; padding: 8px 10px 14px;
+    border-bottom: 1px solid var(--border-soft); overflow-x: visible;
+  }
+  .tab-btn { width: 100%; justify-content: flex-start; padding: 10px 12px; border-radius: 8px; border-bottom: none; }
+  .tab-btn.active { background: var(--bg-panel-raised); border-bottom-color: transparent; }
+  .tab-dropdown { width: 100%; }
+  #apprendreBtn { width: 100%; justify-content: space-between; }
+  .tab-submenu {
+    position: static; margin: 2px 0 2px 18px; box-shadow: none;
+    background: none; border: none; padding: 0;
+  }
+}
 
 .topbar, .tabs, .app-footer { flex: none; }
 #views { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
@@ -190,7 +214,7 @@ body.wide-view #app { max-width: 1500px; }
 .tab-submenu button.active { color: var(--brass-soft); font-weight: 600; }
 
 /* ---------- VIEWS ---------- */
-.view { display: none; padding: 16px 18px 10px; animation: fadein 0.25s ease; }
+.view { display: none; padding: 8px 18px 10px; animation: fadein 0.25s ease; }
 .view.active { display: block; }
 @keyframes fadein { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: none; } }
 
@@ -205,7 +229,6 @@ body.wide-view #app { max-width: 1500px; }
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
   padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-.game-status { font-size: 13px; color: var(--ink-dim); }
 
 .btn-primary {
   background: var(--brass); color: #201A08; border: none; font-family: var(--font-body);

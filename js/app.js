@@ -90,8 +90,6 @@ function pickBalancedColor() {
 }
 
 const homeColor = pickBalancedColor();
-document.getElementById("homeGameStatus").textContent =
-  (homeColor === "w" ? "Blancs à vous" : "Noirs à vous") + " — nouvelle partie";
 createBoard(document.getElementById("homeBoardMount"), new Chess(), {
   interactive: false,
   orientation: homeColor === "b" ? "black" : "white",
