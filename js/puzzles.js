@@ -119,8 +119,32 @@ function loadPuzzle(puzzle) {
   });
 }
 
-function normalizeSan(san) {
-  return san.replace(/[+#]/g, "");
+// A puzzle can have more than one correct move (several squares deliver the
+// same mate) — instead of comparing against a single stored SAN string, we
+// verify the actual resulting position, so any equally valid solution is
+// accepted, not just the one written into the puzzle data.
+function canMateInOne(chess) {
+  for (const m of chess.moves({ verbose: true })) {
+    const c2 = new Chess(chess.fen());
+    c2.move(m.san);
+    if (c2.isCheckmate()) return true;
+  }
+  return false;
+}
+
+// True if, no matter how the side to move (here: Black, right after White's
+// candidate first move) replies, White still has a mate-in-1 available —
+// i.e. the candidate move is a genuine forced mate in 2, not just one that
+// happens to work against a specific reply.
+function isForcedMateInTwo(chessAfterFirstMove) {
+  if (chessAfterFirstMove.isCheckmate()) return true;
+  const replies = chessAfterFirstMove.moves({ verbose: true });
+  if (replies.length === 0) return false; // stalemate: not a mate
+  return replies.every((rm) => {
+    const c2 = new Chess(chessAfterFirstMove.fen());
+    c2.move(rm.san);
+    return canMateInOne(c2);
+  });
 }
 
 function handleMove(result, chessInst) {
@@ -128,22 +152,23 @@ function handleMove(result, chessInst) {
   if (!p) return;
 
   if (p.theme === "mat1") {
-    const correct = normalizeSan(result.san) === normalizeSan(p.solution[0]);
-    if (correct) return onSolved();
+    if (chessInst.isCheckmate()) return onSolved();
     return onWrong(chessInst, p.fen);
   }
 
   if (p.theme === "mat2") {
     if (solverStep === 0) {
-      const correct = normalizeSan(result.san) === normalizeSan(p.solution[0]);
-      if (!correct) return onWrong(chessInst, p.fen);
+      if (!isForcedMateInTwo(chessInst)) return onWrong(chessInst, p.fen);
       solverStep = 1;
       els.status.textContent = "Bien joué ! Les Noirs répondent…";
       els.status.className = "puzzle-status correct";
-      // auto-play scripted black reply
+      // Play the scripted reply if it's still legal in this line, otherwise
+      // fall back to any legal Black move (every reply still loses here).
       setTimeout(() => {
         try {
-          const r = chessInst.move(p.solution[1]);
+          let r;
+          try { r = chessInst.move(p.solution[1]); }
+          catch (e) { r = chessInst.move(chessInst.moves({ verbose: true })[0].san); }
           board.setChess(chessInst, { from: r.from, to: r.to });
           els.status.textContent = "À vous : trouvez le mat !";
         } catch (e) { /* ignore */ }
@@ -151,8 +176,7 @@ function handleMove(result, chessInst) {
       return;
     }
     if (solverStep === 1) {
-      const correct = normalizeSan(result.san) === normalizeSan(p.solution[2]);
-      if (correct) return onSolved();
+      if (chessInst.isCheckmate()) return onSolved();
       return onWrong(chessInst, p.fen);
     }
   }
