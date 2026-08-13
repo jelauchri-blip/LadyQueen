@@ -1,6 +1,6 @@
-// IMPORTANT : incrémenter ce numéro à CHAQUE nouvelle version envoyée,
-// sinon les appareils qui ont déjà installé l'appli garderont l'ancien
-// cache et ne verront pas les mises à jour.
+// Le fetch handler ci-dessous vérifie toujours le réseau en premier, donc
+// ce numéro n'a plus besoin d'être incrémenté à chaque publication — il ne
+// sert qu'à purger l'ancien cache une fois, au prochain déploiement.
 const CACHE_NAME = "echiquier-academie-v30";
 const CORE_ASSETS = [
   "./",
@@ -56,18 +56,18 @@ self.addEventListener("fetch", (event) => {
   // let the network handle them directly so the engine and live puzzles keep working.
   if (url.origin !== self.location.origin) return;
 
+  // Network-first, cache as fallback: whenever online, this always fetches
+  // the latest published version (no more "close and reopen still shows the
+  // old version until a manual refresh"). The cache only kicks in offline.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-    })
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
