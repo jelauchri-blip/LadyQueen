@@ -224,7 +224,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 
 /* ---------- HOME (jeu réel) ---------- */
-.home-layout { display: flex; justify-content: center; }
+/* Vertically centers the home board+button within the available height
+   instead of sitting at the top with a large empty gap above the footer.
+   margin:auto (not align-items:center on the parent) so that if content
+   ever gets taller than the view, it degrades to top-aligned instead of
+   clipping its top edge off-screen. */
+#view-accueil.active { display: flex; flex-direction: column; min-height: 100%; }
+.home-layout { display: flex; justify-content: center; margin: auto 0; }
 .game-panel {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
   padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -255,14 +261,11 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   /* Slightly reduced from 11.5vw to 11vw to make room for the --gutter
      (coordinate labels) added outside the squares, so 8×sq + gutter still
      fits within the same width budget instead of overflowing narrow screens. */
-  /* The vh term was 9vh, but that only ever kicks in below ~867px of
-     viewport height (9vh × 867 ≈ the 78px cap) — on any normal desktop
-     window (900-1100px tall) the board silently maxed out at 78px and
-     ignored window height entirely, which is exactly the case (board +
-     side panels taller than the window) that made the Analyse/Tactique
-     views need to scroll. Lowered to 6.5vh so height-based shrinking
-     actually engages at realistic desktop window heights too. */
-  --sq: clamp(40px, min(11vw, 6.5vh), 78px);
+  /* Raised from 6.5vh/78px after the sidebar-nav layout freed up enough
+     width and height (Analyse/Tactique no longer need to scroll at normal
+     desktop sizes) to let the board grow noticeably larger instead of
+     leaving empty space above the footer. */
+  --sq: clamp(40px, min(11vw, 8.5vh), 92px);
   --gutter: 18px;
   display: inline-block;
   padding: 0 0 var(--gutter) var(--gutter);
