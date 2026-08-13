@@ -9,6 +9,7 @@ import { getDepth, getDepthKey, setDepthKey } from "./engineSettings.js";
 import { eloSteps, uciOptionsForElo, resetEngineStrength, weakPlayParams, ELO_CALIBRATED_MIN } from "./engineSettings.js";
 import { createClock, formatClock } from "./chessClock.js";
 import { playMove, playCapture, playCheck, playGameEnd } from "./sounds.js";
+import { getPlayerName, setPlayerName, getBotName, setBotName } from "./playerNames.js";
 
 // The local copy is tried FIRST — it removes any dependency on an external
 // CDN being reachable, which is the most likely explanation for engine
@@ -239,6 +240,16 @@ export function initAnalysisView() {
 
   // --- Opponent panel (play vs computer) ---
   els.opponentOptions = document.getElementById("opponentOptions");
+  els.playerNameInput = document.getElementById("playerNameInput");
+  els.botNameInput = document.getElementById("botNameInput");
+  if (els.playerNameInput) {
+    els.playerNameInput.value = getPlayerName();
+    els.playerNameInput.addEventListener("change", () => setPlayerName(els.playerNameInput.value));
+  }
+  if (els.botNameInput) {
+    els.botNameInput.value = getBotName();
+    els.botNameInput.addEventListener("change", () => setBotName(els.botNameInput.value));
+  }
   els.opponentSideSelect = document.getElementById("opponentSideSelect");
   els.opponentEloSelect = document.getElementById("opponentEloSelect");
   els.opponentEloHint = document.getElementById("opponentEloHint");
@@ -336,7 +347,7 @@ export function initAnalysisView() {
     }
     ensureEngine();
     const modeLabel = challengeMode ? "Mode Défi" : "Mode Coach";
-    els.engineStatus.textContent = `${modeLabel} — l'ordinateur joue les ${computerSide === "w" ? "Blancs" : "Noirs"} (≈ ${computerElo} Elo).`;
+    els.engineStatus.textContent = `${modeLabel} — ${getBotName()} joue les ${computerSide === "w" ? "Blancs" : "Noirs"} (≈ ${computerElo} Elo).`;
     maybeTriggerComputerMove();
   };
 
@@ -347,7 +358,7 @@ export function initAnalysisView() {
     if (clock) clock.stop();
     board.setInteractive(false);
     els.engineStatus.textContent = "Partie terminée.";
-    showResultBanner("🏳 Vous avez abandonné — l'ordinateur gagne.", "loss");
+    showResultBanner(`🏳 Vous avez abandonné — ${getBotName()} gagne.`, "loss");
     showResultOverlay("loss", "Vous avez abandonné la partie.");
   };
 
@@ -490,12 +501,13 @@ function humanResultKind(chessInst) {
   return "draw";
 }
 
-// Builds a clear, human-centric banner text ("Vous gagnez !" / "L'ordinateur
+// Builds a clear, human-centric banner text ("Jelau gagne !" / "Ruben
 // gagne.") from the technical end-of-game message, so the result is obvious
 // at a glance without having to remember which colour you were playing.
 function humanBannerText(overMsg, kind) {
-  if (kind === "win") return `🏆 Vous gagnez ! (${overMsg.replace(/^./, (c) => c.toLowerCase())})`;
-  if (kind === "loss") return `L'ordinateur gagne. (${overMsg.replace(/^./, (c) => c.toLowerCase())})`;
+  const rest = overMsg.replace(/^./, (c) => c.toLowerCase());
+  if (kind === "win") return `🏆 ${getPlayerName()} gagne ! (${rest})`;
+  if (kind === "loss") return `${getBotName()} gagne. (${rest})`;
   return overMsg; // draw: the technical message is already clear enough
 }
 
@@ -512,14 +524,21 @@ function hideResultBanner() {
   if (els.gameResultBanner) els.gameResultBanner.hidden = true;
 }
 
-const RESULT_ICON = { win: "🏆", loss: "🤖", draw: "🤝" };
-const RESULT_TITLE = { win: "Vous gagnez !", loss: "L'ordinateur gagne.", draw: "Partie nulle." };
+const RESULT_ICON = { win: "🏆", loss: "🏆", draw: "🤝" };
+
+// The winner's actual name, front and center — no more generic "robot" icon
+// for a loss, the human's and the computer's names are both just names.
+function resultTitle(kind) {
+  if (kind === "win") return `${getPlayerName()} gagne !`;
+  if (kind === "loss") return `${getBotName()} gagne.`;
+  return "Partie nulle.";
+}
 
 // Big, impossible-to-miss overlay centered on the board itself.
 function showResultOverlay(kind, sub) {
   if (!els.gameResultOverlay) return;
   els.gameResultIcon.textContent = RESULT_ICON[kind] || "♟";
-  els.gameResultTitle.textContent = RESULT_TITLE[kind] || "Partie terminée.";
+  els.gameResultTitle.textContent = resultTitle(kind);
   els.gameResultSub.textContent = sub || "";
   els.gameResultOverlay.querySelector(".game-result-card").className = "game-result-card " + (kind || "");
   els.gameResultOverlay.hidden = false;
@@ -574,7 +593,7 @@ function handleFlag(loserColor) {
   if (box) box.classList.add("flag");
   const loserLabel = loserColor === "w" ? "Les Blancs" : "Les Noirs";
   const humanWins = loserColor === computerSide;
-  const winnerLabel = humanWins ? "vous gagnez" : "l'ordinateur gagne";
+  const winnerLabel = `${humanWins ? getPlayerName() : getBotName()} gagne`;
   const msg = `⏱ ${loserLabel} n'ont plus de temps — ${winnerLabel} !`;
   els.engineStatus.textContent = "Partie terminée.";
   showResultBanner(msg, humanWins ? "win" : "loss");

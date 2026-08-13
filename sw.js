@@ -31,6 +31,7 @@ const CORE_ASSETS = [
   "./js/chessClock.js",
   "./js/dataBackup.js",
   "./js/sounds.js",
+  "./js/playerNames.js",
 ];
 
 self.addEventListener("install", (event) => {
