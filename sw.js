@@ -1,7 +1,7 @@
 // IMPORTANT : incrémenter ce numéro à CHAQUE nouvelle version envoyée,
 // sinon les appareils qui ont déjà installé l'appli garderont l'ancien
 // cache et ne verront pas les mises à jour.
-const CACHE_NAME = "echiquier-academie-v28";
+const CACHE_NAME = "echiquier-academie-v29";
 const CORE_ASSETS = [
   "./",
   "./index.html",
