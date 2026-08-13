@@ -12,6 +12,7 @@ let currentPuzzle = null;
 let currentIndex = -1;
 let board = null;
 let solverStep = 0; // for multi-move puzzles
+let firstMoveSan = null; // the move the user actually played, to spot other valid solutions
 let recentIds = [];
 let activeThemeFilter = "all";
 let activeEloFilter = "all";
@@ -105,6 +106,7 @@ function loadNextPuzzle() {
 function loadPuzzle(puzzle) {
   currentPuzzle = puzzle;
   solverStep = 0;
+  firstMoveSan = null;
   const chess = new Chess(puzzle.fen);
   els.theme.textContent = `${puzzle.themeLabel} · ≈ ${puzzle.elo} Elo`;
   els.instruction.textContent = puzzle.instruction;
@@ -147,18 +149,39 @@ function isForcedMateInTwo(chessAfterFirstMove) {
   });
 }
 
+function normalizeSan(san) {
+  return san.replace(/[+#]/g, "");
+}
+
+// Other first moves (besides the one just played) that also solve the
+// puzzle from its starting position — used to tell the user more than one
+// solution exists so they can go look for it if they want.
+function findOtherSolutions(fen, theme, playedSan) {
+  const start = new Chess(fen);
+  const others = [];
+  for (const m of start.moves({ verbose: true })) {
+    if (normalizeSan(m.san) === normalizeSan(playedSan)) continue;
+    const c2 = new Chess(fen);
+    c2.move(m.san);
+    const works = theme === "mat1" ? c2.isCheckmate() : theme === "mat2" ? isForcedMateInTwo(c2) : false;
+    if (works) others.push(m.san);
+  }
+  return others;
+}
+
 function handleMove(result, chessInst) {
   const p = currentPuzzle;
   if (!p) return;
 
   if (p.theme === "mat1") {
-    if (chessInst.isCheckmate()) return onSolved();
+    if (chessInst.isCheckmate()) { firstMoveSan = result.san; return onSolved(); }
     return onWrong(chessInst, p.fen);
   }
 
   if (p.theme === "mat2") {
     if (solverStep === 0) {
       if (!isForcedMateInTwo(chessInst)) return onWrong(chessInst, p.fen);
+      firstMoveSan = result.san;
       solverStep = 1;
       els.status.textContent = "Bien joué ! Les Noirs répondent…";
       els.status.className = "puzzle-status correct";
@@ -216,7 +239,16 @@ function onSolved() {
   els.status.textContent = "✓ Résolu !";
   els.status.className = "puzzle-status correct";
   els.explanation.hidden = false;
-  els.explanation.textContent = currentPuzzle.explanation || "Bravo, coup exact.";
+
+  let text = currentPuzzle.explanation || "Bravo, coup exact.";
+  if (firstMoveSan && (currentPuzzle.theme === "mat1" || currentPuzzle.theme === "mat2")) {
+    const others = findOtherSolutions(currentPuzzle.fen, currentPuzzle.theme, firstMoveSan);
+    if (others.length > 0) {
+      text += ` Il existe aussi d'autres façons de mater ici (par ex. ${others[0]}). Clique sur « Recommencer » pour en chercher une autre, ou passe au puzzle suivant.`;
+    }
+  }
+  els.explanation.textContent = text;
+
   board.setInteractive(false);
   incrementSolvedCount();
 }
