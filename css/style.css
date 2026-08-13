@@ -83,8 +83,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   }
   .tab-btn { width: 100%; justify-content: flex-start; padding: 10px 12px; border-radius: 8px; border-bottom: none; }
   .tab-btn.active { background: var(--bg-panel-raised); border-bottom-color: transparent; }
-  .tab-dropdown { width: 100%; }
-  #apprendreBtn { width: 100%; justify-content: space-between; }
 }
 
 .topbar, .tabs, .app-footer { flex: none; }
@@ -185,24 +183,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   border-bottom: 2px solid transparent; white-space: nowrap; display: flex; align-items: center; gap: 7px;
 }
 .tab-btn.active { color: var(--ink); border-bottom-color: var(--brass); }
-
-/* "Apprendre" groups the Règles/Tactique views (Initiation/Puzzle) behind
-   one dropdown instead of two separate top-level tabs. */
-.tab-dropdown { position: relative; }
-.tab-caret { font-size: 10px; margin-left: 2px; transition: transform 0.15s ease; }
-.tab-dropdown.open .tab-caret { transform: rotate(180deg); }
-.tab-submenu {
-  position: absolute; top: calc(100% + 4px); left: 0; z-index: 20; min-width: 160px;
-  background: var(--bg-panel-raised); border: 1px solid var(--border-soft); border-radius: 8px;
-  padding: 6px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 12px 28px rgba(0,0,0,0.45);
-}
-.tab-dropdown:not(.open) .tab-submenu { display: none; }
-.tab-submenu button {
-  background: none; border: none; color: var(--ink); font-family: var(--font-body); font-size: 13.5px;
-  text-align: left; padding: 8px 10px; border-radius: 6px; cursor: pointer;
-}
-.tab-submenu button:hover { background: rgba(201,162,39,0.12); color: var(--brass-soft); }
-.tab-submenu button.active { color: var(--brass-soft); font-weight: 600; }
 
 /* ---------- VIEWS ---------- */
 .view { display: none; padding: 8px 18px 10px; animation: fadein 0.25s ease; }

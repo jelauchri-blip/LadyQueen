@@ -17,12 +17,6 @@ function showTab(name) {
   document.body.classList.toggle("wide-view", name === "analyse");
   document.getElementById("views").scrollTop = 0;
 
-  // "Apprendre" is a dropdown covering both Règles and Tactique (Initiation
-  // / Puzzle) rather than its own view, so it needs its own active-state
-  // logic instead of the plain data-tab match used for the other tabs.
-  document.getElementById("apprendreBtn").classList.toggle("active", name === "regles" || name === "tactique");
-  document.querySelectorAll(".tab-submenu button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-
   if (name === "regles" && !initialized.regles) {
     initialized.regles = true;
     initLessonsView(document.getElementById("lessonNav"), document.getElementById("lessonContent"));
@@ -48,30 +42,7 @@ function showTab(name) {
 }
 
 tabButtons.forEach(btn => {
-  // apprendreBtn is a tab-btn too, but it opens/closes the dropdown
-  // (wired below) instead of switching views directly.
-  if (btn.id === "apprendreBtn") return;
   btn.addEventListener("click", () => showTab(btn.dataset.tab));
-});
-
-// ---- "Apprendre" dropdown (Initiation / Puzzle) ----
-const apprendreDropdown = document.getElementById("apprendreDropdown");
-const apprendreBtn = document.getElementById("apprendreBtn");
-apprendreBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const open = apprendreDropdown.classList.toggle("open");
-  apprendreBtn.setAttribute("aria-expanded", String(open));
-});
-document.querySelectorAll(".tab-submenu button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    showTab(btn.dataset.tab);
-    apprendreDropdown.classList.remove("open");
-    apprendreBtn.setAttribute("aria-expanded", "false");
-  });
-});
-document.addEventListener("click", () => {
-  apprendreDropdown.classList.remove("open");
-  apprendreBtn.setAttribute("aria-expanded", "false");
 });
 
 // ---- Home board preview + "Jouer" CTA ----
