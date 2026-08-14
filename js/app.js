@@ -150,9 +150,20 @@ coordContrastSlider.addEventListener("input", () => {
 
 const themeBtn = document.getElementById("themeBtn");
 const themePanel = document.getElementById("themePanel");
+const sidebarEl = document.querySelector(".sidebar");
 themeBtn.addEventListener("click", (e) => {
   e.stopPropagation();
+  const opening = themePanel.hidden;
   themePanel.hidden = !themePanel.hidden;
+  if (opening) {
+    // Stretch the panel down to the sidebar's own bottom edge instead of
+    // leaving a bare gap of sidebar background below a short panel.
+    const sidebarRect = sidebarEl.getBoundingClientRect();
+    const topbarBottom = document.querySelector(".topbar").getBoundingClientRect().bottom;
+    const top = topbarBottom - sidebarRect.top;
+    themePanel.style.top = top + "px";
+    themePanel.style.minHeight = (sidebarRect.height - top) + "px";
+  }
 });
 document.querySelectorAll(".theme-swatch-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
