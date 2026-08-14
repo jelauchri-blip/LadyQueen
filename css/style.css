@@ -75,13 +75,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
     background: var(--bg-panel); border-right: 1px solid var(--border-soft);
     overflow-y: auto;
   }
-  .topbar { flex-wrap: wrap; row-gap: 10px; padding: 12px 14px 10px; }
+  .topbar { flex-wrap: wrap; }
   .topbar .brand { width: 100%; }
   .tabs {
-    flex-direction: column; gap: 2px; padding: 8px 10px 14px;
+    flex-direction: column;
     border-bottom: 1px solid var(--border-soft); overflow-x: visible;
   }
-  .tab-btn { width: 100%; justify-content: flex-start; padding: 10px 12px; border-radius: 8px; border-bottom: none; }
+  .tab-btn { width: 100%; justify-content: flex-start; border-radius: 8px; border-bottom: none; }
   .tab-btn.active { background: var(--bg-panel-raised); border-bottom-color: transparent; }
 }
 
@@ -92,7 +92,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .sidebar-opponent .eyebrow { margin-bottom: 6px; }
 .sidebar-opponent .opponent-panel { background: var(--bg-panel-raised); margin-bottom: 0; }
 @media (min-width: 861px) {
-  .sidebar-opponent { padding: 0 10px 12px; border-bottom: 1px solid var(--border-soft); }
+  .sidebar-opponent { padding: 0 10px 8px; border-bottom: 1px solid var(--border-soft); }
 }
 #views { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
@@ -128,6 +128,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 20px 8px;
+}
+@media (min-width: 861px) {
+  .topbar { row-gap: 8px; padding: 10px 14px 8px; }
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand-glyph { font-size: 30px; color: var(--brass-soft); line-height: 1; }
@@ -201,6 +204,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   border-bottom: 2px solid transparent; white-space: nowrap; display: flex; align-items: center; gap: 7px;
 }
 .tab-btn.active { color: var(--ink); border-bottom-color: var(--brass); }
+@media (min-width: 861px) {
+  .tabs { gap: 1px; padding: 4px 10px 8px; }
+  .tab-btn { padding: 7px 12px; }
+}
 
 /* ---------- VIEWS ---------- */
 .view { display: none; padding: 8px 18px 10px; animation: fadein 0.25s ease; }
