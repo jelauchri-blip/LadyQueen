@@ -120,8 +120,8 @@ function updateMaterialCounts() {
     if (mv.color === "w") whiteCaptured += value;
     else blackCaptured += value;
   }
-  els.materialWhite.textContent = `B${whiteCaptured}`;
-  els.materialBlack.textContent = `N${blackCaptured}`;
+  els.materialWhite.textContent = `Blanc ${whiteCaptured}`;
+  els.materialBlack.textContent = `Noir ${blackCaptured}`;
 }
 
 export function initAnalysisView() {

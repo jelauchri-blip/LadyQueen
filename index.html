@@ -238,25 +238,23 @@
               </div>
             </div>
           </div>
-          <div class="material-row">
-            <span class="material-count" id="materialWhite" title="Points capturés par les Blancs">B0</span>
-            <div id="gameResultBanner" class="game-result-banner" hidden></div>
-            <span class="material-count" id="materialBlack" title="Points capturés par les Noirs">N0</span>
-          </div>
+          <div id="gameResultBanner" class="game-result-banner" hidden></div>
           <div class="board-actions-row">
+            <span class="material-count" id="materialWhite" title="Points capturés par les Blancs">Blanc 0</span>
             <div class="analyse-controls">
               <button class="btn-ghost" id="flipBtn">↕ Retourner</button>
               <button class="btn-ghost" id="resetBoardBtn">Position initiale</button>
               <button class="btn-ghost" id="clearBoardBtn">Vider</button>
               <button class="btn-ghost" id="saveGameBtn" title="Enregistrer la partie" aria-label="Enregistrer la partie">💾</button>
             </div>
-            <div class="nav-controls">
-              <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
-              <button class="btn-ghost nav-btn" id="navPrevBtn" title="Coup précédent">◀</button>
-              <span class="nav-position" id="navPosition">Début de partie</span>
-              <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
-              <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
-            </div>
+            <span class="material-count" id="materialBlack" title="Points capturés par les Noirs">Noir 0</span>
+          </div>
+          <div class="nav-controls">
+            <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
+            <button class="btn-ghost nav-btn" id="navPrevBtn" title="Coup précédent">◀</button>
+            <span class="nav-position" id="navPosition">Début de partie</span>
+            <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
+            <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
           </div>
           <button class="btn-primary editor-open-btn" id="openEditorBtn">✎ Créer une position (étude libre)</button>
           <div id="editorMount" class="editor-mount" hidden></div>
