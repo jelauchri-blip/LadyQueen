@@ -2,7 +2,7 @@ import { Chess } from "./chess.js";
 import { speakOne, playSequence, pauseSequence, resumeSequence, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { getDepth } from "./engineSettings.js";
 
-const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+export const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
 let ctx = null; // { getChess, evaluateFen, isEngineEnabled, enableEngine, setBusy }
 let els = {};

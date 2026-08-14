@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns } from "./gameAnalysis.js";
+import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -104,6 +104,24 @@ function updateNavButtons() {
   els.navPosition.textContent = currentPly === 0
     ? "Début de partie"
     : `Coup ${Math.ceil(currentPly / 2)}${currentPly % 2 === 1 ? "" : " (Noirs)"} / ${plyMoves.length}`;
+  updateMaterialCounts();
+}
+
+// Running total of enemy material captured by each side, up to the ply
+// currently shown on the board (so stepping back through history shows the
+// count as it stood at that point, matching the board and move list).
+function updateMaterialCounts() {
+  if (!els.materialWhite || !els.materialBlack) return;
+  let whiteCaptured = 0, blackCaptured = 0;
+  for (let i = 0; i < currentPly; i++) {
+    const mv = plyMoves[i];
+    if (!mv || !mv.captured) continue;
+    const value = PIECE_VALUE[mv.captured] || 0;
+    if (mv.color === "w") whiteCaptured += value;
+    else blackCaptured += value;
+  }
+  els.materialWhite.textContent = `B${whiteCaptured}`;
+  els.materialBlack.textContent = `N${blackCaptured}`;
 }
 
 export function initAnalysisView() {
@@ -250,6 +268,8 @@ export function initAnalysisView() {
   els.clockWhite = document.getElementById("clockWhite");
   els.clockBlack = document.getElementById("clockBlack");
   els.resignBtn = document.getElementById("resignBtn");
+  els.materialWhite = document.getElementById("materialWhite");
+  els.materialBlack = document.getElementById("materialBlack");
   els.gameResultBanner = document.getElementById("gameResultBanner");
   els.gameResultOverlay = document.getElementById("gameResultOverlay");
   els.gameResultIcon = document.getElementById("gameResultIcon");
