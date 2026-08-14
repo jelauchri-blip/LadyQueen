@@ -271,13 +271,6 @@ export function initAnalysisView() {
   els.materialWhite = document.getElementById("materialWhite");
   els.materialBlack = document.getElementById("materialBlack");
   els.gameResultBanner = document.getElementById("gameResultBanner");
-  els.gameResultOverlay = document.getElementById("gameResultOverlay");
-  els.gameResultIcon = document.getElementById("gameResultIcon");
-  els.gameResultTitle = document.getElementById("gameResultTitle");
-  els.gameResultSub = document.getElementById("gameResultSub");
-  els.gameResultCloseBtn = document.getElementById("gameResultCloseBtn");
-  els.gameResultCloseBtn.onclick = (e) => { e.stopPropagation(); hideResultOverlay(); };
-  els.gameResultOverlay.onclick = () => hideResultOverlay();
 
   for (const elo of eloSteps()) {
     const opt = document.createElement("option");
@@ -337,7 +330,6 @@ export function initAnalysisView() {
     }
     els.resignBtn.hidden = false;
     hideResultBanner();
-    hideResultOverlay();
 
     if (!engineEnabled) {
       engineEnabled = true;
@@ -357,7 +349,6 @@ export function initAnalysisView() {
     board.setInteractive(false);
     els.engineStatus.textContent = "Partie terminée.";
     showResultBanner(`🏳 Vous avez abandonné — ${getBotName()} gagne.`, "loss");
-    showResultOverlay("loss", "Vous avez abandonné la partie.");
     if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
     if (els.resignBtn) els.resignBtn.hidden = true;
   };
@@ -524,29 +515,6 @@ function hideResultBanner() {
   if (els.gameResultBanner) els.gameResultBanner.hidden = true;
 }
 
-const RESULT_ICON = { win: "🏆", loss: "🏆", draw: "🤝" };
-
-// The winner's actual name, front and center — no more generic "robot" icon
-// for a loss, the human's and the computer's names are both just names.
-function resultTitle(kind) {
-  if (kind === "win") return `${getPlayerName()} gagne !`;
-  if (kind === "loss") return `${getBotName()} gagne.`;
-  return "Partie nulle.";
-}
-
-// Big, impossible-to-miss overlay centered on the board itself.
-function showResultOverlay(kind, sub) {
-  if (!els.gameResultOverlay) return;
-  els.gameResultIcon.textContent = RESULT_ICON[kind] || "♟";
-  els.gameResultTitle.textContent = resultTitle(kind);
-  els.gameResultSub.textContent = sub || "";
-  els.gameResultOverlay.querySelector(".game-result-card").className = "game-result-card " + (kind || "");
-  els.gameResultOverlay.hidden = false;
-}
-function hideResultOverlay() {
-  if (els.gameResultOverlay) els.gameResultOverlay.hidden = true;
-}
-
 // Shared bookkeeping for any move (human or computer): updates history, UI, live coach.
 function recordMove(fenBefore, moveResult, opts = {}) {
   plyFens = plyFens.slice(0, currentPly + 1);
@@ -570,7 +538,6 @@ function recordMove(fenBefore, moveResult, opts = {}) {
       board.setInteractive(false);
       const kind = humanResultKind(chess);
       showResultBanner(humanBannerText(overMsg, kind), kind);
-      showResultOverlay(kind, overMsg);
       els.engineStatus.textContent = "Partie terminée."; // full message already shown in the banner above
       if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
       if (els.resignBtn) els.resignBtn.hidden = true;
@@ -599,7 +566,6 @@ function handleFlag(loserColor) {
   const msg = `⏱ ${loserLabel} n'ont plus de temps — ${winnerLabel} !`;
   els.engineStatus.textContent = "Partie terminée.";
   showResultBanner(msg, humanWins ? "win" : "loss");
-  showResultOverlay(humanWins ? "win" : "loss", `${loserLabel} n'ont plus de temps.`);
   if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
   if (els.resignBtn) els.resignBtn.hidden = true;
 }
@@ -641,7 +607,6 @@ function deactivateComputerMode() {
   if (els.setupControls) els.setupControls.hidden = false;
   if (els.openEditorBtn) els.openEditorBtn.hidden = false;
   hideResultBanner();
-  hideResultOverlay();
   if (board) board.setInteractive(true);
 }
 
