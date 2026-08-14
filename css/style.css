@@ -385,22 +385,16 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 /* ---------- ANALYSE ---------- */
 .analyse-layout { display: grid; grid-template-columns: auto auto; gap: 28px; align-items: start; justify-content: center; width: 100%; }
 .analyse-board-col { display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; }
-.board-actions-row { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; }
+.board-actions-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; }
 .analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
 
-/* ---------- MATERIAL COUNT (pinned to the board's bottom corners) ---------- */
+/* ---------- MATERIAL COUNT (flanking Retourner/Enregistrer, below the board) ---------- */
 .material-count {
   font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--ink-dim);
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 999px;
   padding: 4px 9px; flex: none; white-space: nowrap;
 }
-.board-material {
-  position: absolute; bottom: 8px; z-index: 5; pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
-}
-.board-material-white { left: 8px; }
-.board-material-black { right: 8px; }
 
 /* ---------- GAME RESULT BANNER (centered over the board) ---------- */
 .game-result-banner {

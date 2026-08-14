@@ -229,8 +229,6 @@
         <div class="analyse-board-col">
           <div class="board-wrap">
             <div id="analyseBoardMount"></div>
-            <span class="material-count board-material board-material-white" id="materialWhite" title="Points capturés par les Blancs">Blanc 0</span>
-            <span class="material-count board-material board-material-black" id="materialBlack" title="Points capturés par les Noirs">Noir 0</span>
             <div class="board-confetti" aria-hidden="true">
               <span class="confetti-piece"></span>
               <span class="confetti-piece"></span>
@@ -250,10 +248,12 @@
             <div id="gameResultBanner" class="game-result-banner" hidden></div>
           </div>
           <div class="board-actions-row">
+            <span class="material-count" id="materialWhite" title="Points capturés par les Blancs">Blanc 0</span>
             <div class="analyse-controls">
               <button class="btn-ghost" id="flipBtn">↕ Retourner</button>
               <button class="btn-ghost" id="saveGameBtn" title="Enregistrer la partie" aria-label="Enregistrer la partie">💾</button>
             </div>
+            <span class="material-count" id="materialBlack" title="Points capturés par les Noirs">Noir 0</span>
           </div>
           <div class="nav-controls">
             <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
