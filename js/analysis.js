@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, explainBestMove, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns } from "./gameAnalysis.js";
+import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -373,16 +373,16 @@ export function initAnalysisView() {
       if (!result.bestMove) {
         els.moveExplanation.textContent = "Aucun coup possible : la partie est terminée dans cette position.";
       } else {
-        let bestSan = result.bestMove;
+        let pieceLabel = "";
+        let destSquare = result.bestMove.slice(2, 4);
         try {
           const testChess = new Chess(chess.fen());
           const from = result.bestMove.slice(0, 2), to = result.bestMove.slice(2, 4), promo = result.bestMove.slice(4) || undefined;
           const r = testChess.move({ from, to, promotion: promo });
-          if (r) bestSan = r.san;
-        } catch (e) { /* keep uci form */ }
-        const reasoning = explainBestMove(chess.fen(), result.bestMove);
-        els.moveExplanation.innerHTML = `Meilleure solution : <span class="best-move">${bestSan}</span><br>${reasoning}`;
-        lastHelpSpeech = `Meilleure solution : ${bestSan}. ${reasoning}`;
+          if (r) { pieceLabel = pieceNameFr(r.piece); destSquare = r.to; }
+        } catch (e) { /* keep raw square */ }
+        els.moveExplanation.innerHTML = `${pieceLabel} <span class="best-move">→ ${destSquare}</span>`;
+        lastHelpSpeech = `${pieceLabel} vers ${destSquare}`;
         if (isVoiceSupported()) els.helpSpeakBtn.hidden = false;
       }
     } catch (e) {

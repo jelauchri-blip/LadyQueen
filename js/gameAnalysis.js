@@ -485,28 +485,6 @@ function renderElo(reports) {
 
 // --- Single-move "help" explanation, used by the Analyse tab's Aide button ---
 
-function pieceNameFr(letter) {
+export function pieceNameFr(letter) {
   return { p: "pion", n: "Cavalier", b: "Fou", r: "Tour", q: "Dame", k: "Roi" }[letter] || letter;
-}
-
-export function explainBestMove(fen, uci) {
-  if (!uci || uci.length < 4) return "Aucun coup trouvé (partie peut-être terminée ou position sans issue).";
-  try {
-    const chess = new Chess(fen);
-    const from = uci.slice(0, 2), to = uci.slice(2, 4), promo = uci.slice(4) || undefined;
-    const mv = chess.move({ from, to, promotion: promo });
-    if (!mv) return "";
-    const moveNumber = parseInt(fen.split(" ")[5], 10) || 1;
-    const opening = moveNumber <= 12;
-    const reasons = [];
-    if (mv.flags.includes("k") || mv.flags.includes("q")) reasons.push("il met le Roi à l'abri en roquant");
-    if (mv.captured) reasons.push(`il gagne du matériel en capturant un ${pieceNameFr(mv.captured)}`);
-    if (opening && mv.piece === "p" && ["d4", "d5", "e4", "e5"].includes(mv.to)) reasons.push("il renforce le contrôle du centre");
-    if (mv.flags.includes("p")) reasons.push("il promeut un pion, un gain de matériel décisif");
-    if (chess.inCheck()) reasons.push("il met le Roi adverse en échec");
-    if (reasons.length === 0) reasons.push("il améliore la position sans motif tactique immédiat (développement, activité des pièces ou structure de pions)");
-    return "C'est le meilleur coup trouvé par le moteur car " + reasons.join(", ") + ".";
-  } catch (e) {
-    return "";
-  }
 }
