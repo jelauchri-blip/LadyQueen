@@ -131,8 +131,6 @@ export function initAnalysisView() {
   els.loadFenBtn = document.getElementById("loadFenBtn");
   els.loadPgnBtn = document.getElementById("loadPgnBtn");
   els.flipBtn = document.getElementById("flipBtn");
-  els.resetBoardBtn = document.getElementById("resetBoardBtn");
-  els.clearBoardBtn = document.getElementById("clearBoardBtn");
   els.saveGameBtn = document.getElementById("saveGameBtn");
   els.depthSelect = document.getElementById("depthSelect");
   els.navFirstBtn = document.getElementById("navFirstBtn");
@@ -206,27 +204,6 @@ export function initAnalysisView() {
   els.navPrevBtn.onclick = () => goToPly(currentPly - 1);
   els.navNextBtn.onclick = () => goToPly(currentPly + 1);
   els.navLastBtn.onclick = () => goToPly(plyFens.length - 1);
-
-  els.resetBoardBtn.onclick = () => {
-    deactivateComputerMode();
-    chess = new Chess();
-    board.setChess(chess, null);
-    startHistoryAt(chess.fen());
-    syncFen();
-    updateMoveList();
-    updateNavButtons();
-    requestEval();
-  };
-
-  els.clearBoardBtn.onclick = () => {
-    deactivateComputerMode();
-    chess = new Chess("7k/8/8/8/8/8/8/K7 w - - 0 1");
-    board.setChess(chess, null);
-    startHistoryAt(chess.fen());
-    syncFen();
-    updateMoveList();
-    updateNavButtons();
-  };
 
   els.engineToggle.onchange = () => {
     engineEnabled = els.engineToggle.checked;
@@ -348,7 +325,7 @@ export function initAnalysisView() {
     if (clock) clock.stop();
     board.setInteractive(false);
     els.engineStatus.textContent = "Partie terminée.";
-    showResultBanner(`🏳 Vous avez abandonné — ${getBotName()} gagne.`, "loss");
+    showResultBanner(`${getBotName()} gagne.`, "loss");
     if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
     if (els.resignBtn) els.resignBtn.hidden = true;
   };
