@@ -219,19 +219,8 @@
           <details class="side-section" id="opponentSection" open>
           <summary>Adversaire</summary>
           <div class="opponent-panel">
-            <div class="opponent-mode-row">
-              <label><input type="radio" name="opponentMode" value="libre" checked> Libre (je déplace les deux camps)</label>
-              <label><input type="radio" name="opponentMode" value="ordinateur"> Contre l'ordinateur</label>
-            </div>
-            <div id="opponentOptions" class="opponent-options" hidden>
-              <div class="opponent-row">
-                <span>Votre nom</span>
-                <input type="text" id="playerNameInput" class="name-input" maxlength="20">
-              </div>
-              <div class="opponent-row">
-                <span>Nom de l'adversaire</span>
-                <input type="text" id="botNameInput" class="name-input" maxlength="20">
-              </div>
+            <div id="opponentOptions" class="opponent-options">
+              <div id="vsComputerSetup">
               <div class="opponent-row">
                 <span>Je joue</span>
                 <select id="opponentSideSelect">
@@ -272,6 +261,7 @@
                 </select>
               </div>
               <button class="btn-primary" id="startVsComputerBtn">▶ Nouvelle partie contre l'ordinateur</button>
+              </div>
               <div class="clock-row" id="clockRow" hidden>
                 <div class="clock-box" id="clockWhite"><span class="clock-label">Blancs</span><span class="clock-time">—</span></div>
                 <div class="clock-box" id="clockBlack"><span class="clock-label">Noirs</span><span class="clock-time">—</span></div>

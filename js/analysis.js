@@ -9,7 +9,7 @@ import { getDepth, getDepthKey, setDepthKey } from "./engineSettings.js";
 import { eloSteps, uciOptionsForElo, resetEngineStrength, weakPlayParams, ELO_CALIBRATED_MIN } from "./engineSettings.js";
 import { createClock, formatClock } from "./chessClock.js";
 import { playMove, playCapture, playCheck, playGameEnd } from "./sounds.js";
-import { getPlayerName, setPlayerName, getBotName, setBotName } from "./playerNames.js";
+import { getPlayerName, getBotName } from "./playerNames.js";
 
 // The local copy is tried FIRST — it removes any dependency on an external
 // CDN being reachable, which is the most likely explanation for engine
@@ -238,18 +238,9 @@ export function initAnalysisView() {
     }
   };
 
-  // --- Opponent panel (play vs computer) ---
+  // --- Opponent panel (always vs computer — see playerNames.js for the
+  // Jelau/Ruben names, no mode picker needed since there's only one mode) ---
   els.opponentOptions = document.getElementById("opponentOptions");
-  els.playerNameInput = document.getElementById("playerNameInput");
-  els.botNameInput = document.getElementById("botNameInput");
-  if (els.playerNameInput) {
-    els.playerNameInput.value = getPlayerName();
-    els.playerNameInput.addEventListener("change", () => setPlayerName(els.playerNameInput.value));
-  }
-  if (els.botNameInput) {
-    els.botNameInput.value = getBotName();
-    els.botNameInput.addEventListener("change", () => setBotName(els.botNameInput.value));
-  }
   els.opponentSideSelect = document.getElementById("opponentSideSelect");
   els.opponentEloSelect = document.getElementById("opponentEloSelect");
   els.opponentEloHint = document.getElementById("opponentEloHint");
@@ -284,21 +275,8 @@ export function initAnalysisView() {
   }
   els.opponentEloSelect.onchange = updateEloHint;
   updateEloHint();
-
-  document.querySelectorAll('input[name="opponentMode"]').forEach((radio) => {
-    radio.addEventListener("change", () => {
-      els.opponentOptions.hidden = radio.value !== "ordinateur" || !radio.checked;
-      if (radio.value === "libre" && radio.checked) {
-        deactivateComputerMode();
-      } else if (radio.value === "ordinateur" && radio.checked) {
-        // Free up vertical space as soon as the computer-opponent setup is
-        // shown, not only once the game actually starts — the FEN/PGN/editor
-        // controls aren't useful while configuring or playing a bot game.
-        if (els.setupControls) els.setupControls.hidden = true;
-        if (els.openEditorBtn) els.openEditorBtn.hidden = true;
-      }
-    });
-  });
+  els.vsComputerSetup = document.getElementById("vsComputerSetup");
+  els.startVsComputerBtn.textContent = `▶ Nouvelle partie contre ${getBotName()}`;
 
   els.startVsComputerBtn.onclick = async () => {
     const userSide = els.opponentSideSelect.value;
@@ -309,6 +287,7 @@ export function initAnalysisView() {
     vsComputerGameOver = false;
     if (els.setupControls) els.setupControls.hidden = true; // free up vertical space during play
     if (els.openEditorBtn) els.openEditorBtn.hidden = true;
+    if (els.vsComputerSetup) els.vsComputerSetup.hidden = true;
 
     chess = new Chess();
     board.setChess(chess, null);
@@ -360,6 +339,7 @@ export function initAnalysisView() {
     els.engineStatus.textContent = "Partie terminée.";
     showResultBanner(`🏳 Vous avez abandonné — ${getBotName()} gagne.`, "loss");
     showResultOverlay("loss", "Vous avez abandonné la partie.");
+    if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
   };
 
   syncFen();
@@ -462,11 +442,6 @@ export function initAnalysisView() {
 export function openOpponentPanel() {
   const section = document.getElementById("opponentSection");
   if (section) section.open = true;
-  const computerRadio = document.querySelector('input[name="opponentMode"][value="ordinateur"]');
-  if (computerRadio) {
-    computerRadio.checked = true;
-    computerRadio.dispatchEvent(new Event("change"));
-  }
   if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -572,6 +547,7 @@ function recordMove(fenBefore, moveResult, opts = {}) {
       showResultBanner(humanBannerText(overMsg, kind), kind);
       showResultOverlay(kind, overMsg);
       els.engineStatus.textContent = "Partie terminée."; // full message already shown in the banner above
+      if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
     } else {
       els.engineStatus.textContent = overMsg;
     }
@@ -598,6 +574,7 @@ function handleFlag(loserColor) {
   els.engineStatus.textContent = "Partie terminée.";
   showResultBanner(msg, humanWins ? "win" : "loss");
   showResultOverlay(humanWins ? "win" : "loss", `${loserLabel} n'ont plus de temps.`);
+  if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
 }
 
 // Serializes every engine interaction (setoption commands, position/go
@@ -638,9 +615,6 @@ function deactivateComputerMode() {
   if (els.openEditorBtn) els.openEditorBtn.hidden = false;
   hideResultBanner();
   hideResultOverlay();
-  const libreRadio = document.querySelector('input[name="opponentMode"][value="libre"]');
-  if (libreRadio) libreRadio.checked = true;
-  if (els.opponentOptions) els.opponentOptions.hidden = true;
   if (board) board.setInteractive(true);
 }
 

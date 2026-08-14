@@ -440,19 +440,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
   padding: 14px 16px; margin-bottom: 16px;
 }
-.opponent-mode-row { display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; margin-bottom: 4px; }
-.opponent-mode-row label { display: flex; align-items: center; gap: 7px; cursor: pointer; }
-.opponent-options { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 7px; }
+.opponent-options { display: flex; flex-direction: column; gap: 7px; }
 .opponent-options[hidden] { display: none; }
 .opponent-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--ink-dim); }
 .opponent-row select {
   background: var(--bg-panel-raised); border: 1px solid var(--border-soft); color: var(--ink);
   font-family: var(--font-body); font-size: 12.5px; padding: 6px 8px; border-radius: 6px; cursor: pointer;
-}
-.name-input {
-  background: var(--bg-panel-raised); border: 1px solid var(--border-soft); color: var(--ink);
-  font-family: var(--font-body); font-size: 12.5px; padding: 6px 8px; border-radius: 6px;
-  width: 110px; text-align: right;
 }
 .opponent-hint { font-size: 11.5px; color: var(--ink-faint); margin: 0; line-height: 1.4; }
 .opponent-vsmode-row { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--ink-dim); padding-top: 3px; border-top: 1px solid var(--border-soft); }
