@@ -241,7 +241,6 @@ export function initAnalysisView() {
   // --- Opponent panel (always vs computer — see playerNames.js for the
   // Jelau/Ruben names, no mode picker needed since there's only one mode) ---
   els.opponentOptions = document.getElementById("opponentOptions");
-  els.opponentSideSelect = document.getElementById("opponentSideSelect");
   els.opponentEloSelect = document.getElementById("opponentEloSelect");
   els.opponentEloHint = document.getElementById("opponentEloHint");
   els.startVsComputerBtn = document.getElementById("startVsComputerBtn");
@@ -276,10 +275,10 @@ export function initAnalysisView() {
   els.opponentEloSelect.onchange = updateEloHint;
   updateEloHint();
   els.vsComputerSetup = document.getElementById("vsComputerSetup");
-  els.startVsComputerBtn.textContent = `▶ Nouvelle partie contre ${getBotName()}`;
+  els.startVsComputerBtn.textContent = "▶ Jouer";
 
   els.startVsComputerBtn.onclick = async () => {
-    const userSide = els.opponentSideSelect.value;
+    const userSide = pickBalancedColor();
     computerSide = userSide === "w" ? "b" : "w";
     computerElo = parseInt(els.opponentEloSelect.value, 10);
     challengeMode = document.querySelector('input[name="vsComputerBehavior"]:checked').value === "defi";
@@ -437,12 +436,18 @@ export function initAnalysisView() {
   };
 }
 
-// Opens the "Adversaire" panel and pre-selects "Contre l'ordinateur" — used
-// by the prominent "Jouer" button on the home page for quick access.
-export function openOpponentPanel() {
-  const section = document.getElementById("opponentSection");
-  if (section) section.open = true;
-  if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+// The color offered isn't a plain coin flip: a running per-color count is
+// kept in localStorage and whichever side has been played less often is
+// handed out (ties broken randomly), so it can't land on "always White".
+const HOME_COLOR_KEY = "echiquier_color_counts";
+function pickBalancedColor() {
+  let counts;
+  try { counts = JSON.parse(localStorage.getItem(HOME_COLOR_KEY)) || { w: 0, b: 0 }; }
+  catch (e) { counts = { w: 0, b: 0 }; }
+  const color = counts.w === counts.b ? (Math.random() < 0.5 ? "w" : "b") : (counts.w < counts.b ? "w" : "b");
+  counts[color]++;
+  try { localStorage.setItem(HOME_COLOR_KEY, JSON.stringify(counts)); } catch (e) {}
+  return color;
 }
 
 function syncFen() {

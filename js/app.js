@@ -2,7 +2,7 @@ import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
 import { initLessonsView } from "./lessons.js";
 import { initPuzzlesView } from "./puzzles.js";
-import { initAnalysisView, loadPgnString, openOpponentPanel } from "./analysis.js";
+import { initAnalysisView, loadPgnString } from "./analysis.js";
 import { getPieceStyle, setPieceStyle } from "./pieceStyle.js";
 import { isSoundEnabled, setSoundEnabled } from "./sounds.js";
 import { initLibraryView } from "./libraryView.js";
@@ -25,15 +25,10 @@ function showTab(name) {
     initialized.tactique = true;
     initPuzzlesView();
   }
-  if (name === "analyse" && !initialized.analyse) {
-    initialized.analyse = true;
-    initAnalysisView();
-  }
   if (name === "bibliotheque" && !initialized.bibliotheque) {
     initialized.bibliotheque = true;
     initLibraryView({
       loadPgnIntoAnalysis: (pgn) => {
-        if (!initialized.analyse) { initialized.analyse = true; initAnalysisView(); }
         loadPgnString(pgn);
         showTab("analyse");
       },
@@ -45,36 +40,24 @@ tabButtons.forEach(btn => {
   btn.addEventListener("click", () => showTab(btn.dataset.tab));
 });
 
-// ---- Home board preview + "Jouer" CTA ----
-// The color offered isn't a plain coin flip: a running per-color count is
-// kept in localStorage and whichever side has been played less often is
-// handed out (ties broken randomly), so it can't land on "always White".
-const HOME_COLOR_KEY = "echiquier_color_counts";
-function pickBalancedColor() {
-  let counts;
-  try { counts = JSON.parse(localStorage.getItem(HOME_COLOR_KEY)) || { w: 0, b: 0 }; }
-  catch (e) { counts = { w: 0, b: 0 }; }
-  const color = counts.w === counts.b ? (Math.random() < 0.5 ? "w" : "b") : (counts.w < counts.b ? "w" : "b");
-  counts[color]++;
-  try { localStorage.setItem(HOME_COLOR_KEY, JSON.stringify(counts)); } catch (e) {}
-  return color;
-}
+// The "Adversaire" panel lives in the sidebar and is visible on every tab
+// (not just Analyse), so its controls (and the board it starts games on)
+// need to be wired up immediately rather than lazily on first tab visit.
+initAnalysisView();
+initialized.analyse = true;
 
-const homeColor = pickBalancedColor();
+// ---- Home board preview + "Jouer" CTA ----
+// Purely cosmetic orientation for the idle preview board — the balanced
+// (tracked) color pick happens once, inside the actual "Jouer" click.
+const homeColor = Math.random() < 0.5 ? "w" : "b";
 createBoard(document.getElementById("homeBoardMount"), new Chess(), {
   interactive: false,
   orientation: homeColor === "b" ? "black" : "white",
 });
 
 document.getElementById("homePlayBtn").addEventListener("click", () => {
-  if (!initialized.analyse) {
-    initialized.analyse = true;
-    initAnalysisView();
-  }
   showTab("analyse");
-  openOpponentPanel();
-  const sideSelect = document.getElementById("opponentSideSelect");
-  if (sideSelect) sideSelect.value = homeColor;
+  document.getElementById("startVsComputerBtn").click();
 });
 
 // ---- Sound toggle ----
@@ -169,7 +152,11 @@ const themeBtn = document.getElementById("themeBtn");
 const themePanel = document.getElementById("themePanel");
 themeBtn.addEventListener("click", (e) => {
   e.stopPropagation();
+  const opening = themePanel.hidden;
   themePanel.hidden = !themePanel.hidden;
+  if (opening) {
+    themePanel.style.top = (themeBtn.getBoundingClientRect().bottom + 8) + "px";
+  }
 });
 document.querySelectorAll(".theme-swatch-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
