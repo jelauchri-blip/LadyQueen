@@ -268,13 +268,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   overflow: visible;
   filter: brightness(var(--board-brightness, 1));
 }
-/* The Analyse board carries extra chrome below it (result banner, material
-   count + action buttons, move-navigation row) that the Puzzle/Home boards
-   don't — sized purely off 8.5vh like the shared default, that chrome no
-   longer fits without scrolling on shorter windows. Trimmed down just here. */
-#analyseBoardMount .board {
-  --sq: clamp(40px, min(11vw, 7.2vh), 84px);
-}
 .sq { display: flex; align-items: center; justify-content: center; position: relative; user-select: none; cursor: pointer; overflow: hidden; }
 .sq.light { background: var(--wood-light); }
 .sq.dark { background: var(--wood-dark); }
@@ -405,14 +398,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 
 /* ---------- GAME RESULT BANNER ---------- */
 .game-result-banner {
-  width: 100%; max-width: 420px; text-align: center; padding: 14px 18px; border-radius: 10px;
-  font-family: var(--font-display); font-size: 17px; font-weight: 600; margin-top: -4px;
-  border: 1px solid var(--brass);
+  width: 100%; text-align: center;
+  font-family: var(--font-display); font-size: 17px; font-weight: 600;
 }
 .game-result-banner[hidden] { display: none; }
-.game-result-banner.win { background: rgba(125,164,130,0.18); border-color: var(--success); color: var(--success); }
-.game-result-banner.loss { background: rgba(192,106,92,0.18); border-color: var(--error); color: var(--error); }
-.game-result-banner.draw { background: rgba(201,162,39,0.14); border-color: var(--brass); color: var(--brass-soft); }
+.game-result-banner.win { color: var(--success); }
+.game-result-banner.loss { color: var(--error); }
+.game-result-banner.draw { color: var(--brass-soft); }
 
 .board-wrap { position: relative; display: inline-block; }
 .nav-controls {

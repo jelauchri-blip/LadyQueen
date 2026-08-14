@@ -1,7 +1,7 @@
 // Le fetch handler ci-dessous vérifie toujours le réseau en premier, donc
 // ce numéro n'a plus besoin d'être incrémenté à chaque publication — il ne
 // sert qu'à purger l'ancien cache une fois, au prochain déploiement.
-const CACHE_NAME = "echiquier-academie-v30";
+const CACHE_NAME = "echiquier-academie-v31";
 const CORE_ASSETS = [
   "./",
   "./index.html",
