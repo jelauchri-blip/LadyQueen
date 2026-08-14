@@ -152,11 +152,7 @@ const themeBtn = document.getElementById("themeBtn");
 const themePanel = document.getElementById("themePanel");
 themeBtn.addEventListener("click", (e) => {
   e.stopPropagation();
-  const opening = themePanel.hidden;
   themePanel.hidden = !themePanel.hidden;
-  if (opening) {
-    themePanel.style.top = (themeBtn.getBoundingClientRect().bottom + 8) + "px";
-  }
 });
 document.querySelectorAll(".theme-swatch-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
