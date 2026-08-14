@@ -73,7 +73,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .sidebar {
     width: 220px; flex: none; display: flex; flex-direction: column;
     background: var(--bg-panel); border-right: 1px solid var(--border-soft);
-    overflow-y: auto;
+    overflow-y: auto; overflow-x: hidden;
   }
   .topbar { flex-wrap: wrap; }
   .topbar .brand { width: 100%; }
