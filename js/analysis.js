@@ -178,8 +178,8 @@ export function initAnalysisView() {
     const pgn = buildPgnFromHistory();
     saveGame({ pgn, label: label && label.trim() ? label.trim() : undefined, moveCount: plyMoves.length });
     refreshLibraryView();
-    els.saveGameBtn.textContent = "✓ Enregistré";
-    setTimeout(() => { els.saveGameBtn.textContent = "💾 Enregistrer"; }, 1500);
+    els.saveGameBtn.textContent = "✓";
+    setTimeout(() => { els.saveGameBtn.textContent = "💾"; }, 1500);
   };
 
   els.flipBtn.onclick = () => { orientation = orientation === "white" ? "black" : "white"; board.flip(); };
@@ -486,9 +486,8 @@ function humanResultKind(chessInst) {
 // gagne.") from the technical end-of-game message, so the result is obvious
 // at a glance without having to remember which colour you were playing.
 function humanBannerText(overMsg, kind) {
-  const rest = overMsg.replace(/^./, (c) => c.toLowerCase());
-  if (kind === "win") return `🏆 ${getPlayerName()} gagne ! (${rest})`;
-  if (kind === "loss") return `${getBotName()} gagne. (${rest})`;
+  if (kind === "win") return `🏆 ${getPlayerName()} gagne !`;
+  if (kind === "loss") return `${getBotName()} gagne.`;
   return overMsg; // draw: the technical message is already clear enough
 }
 

@@ -388,8 +388,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 
 /* ---------- GAME RESULT BANNER ---------- */
+.game-result-row { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
 .game-result-banner {
-  width: 100%; max-width: 420px; text-align: center; padding: 14px 18px; border-radius: 10px;
+  flex: 1 1 auto; max-width: 420px; text-align: center; padding: 14px 18px; border-radius: 10px;
   font-family: var(--font-display); font-size: 17px; font-weight: 600; margin-top: -4px;
   border: 1px solid var(--brass);
 }
