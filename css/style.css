@@ -385,34 +385,69 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 /* ---------- ANALYSE ---------- */
 .analyse-layout { display: grid; grid-template-columns: auto auto; gap: 28px; align-items: start; justify-content: center; width: 100%; }
 .analyse-board-col { display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; }
-.board-actions-row { display: flex; align-items: center; justify-content: flex-start; gap: 4px; flex-wrap: wrap; width: 100%; }
-.analyse-controls { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; }
-.board-actions-row .btn-ghost { padding: 4px 5px; font-size: 11px; }
+.board-actions-row { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; }
+.analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
 
-/* ---------- MATERIAL COUNT ---------- */
+/* ---------- MATERIAL COUNT (pinned to the board's bottom corners) ---------- */
 .material-count {
-  font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--ink-dim);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--ink-dim);
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 999px;
-  padding: 3px 7px; flex: none; white-space: nowrap;
+  padding: 4px 9px; flex: none; white-space: nowrap;
 }
+.board-material {
+  position: absolute; bottom: 8px; z-index: 5; pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+.board-material-white { left: 8px; }
+.board-material-black { right: 8px; }
 
-/* ---------- GAME RESULT BANNER ---------- */
+/* ---------- GAME RESULT BANNER (centered over the board) ---------- */
 .game-result-banner {
-  width: 100%; text-align: center;
-  font-family: var(--font-display); font-size: 17px; font-weight: 600;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 7; text-align: center; white-space: nowrap; pointer-events: none;
+  font-family: var(--font-display); font-size: 21px; font-weight: 700;
+  padding: 10px 22px; border-radius: 12px;
+  background: rgba(27,31,29,0.85);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 .game-result-banner[hidden] { display: none; }
 .game-result-banner.win { color: var(--success); }
 .game-result-banner.loss { color: var(--error); }
 .game-result-banner.draw { color: var(--brass-soft); }
 
+/* ---------- CONFETTI (plays once when the result banner appears) ---------- */
+.board-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 6; }
+.confetti-piece { position: absolute; top: -8%; width: 8px; height: 14px; border-radius: 2px; opacity: 0; }
+.board-wrap:has(#gameResultBanner:not([hidden])) .confetti-piece {
+  animation: confetti-fall 2.4s ease-in forwards;
+}
+@keyframes confetti-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(340px) rotate(560deg); }
+}
+.confetti-piece:nth-child(1) { left: 6%; background: var(--brass); animation-delay: 0s; }
+.confetti-piece:nth-child(2) { left: 14%; background: var(--success); animation-delay: 0.12s; }
+.confetti-piece:nth-child(3) { left: 22%; background: var(--error); animation-delay: 0.24s; }
+.confetti-piece:nth-child(4) { left: 30%; background: var(--brass-soft); animation-delay: 0.05s; }
+.confetti-piece:nth-child(5) { left: 38%; background: var(--success); animation-delay: 0.3s; }
+.confetti-piece:nth-child(6) { left: 46%; background: var(--brass); animation-delay: 0.18s; }
+.confetti-piece:nth-child(7) { left: 54%; background: var(--error); animation-delay: 0.08s; }
+.confetti-piece:nth-child(8) { left: 62%; background: var(--brass-soft); animation-delay: 0.28s; }
+.confetti-piece:nth-child(9) { left: 70%; background: var(--success); animation-delay: 0.14s; }
+.confetti-piece:nth-child(10) { left: 78%; background: var(--brass); animation-delay: 0.22s; }
+.confetti-piece:nth-child(11) { left: 86%; background: var(--error); animation-delay: 0.02s; }
+.confetti-piece:nth-child(12) { left: 94%; background: var(--brass-soft); animation-delay: 0.32s; }
+.confetti-piece:nth-child(13) { left: 50%; background: var(--success); animation-delay: 0.4s; }
+.confetti-piece:nth-child(14) { left: 10%; background: var(--error); animation-delay: 0.36s; }
+
 .board-wrap { position: relative; display: inline-block; }
 .nav-controls {
-  display: flex; align-items: center; gap: 3px; background: var(--bg-panel);
-  border: 1px solid var(--border-soft); border-radius: 999px; padding: 3px 5px;
+  display: flex; align-items: center; gap: 6px; background: var(--bg-panel);
+  border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 8px;
 }
-.nav-btn { padding: 3px 5px; font-size: 10.5px; border-radius: 999px; }
-.nav-position { font-family: var(--font-mono); font-size: 10px; color: var(--ink-dim); min-width: 64px; text-align: center; }
+.nav-btn { padding: 5px 10px; font-size: 13px; border-radius: 999px; }
+.nav-position { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-dim); min-width: 110px; text-align: center; }
 .fen-row, .pgn-row { width: 100%; max-width: 380px; }
 .fen-row { display: flex; gap: 6px; align-items: center; }
 .fen-row label { font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); }
