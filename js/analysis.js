@@ -339,6 +339,7 @@ export function initAnalysisView() {
     showResultBanner(`🏳 Vous avez abandonné — ${getBotName()} gagne.`, "loss");
     showResultOverlay("loss", "Vous avez abandonné la partie.");
     if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
+    if (els.resignBtn) els.resignBtn.hidden = true;
   };
 
   syncFen();
@@ -553,6 +554,7 @@ function recordMove(fenBefore, moveResult, opts = {}) {
       showResultOverlay(kind, overMsg);
       els.engineStatus.textContent = "Partie terminée."; // full message already shown in the banner above
       if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
+      if (els.resignBtn) els.resignBtn.hidden = true;
     } else {
       els.engineStatus.textContent = overMsg;
     }
@@ -580,6 +582,7 @@ function handleFlag(loserColor) {
   showResultBanner(msg, humanWins ? "win" : "loss");
   showResultOverlay(humanWins ? "win" : "loss", `${loserLabel} n'ont plus de temps.`);
   if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
+  if (els.resignBtn) els.resignBtn.hidden = true;
 }
 
 // Serializes every engine interaction (setoption commands, position/go
