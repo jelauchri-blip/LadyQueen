@@ -463,17 +463,12 @@ function renderElo(reports) {
     cards.appendChild(card);
   }
 
-  const disclaimer = document.createElement("div");
-  disclaimer.className = "elo-disclaimer";
-  disclaimer.textContent = "Estimation informelle basée uniquement sur la perte de centipions moyenne face au moteur dans cette partie. Ce n'est pas un classement officiel : une seule partie ne suffit pas à mesurer un niveau de façon fiable, le résultat varie selon l'adversaire, le format de jeu et la phase de partie.";
-
   const wrap = document.createElement("div");
   wrap.className = "phase-block";
   const title = document.createElement("h4");
   title.textContent = "Estimation de niveau (Elo)";
   wrap.appendChild(title);
   wrap.appendChild(cards);
-  wrap.appendChild(disclaimer);
   els.results.appendChild(wrap);
 }
 

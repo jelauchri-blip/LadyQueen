@@ -622,18 +622,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .fullgame-results { display: flex; flex-direction: column; gap: 14px; }
 
-.elo-cards { display: flex; gap: 10px; flex-wrap: wrap; }
+.elo-cards { display: flex; gap: 10px; flex-wrap: nowrap; }
 .elo-card {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
-  padding: 14px 16px; flex: 1; min-width: 130px;
+  padding: 14px 16px; flex: 1; min-width: 0;
 }
 .elo-card .elo-side { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
 .elo-card .elo-value { display: block; font-family: var(--font-display); font-size: 26px; color: var(--brass-soft); font-weight: 600; margin: 4px 0; }
 .elo-card .elo-acpl { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
-.elo-disclaimer {
-  font-size: 11.5px; color: var(--ink-faint); line-height: 1.5; padding: 10px 12px;
-  background: var(--bg-panel); border-radius: 6px; border-left: 3px solid var(--ink-faint);
-}
 
 .phase-block { background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 14px 16px; }
 .phase-block h4 { font-family: var(--font-body); font-size: 13.5px; color: var(--brass-soft); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
