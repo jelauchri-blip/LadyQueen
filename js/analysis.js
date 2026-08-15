@@ -57,6 +57,7 @@ function startHistoryAt(fen) {
   plyMoves = [];
   currentPly = 0;
   liveMoveCountByPieceType = { w: {}, b: {} };
+  if (els.fullgameResults) els.fullgameResults.innerHTML = "";
 }
 
 function rebuildHistoryFromChessObject(chessWithHistory) {
@@ -69,6 +70,7 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
     plyFens.push(h.after);
   }
   currentPly = plyFens.length - 1;
+  if (els.fullgameResults) els.fullgameResults.innerHTML = "";
 }
 
 export function goToPly(n) {
@@ -144,6 +146,7 @@ export function initAnalysisView() {
   els.evalBarFill = document.getElementById("evalBarFill");
   els.engineOutput = document.getElementById("engineOutput");
   els.moveList = document.getElementById("moveList");
+  els.fullgameResults = document.getElementById("fullgameResults");
   els.helpBtn = document.getElementById("helpMoveBtn");
   els.moveExplanation = document.getElementById("moveExplanation");
   els.helpSpeakBtn = document.getElementById("helpSpeakBtn");
