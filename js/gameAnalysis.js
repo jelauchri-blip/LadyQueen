@@ -188,46 +188,16 @@ function renderMoveList(reports) {
     titleRow.appendChild(coachBar);
   }
   wrap.appendChild(titleRow);
-
-  const list = document.createElement("div");
-  list.className = "annotated-move-wrap";
-
-  const rows = [];
-  for (const r of reports) {
-    const row = document.createElement("div");
-    row.className = "annotated-move";
-    row.innerHTML = `
-      <span class="mv-symbol sym-${r.classification.key}">${r.classification.symbol}</span>
-      ${isVoiceSupported() ? '<button class="mv-speak" title="Écouter ce coup">🔊</button>' : ""}
-    `;
-    const speakBtn = row.querySelector(".mv-speak");
-    if (speakBtn) {
-      speakBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        stopSpeech();
-        row.classList.add("speaking");
-        const numWord = r.color === "w" ? `Coup ${r.moveNumber} pour les Blancs` : `Coup ${r.moveNumber} pour les Noirs`;
-        speakOne(`${numWord}, ${r.san}. ${r.explanation}`, () => row.classList.remove("speaking"));
-      });
-    }
-    list.appendChild(row);
-    rows.push({ row, report: r });
-  }
-  wrap.appendChild(list);
   els.results.appendChild(wrap);
 
-  if (isVoiceSupported()) wireCoachControls(rows);
+  if (isVoiceSupported()) wireCoachControls(reports);
 }
 
-function wireCoachControls(rows) {
+function wireCoachControls(reports) {
   const playBtn = document.getElementById("coachPlayBtn");
   const pauseBtn = document.getElementById("coachPauseBtn");
   const stopBtn = document.getElementById("coachStopBtn");
   let playing = false;
-
-  function clearHighlights() {
-    rows.forEach(({ row }) => row.classList.remove("speaking"));
-  }
 
   playBtn.addEventListener("click", () => {
     if (playing) {
@@ -242,18 +212,13 @@ function wireCoachControls(rows) {
     playBtn.hidden = true;
     pauseBtn.hidden = false;
     stopBtn.hidden = false;
-    const items = rows.map(({ report }) => {
+    const items = reports.map((report) => {
       const numWord = report.color === "w" ? `Coup ${report.moveNumber}, les Blancs jouent` : `Coup ${report.moveNumber}, les Noirs jouent`;
       return { text: `${numWord} ${report.san}. ${report.explanation}` };
     });
     playSequence(items, {
-      onItemStart: (i) => {
-        clearHighlights();
-        rows[i].row.classList.add("speaking");
-      },
       onComplete: () => {
         playing = false;
-        clearHighlights();
         playBtn.hidden = false;
         playBtn.textContent = "🔊 Coach vocal";
         pauseBtn.hidden = true;
@@ -272,7 +237,6 @@ function wireCoachControls(rows) {
   stopBtn.addEventListener("click", () => {
     stopSpeech();
     playing = false;
-    clearHighlights();
     playBtn.hidden = false;
     playBtn.textContent = "🔊 Coach vocal";
     pauseBtn.hidden = true;
