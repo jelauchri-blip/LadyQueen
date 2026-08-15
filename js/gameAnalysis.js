@@ -85,7 +85,6 @@ async function runAnalysis() {
     }
 
     renderMoveList(moveReports);
-    renderPhases(moveReports, plies);
     renderElo(moveReports);
     renderErrorCoach(moveReports);
   } catch (e) {
@@ -279,64 +278,6 @@ function wireCoachControls(rows) {
     pauseBtn.hidden = true;
     stopBtn.hidden = true;
   });
-}
-
-function renderPhases(reports, plies) {
-  const openingEnd = Math.min(24, reports.length); // ~12 full moves
-  const totalMaterial = (fenPly) => fenPly; // placeholder not used
-  const endgameStartIdx = findEndgameStart(plies);
-
-  const phases = [
-    { name: "Ouverture", from: 0, to: openingEnd },
-    { name: "Milieu de partie", from: openingEnd, to: endgameStartIdx },
-    { name: "Finale", from: endgameStartIdx, to: reports.length },
-  ].filter((p) => p.to > p.from);
-
-  for (const phase of phases) {
-    const slice = reports.slice(phase.from, phase.to);
-    if (slice.length === 0) continue;
-    const blunders = slice.filter((r) => r.classification.key === "blunder").length;
-    const mistakes = slice.filter((r) => r.classification.key === "mistake").length;
-    const inaccuracies = slice.filter((r) => r.classification.key === "inaccuracy").length;
-    const avgLoss = Math.round(slice.reduce((s, r) => s + r.cpLoss, 0) / slice.length);
-
-    let text = `${slice.length} coups analysés, perte moyenne ≈ ${avgLoss} centipions. `;
-    if (blunders + mistakes === 0 && inaccuracies === 0) {
-      text += "Aucune erreur notable sur cette phase — jeu précis.";
-    } else {
-      const bits = [];
-      if (blunders) bits.push(`${blunders} gaffe${blunders > 1 ? "s" : ""}`);
-      if (mistakes) bits.push(`${mistakes} erreur${mistakes > 1 ? "s" : ""}`);
-      if (inaccuracies) bits.push(`${inaccuracies} imprécision${inaccuracies > 1 ? "s" : ""}`);
-      text += `Points à travailler : ${bits.join(", ")}.`;
-    }
-    if (phase.name === "Ouverture") {
-      const devIssues = slice.filter((r) => r.tags.some((t) => t.kind === "con")).length;
-      if (devIssues > 0) text += ` ${devIssues} coup${devIssues > 1 ? "s ont" : " a"} retardé le développement des pièces.`;
-    }
-
-    const block = document.createElement("div");
-    block.className = "phase-block";
-    block.innerHTML = `<h4>${phase.name}</h4><p>${text}</p>`;
-    els.results.appendChild(block);
-  }
-}
-
-function findEndgameStart(plies) {
-  // Endgame heuristic: both queens off the board, or total non-king material <= 14 points.
-  for (let i = 0; i < plies.length; i++) {
-    const fen = plies[i].after;
-    const boardPart = fen.split(" ")[0];
-    let material = 0;
-    let queens = 0;
-    for (const ch of boardPart) {
-      const lower = ch.toLowerCase();
-      if (PIECE_VALUE[lower] !== undefined && lower !== "k") material += PIECE_VALUE[lower];
-      if (lower === "q") queens++;
-    }
-    if (queens === 0 || material <= 14) return i;
-  }
-  return plies.length;
 }
 
 // --- Guided error-correction coach ------------------------------------------
