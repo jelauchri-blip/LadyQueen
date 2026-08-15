@@ -373,21 +373,28 @@ export function initAnalysisView() {
     };
   }
 
+  // .board-wrap/.board-actions-row/.nav-controls all set their own explicit
+  // `display` in CSS, which beats the browser's default `[hidden] { display:
+  // none }` rule at equal specificity — so toggling the `hidden` property on
+  // them (as done for #editorMount, which has a dedicated [hidden] override)
+  // silently does nothing. Toggle `style.display` directly instead.
+  function setBoardChromeVisible(visible) {
+    if (els.boardWrap) els.boardWrap.style.display = visible ? "" : "none";
+    if (els.boardActionsRow) els.boardActionsRow.style.display = visible ? "" : "none";
+    if (els.navControls) els.navControls.style.display = visible ? "" : "none";
+  }
+
   let editorInited = false;
   els.openEditorBtn.onclick = () => {
     const isOpen = !els.editorMount.hidden;
     if (isOpen) {
       els.editorMount.hidden = true;
-      if (els.boardWrap) els.boardWrap.hidden = false;
-      if (els.boardActionsRow) els.boardActionsRow.hidden = false;
-      if (els.navControls) els.navControls.hidden = false;
+      setBoardChromeVisible(true);
       els.openEditorBtn.textContent = "✎ Créer une position";
       return;
     }
     els.editorMount.hidden = false;
-    if (els.boardWrap) els.boardWrap.hidden = true;
-    if (els.boardActionsRow) els.boardActionsRow.hidden = true;
-    if (els.navControls) els.navControls.hidden = true;
+    setBoardChromeVisible(false);
     els.openEditorBtn.textContent = "✕ Fermer l'éditeur";
     if (!editorInited) {
       editorInited = true;
@@ -407,9 +414,7 @@ export function initAnalysisView() {
           els.moveExplanation.hidden = true;
           requestEval();
           els.editorMount.hidden = true;
-          if (els.boardWrap) els.boardWrap.hidden = false;
-          if (els.boardActionsRow) els.boardActionsRow.hidden = false;
-          if (els.navControls) els.navControls.hidden = false;
+          setBoardChromeVisible(true);
           els.openEditorBtn.textContent = "✎ Créer une position";
         },
       });
