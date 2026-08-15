@@ -78,7 +78,6 @@ export function goToPly(n) {
   chess.load(plyFens[currentPly]);
   const lastMove = currentPly > 0 ? plyMoves[currentPly - 1] : null;
   board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null);
-  syncFen();
   updateMoveList();
   updateNavButtons();
   els.moveExplanation.hidden = true;
@@ -128,9 +127,7 @@ function updateMaterialCounts() {
 
 export function initAnalysisView() {
   els.mount = document.getElementById("analyseBoardMount");
-  els.fenInput = document.getElementById("fenInput");
   els.pgnInput = document.getElementById("pgnInput");
-  els.loadFenBtn = document.getElementById("loadFenBtn");
   els.loadPgnBtn = document.getElementById("loadPgnBtn");
   els.flipBtn = document.getElementById("flipBtn");
   els.saveGameBtn = document.getElementById("saveGameBtn");
@@ -164,22 +161,6 @@ export function initAnalysisView() {
       },
     });
   }
-
-  els.fenInput.value = chess.fen();
-
-  els.loadFenBtn.onclick = () => {
-    deactivateComputerMode();
-    try {
-      chess.load(els.fenInput.value.trim());
-      board.setChess(chess, null);
-      startHistoryAt(chess.fen());
-      updateMoveList();
-      updateNavButtons();
-      requestEval();
-    } catch (e) {
-      alert("FEN invalide.");
-    }
-  };
 
   els.loadPgnBtn.onclick = () => {
     deactivateComputerMode();
@@ -285,7 +266,6 @@ export function initAnalysisView() {
     board.setChess(chess, null);
     board.setInteractive(true);
     startHistoryAt(chess.fen());
-    syncFen();
     updateMoveList();
     updateNavButtons();
     orientation = userSide === "b" ? "black" : "white";
@@ -333,7 +313,6 @@ export function initAnalysisView() {
     if (els.resignBtn) els.resignBtn.hidden = true;
   };
 
-  syncFen();
   updateMoveList();
   updateNavButtons();
 
@@ -414,7 +393,6 @@ export function initAnalysisView() {
           chess.load(fen);
           board.setChess(chess, null);
           startHistoryAt(fen);
-          syncFen();
           updateMoveList();
           updateNavButtons();
           els.moveExplanation.hidden = true;
@@ -440,10 +418,6 @@ function pickBalancedColor() {
   counts[color]++;
   try { localStorage.setItem(HOME_COLOR_KEY, JSON.stringify(counts)); } catch (e) {}
   return color;
-}
-
-function syncFen() {
-  els.fenInput.value = chess.fen();
 }
 
 // Precise, human-readable end-of-game description for the current position.
@@ -502,7 +476,6 @@ function recordMove(fenBefore, moveResult, opts = {}) {
   plyMoves.push(moveResult);
   plyFens.push(moveResult.after);
   currentPly = plyFens.length - 1;
-  syncFen();
   updateMoveList();
   updateNavButtons();
   els.moveExplanation.hidden = true;
@@ -700,7 +673,6 @@ export function loadPgnString(pgn) {
   chess = tmp;
   board.setChess(chess, null);
   rebuildHistoryFromChessObject(chess);
-  syncFen();
   updateMoveList();
   updateNavButtons();
   requestEval();

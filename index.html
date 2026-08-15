@@ -168,15 +168,12 @@
     </button>
     <details id="setupControls" class="setup-controls sidebar-action-group">
       <summary class="tab-btn">Position de départ</summary>
-      <div class="fen-row">
-        <label for="fenInput">FEN</label>
-        <input type="text" id="fenInput" spellcheck="false" autocomplete="off">
-        <button class="btn-ghost" id="loadFenBtn">Charger</button>
-      </div>
       <div class="pgn-row">
         <label for="pgnInput">Coller une partie (PGN)</label>
-        <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
-        <button class="btn-ghost" id="loadPgnBtn">Charger la partie</button>
+        <div class="pgn-input-row">
+          <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
+          <button class="btn-ghost" id="loadPgnBtn">Charger</button>
+        </div>
       </div>
     </details>
   </nav>

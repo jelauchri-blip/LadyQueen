@@ -219,10 +219,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   transition: transform 0.15s ease;
 }
 .sidebar-action-group[open] summary::after { transform: rotate(90deg); }
-.sidebar-action-group .fen-row, .sidebar-action-group .pgn-row {
-  max-width: none; padding: 4px 12px 10px;
-}
-.sidebar-action-group .fen-row { flex-direction: column; align-items: stretch; gap: 5px; }
+.sidebar-action-group .pgn-row { max-width: none; padding: 4px 12px 10px; }
 @media (min-width: 861px) {
   .sidebar-action-btn { padding: 5px 12px; }
   .sidebar-action-group summary { padding: 5px 12px; }
@@ -466,19 +463,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .nav-btn { padding: 5px 10px; font-size: 13px; border-radius: 999px; }
 .nav-position { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-dim); min-width: 110px; text-align: center; }
-.fen-row, .pgn-row { width: 100%; max-width: 380px; }
-.fen-row { display: flex; gap: 6px; align-items: center; }
-.fen-row label { font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); }
-#fenInput {
-  flex: 1; background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--ink);
-  font-family: var(--font-mono); font-size: 11px; padding: 8px 10px; border-radius: 6px;
-}
-.pgn-row { display: flex; flex-direction: column; gap: 6px; }
+.pgn-row { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 6px; }
 .pgn-row label { font-size: 12px; color: var(--ink-dim); }
+.pgn-input-row { display: flex; gap: 6px; align-items: stretch; }
 #pgnInput {
-  background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--ink);
+  flex: 1; min-width: 0; background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--ink);
   font-family: var(--font-mono); font-size: 12px; padding: 8px 10px; border-radius: 6px; resize: vertical;
 }
+.pgn-input-row .btn-ghost { flex: none; white-space: nowrap; }
 
 .analyse-side-col { max-width: 360px; min-width: 0; }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px; font-weight: 600; }
