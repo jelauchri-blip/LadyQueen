@@ -396,9 +396,6 @@ function renderElo(reports) {
 
   const wrap = document.createElement("div");
   wrap.className = "phase-block";
-  const title = document.createElement("h4");
-  title.textContent = "Estimation de niveau (Elo)";
-  wrap.appendChild(title);
   wrap.appendChild(cards);
   els.results.appendChild(wrap);
 }
