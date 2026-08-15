@@ -640,7 +640,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .phase-block p { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0; }
 
 .annotated-move {
-  display: flex; align-items: baseline; gap: 6px; cursor: pointer; padding: 3px 4px; border-radius: 4px;
+  display: flex; align-items: baseline; gap: 6px; cursor: pointer; padding: 3px 4px 3px 10px; border-radius: 4px;
 }
 .annotated-move:hover { background: rgba(201,162,39,0.08); }
 .annotated-move .mv-num { color: var(--ink-faint); }
@@ -657,7 +657,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   border-left: 2px solid var(--brass); flex-basis: 100%;
 }
 .annotated-move.expanded .mv-explain { display: block; }
-.annotated-move-wrap { display: flex; flex-wrap: wrap; }
+.annotated-move-wrap { display: flex; flex-wrap: wrap; padding-left: 4px; }
 
 @media (max-width: 760px) {
   .analyse-layout { grid-template-columns: 1fr; }
