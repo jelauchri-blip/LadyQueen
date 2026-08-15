@@ -204,6 +204,30 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .tab-btn { padding: 7px 12px; }
 }
 
+/* ---------- SIDEBAR SHORTCUTS: Créer une position / Position de départ
+   (moved out of the Analyse board column, listed right after Bibliothèque
+   so they're reachable from any tab; kept smaller than the main 5 tabs
+   since they're secondary actions, not views) ---------- */
+.sidebar-action-btn { font-size: 12.5px; padding: 6px 12px; }
+.sidebar-action-group { margin: 0; padding: 0; }
+.sidebar-action-group summary {
+  font-size: 12.5px; padding: 6px 12px; margin: 0; list-style: none;
+}
+.sidebar-action-group summary::-webkit-details-marker { display: none; }
+.sidebar-action-group summary::after {
+  content: "▸"; margin-left: auto; font-size: 11px; color: var(--ink-faint);
+  transition: transform 0.15s ease;
+}
+.sidebar-action-group[open] summary::after { transform: rotate(90deg); }
+.sidebar-action-group .fen-row, .sidebar-action-group .pgn-row {
+  max-width: none; padding: 4px 12px 10px;
+}
+.sidebar-action-group .fen-row { flex-direction: column; align-items: stretch; gap: 5px; }
+@media (min-width: 861px) {
+  .sidebar-action-btn { padding: 5px 12px; }
+  .sidebar-action-group summary { padding: 5px 12px; }
+}
+
 /* ---------- VIEWS ---------- */
 .view { display: none; padding: 8px 18px 10px; animation: fadein 0.25s ease; }
 .view.active { display: block; }
@@ -551,7 +575,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .movelist .mv-pair span.mv-clickable.current { background: var(--brass); color: #201A08; font-weight: 700; }
 
 /* ---------- POSITION EDITOR ---------- */
-.editor-open-btn { width: 100%; max-width: 380px; }
 .editor-mount { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; align-items: center; }
 .editor-mount[hidden] { display: none; }
 .editor-board .sq { cursor: pointer; }

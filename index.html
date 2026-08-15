@@ -163,6 +163,22 @@
     <button class="tab-btn" data-tab="bibliotheque">
       Bibliothèque
     </button>
+    <button class="tab-btn sidebar-action-btn" id="openEditorBtn">
+      ✎ Créer une position
+    </button>
+    <details id="setupControls" class="setup-controls sidebar-action-group">
+      <summary class="tab-btn">Position de départ</summary>
+      <div class="fen-row">
+        <label for="fenInput">FEN</label>
+        <input type="text" id="fenInput" spellcheck="false" autocomplete="off">
+        <button class="btn-ghost" id="loadFenBtn">Charger</button>
+      </div>
+      <div class="pgn-row">
+        <label for="pgnInput">Coller une partie (PGN)</label>
+        <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
+        <button class="btn-ghost" id="loadPgnBtn">Charger la partie</button>
+      </div>
+    </details>
   </nav>
 
   </div>
@@ -262,21 +278,7 @@
             <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
             <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
           </div>
-          <button class="btn-primary editor-open-btn" id="openEditorBtn">✎ Créer une position (étude libre)</button>
           <div id="editorMount" class="editor-mount" hidden></div>
-          <details id="setupControls" class="setup-controls side-section">
-            <summary>Position de départ (FEN / PGN)</summary>
-            <div class="fen-row">
-              <label for="fenInput">FEN</label>
-              <input type="text" id="fenInput" spellcheck="false" autocomplete="off">
-              <button class="btn-ghost" id="loadFenBtn">Charger</button>
-            </div>
-            <div class="pgn-row">
-              <label for="pgnInput">Coller une partie (PGN)</label>
-              <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
-              <button class="btn-ghost" id="loadPgnBtn">Charger la partie</button>
-            </div>
-          </details>
         </div>
         <div class="analyse-side-col">
           <details class="side-section">

@@ -277,7 +277,7 @@ export function initAnalysisView() {
     challengeMode = document.querySelector('input[name="vsComputerBehavior"]:checked').value === "defi";
     vsComputerMode = true;
     vsComputerGameOver = false;
-    if (els.setupControls) els.setupControls.hidden = true; // free up vertical space during play
+    if (els.setupControls) els.setupControls.hidden = true; // avoid loading a different FEN/PGN mid-game
     if (els.openEditorBtn) els.openEditorBtn.hidden = true;
     if (els.vsComputerSetup) els.vsComputerSetup.hidden = true;
 

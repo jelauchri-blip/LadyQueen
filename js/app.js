@@ -46,6 +46,16 @@ tabButtons.forEach(btn => {
 initAnalysisView();
 initialized.analyse = true;
 
+// "Créer une position" and "Position de départ" now live in the sidebar
+// (visible on every tab), but the controls they open only make sense on
+// the Analyse board — jump there first when used from elsewhere.
+document.getElementById("openEditorBtn").addEventListener("click", () => {
+  if (!document.getElementById("view-analyse").classList.contains("active")) showTab("analyse");
+});
+document.querySelector("#setupControls > summary").addEventListener("click", () => {
+  if (!document.getElementById("view-analyse").classList.contains("active")) showTab("analyse");
+});
+
 // ---- Home board preview + "Jouer" CTA ----
 // Purely cosmetic orientation for the idle preview board — the balanced
 // (tracked) color pick happens once, inside the actual "Jouer" click.
