@@ -203,18 +203,13 @@ function renderMoveList(reports) {
       <span class="mv-san">${r.san}</span>
       <span class="mv-symbol sym-${r.classification.key}">${r.classification.symbol}</span>
       ${isVoiceSupported() ? '<button class="mv-speak" title="Écouter ce coup">🔊</button>' : ""}
-      <div class="mv-explain">${r.explanation}</div>
     `;
-    row.addEventListener("click", (e) => {
-      if (e.target.classList.contains("mv-speak")) return;
-      row.classList.toggle("expanded");
-    });
     const speakBtn = row.querySelector(".mv-speak");
     if (speakBtn) {
       speakBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         stopSpeech();
-        row.classList.add("expanded", "speaking");
+        row.classList.add("speaking");
         const numWord = r.color === "w" ? `Coup ${r.moveNumber} pour les Blancs` : `Coup ${r.moveNumber} pour les Noirs`;
         speakOne(`${numWord}, ${r.san}. ${r.explanation}`, () => row.classList.remove("speaking"));
       });
@@ -258,8 +253,7 @@ function wireCoachControls(rows) {
     playSequence(items, {
       onItemStart: (i) => {
         clearHighlights();
-        rows[i].row.classList.add("expanded", "speaking");
-        rows[i].row.scrollIntoView({ behavior: "smooth", block: "center" });
+        rows[i].row.classList.add("speaking");
       },
       onComplete: () => {
         playing = false;

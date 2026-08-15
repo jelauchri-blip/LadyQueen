@@ -640,9 +640,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .phase-block p { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0; }
 
 .annotated-move {
-  display: flex; align-items: baseline; gap: 6px; cursor: pointer; padding: 3px 4px 3px 10px; border-radius: 4px;
+  display: flex; align-items: baseline; gap: 6px; padding: 3px 4px 3px 10px; border-radius: 4px;
 }
-.annotated-move:hover { background: rgba(201,162,39,0.08); }
 .annotated-move .mv-num { color: var(--ink-faint); }
 .annotated-move .mv-san { color: var(--ink); font-weight: 600; }
 .annotated-move .mv-symbol { font-weight: 700; }
@@ -651,12 +650,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .sym-inaccuracy { color: var(--brass-soft); }
 .sym-mistake { color: #D98B4A; }
 .sym-blunder { color: var(--error); }
-.annotated-move .mv-explain {
-  display: none; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5;
-  padding: 6px 10px; margin: 2px 0 6px 0; background: var(--bg-deep); border-radius: 6px;
-  border-left: 2px solid var(--brass); flex-basis: 100%;
-}
-.annotated-move.expanded .mv-explain { display: block; }
 .annotated-move-wrap { display: flex; flex-wrap: wrap; padding-left: 4px; }
 
 @media (max-width: 760px) {
