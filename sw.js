@@ -1,7 +1,7 @@
 // Le fetch handler ci-dessous vérifie toujours le réseau en premier, donc
 // ce numéro n'a plus besoin d'être incrémenté à chaque publication — il ne
 // sert qu'à purger l'ancien cache une fois, au prochain déploiement.
-const CACHE_NAME = "echiquier-academie-v31";
+const CACHE_NAME = "echiquier-academie-v32";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -60,8 +60,14 @@ self.addEventListener("fetch", (event) => {
   // Network-first, cache as fallback: whenever online, this always fetches
   // the latest published version (no more "close and reopen still shows the
   // old version until a manual refresh"). The cache only kicks in offline.
+  // { cache: "no-store" } is required here: without it, this fetch() can
+  // still be silently answered from the BROWSER's own HTTP cache (not the
+  // Cache Storage above) if GitHub Pages' response headers look fresh —
+  // "network-first" only works if the "network" step actually reaches the
+  // network, and even a manual hard-refresh doesn't reliably force that for
+  // requests a service worker intercepts.
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: "no-store" })
       .then((response) => {
         if (response && response.status === 200) {
           const clone = response.clone();
