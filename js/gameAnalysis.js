@@ -98,13 +98,14 @@ async function runAnalysis() {
   }
 }
 
-// Caps "Analyse complète de la partie" so its bottom lines up with the
-// board's move-navigation row (⏮◀▶⏭) instead of running on far past it —
-// only while the two columns actually sit side by side (desktop grid); on
-// the stacked mobile layout there's nothing to line up with, so it's left
-// free to take whatever height it needs.
+// Lines up "Analyse complète de la partie"'s bottom edge with the board's
+// move-navigation row (⏮◀▶⏭) — set as an explicit height (not just a cap)
+// so a short result set still stretches down to that line instead of
+// stopping early and leaving a gap. Only while the two columns actually sit
+// side by side (desktop grid); on the stacked mobile layout there's nothing
+// to line up with, so it's left free to take whatever height it needs.
 // On a short window the nav row itself can be below the visible fold, so
-// lining up with it alone isn't enough — the cap is also clamped to the
+// lining up with it alone isn't enough — the height is also clamped to the
 // actual viewport height, whichever of the two limits is smaller wins.
 function syncResultsHeight() {
   const nav = document.querySelector(".nav-controls");
@@ -113,7 +114,7 @@ function syncResultsHeight() {
   if (!nav || !boardCol || !sideCol || !els.results) return;
   const sideByCol = Math.abs(boardCol.getBoundingClientRect().top - sideCol.getBoundingClientRect().top) < 4;
   if (!sideByCol) {
-    els.results.style.maxHeight = "";
+    els.results.style.height = "";
     els.results.style.overflowY = "";
     return;
   }
@@ -121,7 +122,7 @@ function syncResultsHeight() {
   const navCap = nav.getBoundingClientRect().bottom - resultsTop;
   const viewportCap = window.innerHeight - resultsTop - 16;
   const maxHeight = Math.min(navCap, viewportCap);
-  els.results.style.maxHeight = Math.max(120, maxHeight) + "px";
+  els.results.style.height = Math.max(120, maxHeight) + "px";
   els.results.style.overflowY = "auto";
 }
 
