@@ -130,7 +130,6 @@ function syncResultsHeight() {
   if (!sideByCol) {
     els.results.style.height = "";
     els.results.style.overflowY = "";
-    showSyncDebug({ sideByCol, boardRect, sideRect });
     return;
   }
   const resultsTop = els.results.getBoundingClientRect().top;
@@ -140,19 +139,6 @@ function syncResultsHeight() {
   const maxHeight = Math.min(navCap, viewportCap);
   els.results.style.height = Math.max(120, maxHeight) + "px";
   els.results.style.overflowY = "auto";
-  showSyncDebug({ sideByCol, resultsTop, navBottom, navCap, viewportCap, maxHeight, viewportH: window.innerHeight, viewportW: window.innerWidth, dpr: window.devicePixelRatio });
-}
-
-// TEMPORARY diagnostic overlay — remove once the alignment bug is confirmed fixed.
-function showSyncDebug(info) {
-  let el = document.getElementById("debugSyncInfo");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "debugSyncInfo";
-    el.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:#000; color:#0f0; font-size:11px; font-family:monospace; padding:6px; z-index:9999; white-space:pre-wrap; max-height:40vh; overflow:auto;";
-    document.body.appendChild(el);
-  }
-  el.textContent = JSON.stringify(info, null, 1);
 }
 
 window.addEventListener("resize", () => { if (els.results && els.results.children.length) syncResultsHeight(); });
