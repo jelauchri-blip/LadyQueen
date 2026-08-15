@@ -107,10 +107,17 @@ export function initPositionEditor({ mount, onValidate }) {
 let editorBoardEl = null;
 
 export function renderEditableBoard(mountEl) {
-  editorBoardEl = document.createElement("div");
-  editorBoardEl.className = "board editor-board";
+  const boardOuter = document.createElement("div");
+  boardOuter.className = "board editor-board";
   mountEl.innerHTML = "";
-  mountEl.appendChild(editorBoardEl);
+  mountEl.appendChild(boardOuter);
+  // Squares go in a nested .board-grid (like the main board in board.js) so
+  // the 8x8 CSS grid layout actually applies — appending them straight into
+  // .board (which is just an inline-block frame, not a grid) left every
+  // square as a full-width stacked block instead of an 8x8 grid.
+  editorBoardEl = document.createElement("div");
+  editorBoardEl.className = "board-grid";
+  boardOuter.appendChild(editorBoardEl);
   setFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 }
 
