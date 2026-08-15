@@ -150,6 +150,9 @@ export function initAnalysisView() {
   els.openEditorBtn = document.getElementById("openEditorBtn");
   els.editorMount = document.getElementById("editorMount");
   els.setupControls = document.getElementById("setupControls");
+  els.boardWrap = document.querySelector(".board-wrap");
+  els.boardActionsRow = document.querySelector(".board-actions-row");
+  els.navControls = document.querySelector(".nav-controls");
 
   if (!board) {
     board = createBoard(els.mount, chess, {
@@ -375,10 +378,16 @@ export function initAnalysisView() {
     const isOpen = !els.editorMount.hidden;
     if (isOpen) {
       els.editorMount.hidden = true;
-      els.openEditorBtn.textContent = "✎ Créer une position (étude libre)";
+      if (els.boardWrap) els.boardWrap.hidden = false;
+      if (els.boardActionsRow) els.boardActionsRow.hidden = false;
+      if (els.navControls) els.navControls.hidden = false;
+      els.openEditorBtn.textContent = "✎ Créer une position";
       return;
     }
     els.editorMount.hidden = false;
+    if (els.boardWrap) els.boardWrap.hidden = true;
+    if (els.boardActionsRow) els.boardActionsRow.hidden = true;
+    if (els.navControls) els.navControls.hidden = true;
     els.openEditorBtn.textContent = "✕ Fermer l'éditeur";
     if (!editorInited) {
       editorInited = true;
@@ -398,7 +407,10 @@ export function initAnalysisView() {
           els.moveExplanation.hidden = true;
           requestEval();
           els.editorMount.hidden = true;
-          els.openEditorBtn.textContent = "✎ Créer une position (étude libre)";
+          if (els.boardWrap) els.boardWrap.hidden = false;
+          if (els.boardActionsRow) els.boardActionsRow.hidden = false;
+          if (els.navControls) els.navControls.hidden = false;
+          els.openEditorBtn.textContent = "✎ Créer une position";
         },
       });
       api.mountBoard(boardHolder);
