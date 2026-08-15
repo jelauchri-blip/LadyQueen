@@ -95,6 +95,13 @@ async function runAnalysis() {
     els.progress.hidden = true;
     ctx.setBusy(false);
     syncResultsHeight();
+    // Re-sync once webfonts (Fraunces/Source Sans/JetBrains Mono) finish
+    // loading: on a first visit (nothing cached yet — e.g. a fresh browser
+    // profile or private window) they can swap in after this point, subtly
+    // resizing the board-column text and shifting the nav row's position
+    // just enough to throw off the height computed above.
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncResultsHeight);
+    setTimeout(syncResultsHeight, 400);
   }
 }
 
