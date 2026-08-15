@@ -598,33 +598,35 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .coach-error-explain { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0 0 8px; }
 .coach-error-best { font-size: 13.5px; color: var(--ink-dim); margin: 0 0 14px; }
 .coach-error-best .best-move { color: var(--brass-soft); font-family: var(--font-mono); font-weight: 600; }
-.coach-error-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.coach-error-actions { display: flex; gap: 5px; flex-wrap: nowrap; }
+.coach-error-actions .btn-ghost, .coach-error-actions .btn-primary { padding: 6px 8px; font-size: 11px; white-space: nowrap; }
 
 /* ---------- FULL GAME ANALYSIS ---------- */
 .fullgame-panel {
   margin: 18px 0; padding-top: 16px; border-top: 1px solid var(--border-soft);
 }
-.fullgame-controls { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.fullgame-controls { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 #playerSideSelect {
   background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--ink);
-  font-family: var(--font-body); font-size: 13px; padding: 8px 10px; border-radius: 6px;
+  font-family: var(--font-body); font-size: 12px; padding: 6px 9px; border-radius: 6px;
 }
+.fullgame-controls .btn-primary { padding: 7px 14px; font-size: 12.5px; }
 .fullgame-progress {
-  font-family: var(--font-mono); font-size: 12px; color: var(--brass-soft); margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--brass-soft); margin-bottom: 8px;
 }
-.fullgame-results { display: flex; flex-direction: column; gap: 14px; }
+.fullgame-results { display: flex; flex-direction: column; gap: 10px; }
 
-.elo-cards { display: flex; gap: 10px; flex-wrap: nowrap; }
+.elo-cards { display: flex; gap: 8px; flex-wrap: nowrap; }
 .elo-card {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
-  padding: 14px 16px; flex: 1; min-width: 0;
+  padding: 9px 12px; flex: 1; min-width: 0;
 }
-.elo-card .elo-side { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
-.elo-card .elo-value { display: block; font-family: var(--font-display); font-size: 26px; color: var(--brass-soft); font-weight: 600; margin: 4px 0; }
-.elo-card .elo-acpl { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
+.elo-card .elo-side { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
+.elo-card .elo-value { display: block; font-family: var(--font-display); font-size: 19px; color: var(--brass-soft); font-weight: 600; margin: 2px 0; }
+.elo-card .elo-acpl { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); }
 
 .phase-block { background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 14px 16px; }
-.phase-block h4 { font-family: var(--font-body); font-size: 13.5px; color: var(--brass-soft); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.phase-block h4 { font-family: var(--font-body); font-size: 12px; color: var(--brass-soft); margin: 0 0 5px; text-transform: uppercase; letter-spacing: 0.06em; }
 .phase-block p { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0; }
 
 .mv-symbol { font-weight: 700; }
@@ -645,8 +647,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   margin-bottom: 14px; padding: 0 16px;
 }
 .side-section summary {
-  cursor: pointer; list-style: none; padding: 14px 0; font-family: var(--font-mono);
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--brass-soft);
+  cursor: pointer; list-style: none; padding: 9px 0; font-family: var(--font-mono);
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--brass-soft);
   display: flex; align-items: center; justify-content: space-between;
 }
 .side-section summary::-webkit-details-marker { display: none; }
