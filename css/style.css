@@ -542,7 +542,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { max-width: none; }
 .movelist {
   font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); line-height: 1.9;
-  padding-left: 20px; max-height: 220px; overflow-y: auto;
+  list-style-position: inside; padding-left: 4px; max-height: 220px; overflow-y: auto;
   background: repeating-linear-gradient(var(--bg-deep) 0 27px, rgba(243,238,225,0.03) 27px 28px);
 }
 .movelist .mv-pair { cursor: default; }
