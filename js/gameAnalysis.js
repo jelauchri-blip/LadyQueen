@@ -94,8 +94,32 @@ async function runAnalysis() {
     els.btn.disabled = false;
     els.progress.hidden = true;
     ctx.setBusy(false);
+    syncResultsHeight();
   }
 }
+
+// Caps "Analyse complète de la partie" so its bottom lines up with the
+// board's move-navigation row (⏮◀▶⏭) instead of running on far past it —
+// only while the two columns actually sit side by side (desktop grid); on
+// the stacked mobile layout there's nothing to line up with, so it's left
+// free to take whatever height it needs.
+function syncResultsHeight() {
+  const nav = document.querySelector(".nav-controls");
+  const boardCol = document.querySelector(".analyse-board-col");
+  const sideCol = document.querySelector(".analyse-side-col");
+  if (!nav || !boardCol || !sideCol || !els.results) return;
+  const sideByCol = Math.abs(boardCol.getBoundingClientRect().top - sideCol.getBoundingClientRect().top) < 4;
+  if (!sideByCol) {
+    els.results.style.maxHeight = "";
+    els.results.style.overflowY = "";
+    return;
+  }
+  const maxHeight = nav.getBoundingClientRect().bottom - els.results.getBoundingClientRect().top;
+  els.results.style.maxHeight = Math.max(120, maxHeight) + "px";
+  els.results.style.overflowY = "auto";
+}
+
+window.addEventListener("resize", () => { if (els.results && els.results.children.length) syncResultsHeight(); });
 
 export function toWhiteCentipawns(score, turn) {
   if (!score) return 0;
