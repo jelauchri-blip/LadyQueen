@@ -118,7 +118,14 @@ function syncResultsHeight() {
   const nav = document.querySelector(".nav-controls");
   const boardCol = document.querySelector(".analyse-board-col");
   const sideCol = document.querySelector(".analyse-side-col");
-  if (!nav || !boardCol || !sideCol || !els.results) return;
+  const panel = els.results && els.results.closest(".side-section");
+  if (!nav || !boardCol || !sideCol || !els.results || !panel) return;
+
+  // Clear any previous forced height first so the measurements below reflect
+  // the content's natural size, not a stale constraint from an earlier call.
+  els.results.style.height = "";
+  els.results.style.overflowY = "";
+
   const boardRect = boardCol.getBoundingClientRect();
   const sideRect = sideCol.getBoundingClientRect();
   // Side-by-side means the side column starts at/after the board column's
@@ -127,17 +134,22 @@ function syncResultsHeight() {
   // old "top1 === top2" check could be off by a few px and wrongly assume a
   // stacked (mobile) layout, silently skipping the sync entirely.
   const sideByCol = sideRect.left >= boardRect.right - 20;
-  if (!sideByCol) {
-    els.results.style.height = "";
-    els.results.style.overflowY = "";
-    return;
-  }
-  const resultsTop = els.results.getBoundingClientRect().top;
+  if (!sideByCol) return;
+
   const navBottom = nav.getBoundingClientRect().bottom;
-  const navCap = navBottom - resultsTop;
-  const viewportCap = window.innerHeight - resultsTop - 16;
-  const maxHeight = Math.min(navCap, viewportCap);
-  els.results.style.height = Math.max(120, maxHeight) + "px";
+  const viewportBottom = window.innerHeight - 16;
+  const panelRect = panel.getBoundingClientRect();
+  const resultsRect = els.results.getBoundingClientRect();
+  // The card the user actually sees is `.side-section` (its border/background),
+  // not #fullgameResults — the section has its own bottom padding, so its
+  // visible edge sits a fixed amount below #fullgameResults's own bottom.
+  // Growing/shrinking #fullgameResults by the gap between the section's
+  // CURRENT bottom and the target lines the section's real edge up with the
+  // nav row regardless of that fixed offset.
+  const targetPanelBottom = Math.min(navBottom, viewportBottom);
+  const delta = targetPanelBottom - panelRect.bottom;
+  const targetHeight = resultsRect.height + delta;
+  els.results.style.height = Math.max(120, targetHeight) + "px";
   els.results.style.overflowY = "auto";
 }
 
