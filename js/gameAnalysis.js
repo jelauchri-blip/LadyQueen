@@ -197,10 +197,7 @@ function renderMoveList(reports) {
   for (const r of reports) {
     const row = document.createElement("div");
     row.className = "annotated-move";
-    const numLabel = r.color === "w" ? `${r.moveNumber}.` : `${r.moveNumber}…`;
     row.innerHTML = `
-      <span class="mv-num">${numLabel}</span>
-      <span class="mv-san">${r.san}</span>
       <span class="mv-symbol sym-${r.classification.key}">${r.classification.symbol}</span>
       ${isVoiceSupported() ? '<button class="mv-speak" title="Écouter ce coup">🔊</button>' : ""}
     `;

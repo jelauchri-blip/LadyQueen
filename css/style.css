@@ -596,7 +596,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .mv-speak:hover { border-color: var(--brass); }
 .annotated-move.speaking { background: rgba(201,162,39,0.14); border-radius: 6px; }
-.annotated-move.speaking .mv-san { color: var(--brass-soft); }
 
 /* ---------- ERROR COACH ---------- */
 .coach-error-block { border: 1px solid var(--brass); }
@@ -638,8 +637,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .annotated-move {
   display: flex; align-items: baseline; gap: 6px; padding: 3px 4px 3px 10px; border-radius: 4px;
 }
-.annotated-move .mv-num { color: var(--ink-faint); }
-.annotated-move .mv-san { color: var(--ink); font-weight: 600; }
 .annotated-move .mv-symbol { font-weight: 700; }
 .sym-excellent { color: var(--success); }
 .sym-good { color: var(--ink-dim); }
