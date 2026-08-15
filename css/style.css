@@ -587,9 +587,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .move-explanation .best-move { color: var(--brass-soft); font-family: var(--font-mono); font-weight: 600; }
 
 /* ---------- VOICE COACH ---------- */
-.coach-title-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
-.coach-bar { display: flex; gap: 6px; }
-.coach-btn { font-size: 12.5px; padding: 6px 12px; white-space: nowrap; }
+.coach-title-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0; }
+.coach-bar { display: flex; gap: 5px; }
+.coach-btn { font-size: 11px; padding: 4px 9px; white-space: nowrap; }
 /* ---------- ERROR COACH ---------- */
 .coach-error-block { border: 1px solid var(--brass); }
 .coach-error-counter { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brass-soft); margin-bottom: 8px; }
@@ -623,7 +623,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .elo-card .elo-side { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
 .elo-card .elo-value { display: block; font-family: var(--font-display); font-size: 19px; color: var(--brass-soft); font-weight: 600; margin: 2px 0; }
-.elo-card .elo-acpl { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); }
 
 .phase-block { background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 14px 16px; }
 .phase-block h4 { font-family: var(--font-body); font-size: 12px; color: var(--brass-soft); margin: 0 0 5px; text-transform: uppercase; letter-spacing: 0.06em; }

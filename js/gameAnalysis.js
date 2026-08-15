@@ -390,7 +390,6 @@ function renderElo(reports) {
     card.innerHTML = `
       <span class="elo-side">${s === "w" ? "Blancs" : "Noirs"}</span>
       <span class="elo-value">≈ ${elo}</span>
-      <span class="elo-acpl">perte moyenne : ${acpl} cp / coup</span>
     `;
     cards.appendChild(card);
   }
