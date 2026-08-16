@@ -75,7 +75,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
     width: 195px; flex: none; display: flex; flex-direction: column;
     background: var(--bg-panel); border-right: 1px solid var(--border-soft);
     overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: none; /* still scrollable (wheel/trackpad), just not drawn */
   }
+  .sidebar::-webkit-scrollbar { display: none; }
   .topbar { flex-wrap: wrap; }
   .topbar .brand { width: 100%; }
   .tabs {
