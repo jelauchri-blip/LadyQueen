@@ -96,6 +96,29 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .resize-handle-height { display: flex; }
 }
 @media (min-width: 1180px) { .resize-handle-analyse { display: flex; align-self: stretch; } }
+
+/* Corner grip for the board — like the resize corner of an OS window/a
+   <textarea>: a fixed-position 24x24 square, kept aligned to the board's
+   live bottom-right corner by js/layoutResize.js (the board isn't a static
+   element — it's re-created by board.js/positionEditor.js — so its position
+   can't just be expressed in CSS relative to a parent). Diagonal stripes are
+   the universal "drag to resize" affordance, more recognizable than a plain
+   edge line. */
+.resize-corner-grip {
+  display: none; position: fixed; width: 24px; height: 24px; cursor: nwse-resize;
+  z-index: 8; touch-action: none;
+}
+.resize-corner-grip::after {
+  content: ""; position: absolute; right: 3px; bottom: 3px; width: 15px; height: 15px;
+  background-image: repeating-linear-gradient(
+    135deg, var(--brass) 0 2px, transparent 2px 5px
+  );
+  -webkit-mask-image: linear-gradient(135deg, transparent 40%, black 40%);
+  mask-image: linear-gradient(135deg, transparent 40%, black 40%);
+  opacity: 0.75;
+}
+.resize-corner-grip:hover::after, .resize-corner-grip.dragging::after { opacity: 1; }
+@media (min-width: 1180px) { .resize-corner-grip { display: block; } }
 .layout-confirm-bar {
   position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
   display: flex; align-items: center; gap: 10px; background: var(--bg-panel-raised);
@@ -634,8 +657,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      itself can't shrink, since its size comes from the --sq custom
      property, not intrinsic content sizing), and the board silently
      overflows off the left edge instead of the layout just being tight. */
-  /* 5 tracks: board | drag handle | side-col | drag handle | movelist.
-     Board/side-col/movelist widths are CSS custom properties (js/layoutResize.js
+  /* 4 tracks: board | side-col | drag handle | movelist. The board no longer
+     has an edge-drag handle here — resizing it now happens via a corner grip
+     (.resize-corner-grip, positioned by js/layoutResize.js on top of the
+     board's own bottom-right corner, like an OS window's resize corner)
+     since a full-height edge line proved too easy to miss/mis-click. Board/
+     side-col/movelist widths are CSS custom properties (js/layoutResize.js
      writes them on drag), each with a minmax() floor so a handle dragged to
      an extreme can't collapse a column below a usable size. Explicit
      grid-column below (not DOM order) is what actually places each track —
@@ -643,24 +670,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .analyse-layout {
     grid-template-columns:
       minmax(480px, var(--board-col-w, 1fr))
-      16px
       minmax(230px, var(--side-col-w, 320px))
       16px
       minmax(150px, var(--movelist-col-w, 190px));
   }
   .analyse-board-col { grid-column: 1; grid-row: 1; }
-  /* Shifted almost entirely onto the board's own gold border instead of
-     floating in the neutral gap after it — "grab the board's edge itself",
-     the way an OS window's edge is what you drag, not a separate strip next
-     to it. No grip dots here (they'd look like stray clutter sitting on top
-     of the board's border) — the gold line IS the board's border, just a
-     little thicker, which is affordance enough once you know it's there. */
-  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; width: 28px; margin-left: -26px; }
-  .resize-handle-analyse.handle-board-side::before { content: none; }
-  .resize-handle-analyse.handle-board-side::after { background: var(--brass); width: 4px; }
-  .analyse-side-col { grid-column: 3; grid-row: 1; }
-  .resize-handle-analyse.handle-side-movelist { grid-column: 4; grid-row: 1; align-self: stretch; }
-  .movelist-wrap { grid-column: 5; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0; }
+  .analyse-side-col { grid-column: 2; grid-row: 1; }
+  .resize-handle-analyse.handle-side-movelist { grid-column: 3; grid-row: 1; align-self: stretch; }
+  .movelist-wrap { grid-column: 4; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
      (with quality marks) — the plain move list next to them is redundant, so
@@ -668,7 +685,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .analyse-layout:has(#fullgameResults:not(:empty)) {
     grid-template-columns: minmax(400px, var(--board-col-w, auto)) 1fr;
   }
-  .analyse-layout:has(#fullgameResults:not(:empty)) .handle-board-side,
   .analyse-layout:has(#fullgameResults:not(:empty)) .handle-side-movelist { display: none; }
 }
 .analyse-layout:has(#fullgameResults:not(:empty)) .movelist-wrap { display: none; }

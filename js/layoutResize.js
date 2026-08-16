@@ -110,17 +110,52 @@ export function initLayoutResize() {
     });
   }
 
-  const boardSideHandle = document.getElementById("boardSideResizeHandle");
-  if (boardSideHandle) {
-    dragHandle(boardSideHandle, (clientX) => {
+  // The board itself is re-created by board.js/positionEditor.js (it's not a
+  // static element), so its size/position can only be read live, never
+  // assumed. This finds whichever one is actually visible right now — the
+  // normal game board, or the position editor's board when that's open.
+  function activeBoard() {
+    const editorMount = document.getElementById("editorMount");
+    if (editorMount && !editorMount.hidden) {
+      const b = editorMount.querySelector(".board");
+      if (b) return b;
+    }
+    return document.querySelector("#analyseBoardMount .board");
+  }
+
+  const boardGrip = document.getElementById("boardCornerGrip");
+  function positionBoardGrip() {
+    if (!boardGrip) return;
+    const analyseView = document.getElementById("view-analyse");
+    const board = analyseView && analyseView.classList.contains("active") ? activeBoard() : null;
+    if (!board) { boardGrip.style.display = "none"; return; }
+    boardGrip.style.display = "";
+    const rect = board.getBoundingClientRect();
+    boardGrip.style.left = (rect.right - 24) + "px";
+    boardGrip.style.top = (rect.bottom - 24) + "px";
+  }
+
+  if (boardGrip) {
+    dragHandle(boardGrip, (clientX) => {
+      const board = activeBoard();
+      if (!board) return;
       const layout = document.querySelector(".analyse-layout");
-      const boardCol = document.querySelector(".analyse-board-col");
       const sideColW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--side-col-w")) || 320;
       const layoutW = layout.getBoundingClientRect().width;
-      const left = boardCol.getBoundingClientRect().left;
-      const maxW = layoutW - sideColW - 150 - 32; // reserve side-col + movelist floor + 2 handles
+      const left = board.getBoundingClientRect().left;
+      const maxW = layoutW - sideColW - 150 - 16; // reserve side-col + movelist floor + 1 handle
       const w = Math.max(480, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--board-col-w", w + "px");
+      positionBoardGrip();
+    });
+    positionBoardGrip();
+    window.addEventListener("resize", positionBoardGrip);
+    // Catches the editor opening/closing, switching tabs, and any other
+    // change to the board area (a plain resize listener alone wouldn't fire
+    // for those) — recomputing the grip's position is cheap enough that
+    // there's no need to be selective about which mutation actually mattered.
+    new MutationObserver(positionBoardGrip).observe(document.body, {
+      attributes: true, attributeFilter: ["hidden", "class"], subtree: true, childList: true,
     });
   }
 
@@ -132,7 +167,7 @@ export function initLayoutResize() {
       const boardColW = document.querySelector(".analyse-board-col").getBoundingClientRect().width;
       const layoutW = layout.getBoundingClientRect().width;
       const left = sideCol.getBoundingClientRect().left;
-      const maxW = layoutW - boardColW - 150 - 32; // reserve board-col + movelist floor + 2 handles
+      const maxW = layoutW - boardColW - 150 - 16; // reserve board-col + movelist floor + 1 handle
       const w = Math.max(230, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--side-col-w", w + "px");
     });
