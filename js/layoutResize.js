@@ -68,6 +68,24 @@ export function initLayoutResize() {
     confirmBar.hidden = true;
   };
 
+  // Manual escape hatch, always available (not just while there's a pending
+  // drag) — for when a size saved on a wider/older screen no longer fits
+  // and needs clearing out, without the user having to find and delete
+  // localStorage themselves. Clears the saved sizes AND the lock state (no
+  // point resetting the sizes but leaving the handles hidden).
+  const resetLayoutBtn = document.getElementById("resetLayoutBtn");
+  if (resetLayoutBtn) {
+    resetLayoutBtn.onclick = () => {
+      if (!confirm("Réinitialiser la disposition du plateau et des panneaux à leur taille par défaut ?")) return;
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      applyVars({ ...DEFAULTS });
+      sessionStart = null;
+      confirmBar.hidden = true;
+      if (locked) { locked = false; try { localStorage.setItem(LOCK_KEY, "0"); } catch (e) {} applyLockedClass(); }
+      positionGrips();
+    };
+  }
+
   // Double-clicking any handle locks the whole layout in place: saves
   // whatever's currently in effect (same as clicking "Valider"), then hides
   // every handle so nothing can be nudged by accident. Double-clicking again
@@ -212,7 +230,28 @@ export function initLayoutResize() {
     movelistMoveGrip.style.top = (rect.top - 13) + "px";
   }
 
-  function positionGrips() { positionBoardGrip(); positionMoveGrip(); positionSideMoveGrip(); positionMovelistMoveGrip(); }
+  // A --side-col-w/--movelist-col-w saved from before "Coups joués" was
+  // always shown (or saved on a wider screen than this one) can add up to
+  // more than the row actually has room for — the grid can't fix that on
+  // its own once both are past their floors, so the whole page ends up
+  // wider than the viewport with a horizontal scrollbar at the very bottom.
+  // Silently falling back to the defaults (which are always guaranteed to
+  // fit) self-heals this instead of leaving it broken until someone manually
+  // resets it — the stale localStorage value is left alone, so a wider
+  // screen later just picks the saved size back up normally.
+  function clampOverflow() {
+    const analyseView = document.getElementById("view-analyse");
+    if (!analyseView || !analyseView.classList.contains("active")) return;
+    if (document.documentElement.scrollWidth > document.documentElement.clientWidth + 1) {
+      document.documentElement.style.removeProperty("--side-col-w");
+      document.documentElement.style.removeProperty("--movelist-col-w");
+    }
+  }
+
+  function positionGrips() {
+    positionBoardGrip(); positionMoveGrip(); positionSideMoveGrip(); positionMovelistMoveGrip();
+    clampOverflow();
+  }
 
   if (boardGrip) {
     dragHandle(boardGrip, (clientX) => {
