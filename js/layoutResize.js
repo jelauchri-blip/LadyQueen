@@ -460,7 +460,7 @@ export function initLayoutResize() {
 
   const sideMovelistHandle = document.getElementById("sideMovelistResizeHandle");
   if (sideMovelistHandle) {
-    const SIDE_COL_DEFAULT = 320, MOVELIST_DEFAULT = 190, MOVELIST_FLOOR = 150;
+    const SIDE_COL_FLOOR = 230, MOVELIST_FLOOR = 150;
     dragHandle(sideMovelistHandle, (clientX) => {
       const layout = document.querySelector(".analyse-layout");
       const sideCol = document.querySelector(".analyse-side-col");
@@ -474,30 +474,31 @@ export function initLayoutResize() {
       const boardColW = board ? board.getBoundingClientRect().width : document.querySelector(".analyse-board-col").getBoundingClientRect().width;
       const layoutW = layout.getBoundingClientRect().width;
       const left = sideCol.getBoundingClientRect().left;
-      // Once full-game results are showing, the move-list column doesn't
-      // exist at all (see the .analyse-layout:has(#fullgameResults...) rule
-      // in style.css) — reserving its 150px floor here as if it still did
-      // would just cut this drag's range short for no reason.
       const fullgameResults = document.getElementById("fullgameResults");
       const resultsMode = !!(fullgameResults && fullgameResults.children.length > 0);
-      const maxW = layoutW - boardColW - (resultsMode ? 0 : MOVELIST_FLOOR) - 16; // reserve board-col + (movelist floor) + 1 handle
-      const w = Math.max(230, Math.min(maxW, clientX - left));
-      document.documentElement.style.setProperty("--side-col-w", w + "px");
-      if (!resultsMode) {
-        // The board column is `1fr` (flexible) in the grid, so it silently
-        // absorbed whatever "Moteur & coach" grew into — widening the coach
-        // panel visibly shrank the board even though nothing about the board
-        // itself was touched. The move-list column next to it, on the other
-        // hand, sat untouched at a fixed width regardless of this drag.
-        // Taking the growth out of the move-list's width instead (down to
-        // its own floor) keeps side-col + move-list's combined width
-        // constant, so the board's automatic share of the row never changes
-        // from this handle. Irrelevant in results mode — no move-list column
-        // to shrink there, --movelist-col-w isn't even read by that layout.
-        const growth = Math.max(0, w - SIDE_COL_DEFAULT);
-        const movelistW = Math.max(MOVELIST_FLOOR, MOVELIST_DEFAULT - growth);
-        document.documentElement.style.setProperty("--movelist-col-w", movelistW + "px");
+      if (resultsMode) {
+        // Once full-game results are showing, the move-list column doesn't
+        // exist at all (see .analyse-layout:has(#fullgameResults...) in
+        // style.css) — nothing to split with, side-col just gets whatever's
+        // left after the (protected) board.
+        const maxW = layoutW - boardColW - 16;
+        const w = Math.max(SIDE_COL_FLOOR, Math.min(maxW, clientX - left));
+        document.documentElement.style.setProperty("--side-col-w", w + "px");
+        return;
       }
+      // Normal mode: side-col and move-list share a fixed combined budget —
+      // whatever's left of the row after the board's own (protected) width —
+      // so this is a genuine two-way splitter between them, not side-col
+      // alone chasing the cursor while move-list could only ever passively
+      // shrink down to (and never past) its own untouched default width.
+      // That asymmetry was the actual bug behind "je ne peux toujours pas
+      // régler Coups joués" — dragging left past move-list's *default* 190px
+      // used to do nothing at all, since nothing was pulling move-list any
+      // wider than that default in the first place.
+      const totalSpan = layoutW - boardColW - 16; // side-col + move-list combined, board protected
+      const w = Math.max(SIDE_COL_FLOOR, Math.min(totalSpan - MOVELIST_FLOOR, clientX - left));
+      document.documentElement.style.setProperty("--side-col-w", w + "px");
+      document.documentElement.style.setProperty("--movelist-col-w", (totalSpan - w) + "px");
     });
   }
 
