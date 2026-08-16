@@ -85,8 +85,14 @@ export function goToPly(n) {
 
   // In "Défi" mode against the computer, browsing history is read-only:
   // the board only accepts moves again once back at the live position.
+  // Once the game itself has ended, that same read-only rule used to apply
+  // unconditionally to every ply, including ones from *before* the game
+  // ended — so there was no way to rewind a finished game and explore "what
+  // if I'd played differently here" (in Coach mode, where branching mid-game
+  // is otherwise allowed). Now that lock only applies to the actual final
+  // position itself, where there's nothing to explore anyway (already mate).
   const atLatest = currentPly === plyFens.length - 1;
-  if (vsComputerGameOver) {
+  if (vsComputerGameOver && atLatest) {
     board.setInteractive(false);
   } else if (vsComputerMode && challengeMode) {
     board.setInteractive(atLatest);
@@ -516,6 +522,19 @@ function hideResultBanner() {
 
 // Shared bookkeeping for any move (human or computer): updates history, UI, live coach.
 function recordMove(fenBefore, moveResult, opts = {}) {
+  // Branching off a game that had already ended (rewound to an earlier ply
+  // in Coach mode, then played a different move here): that old ending no
+  // longer applies to this new line, so un-freeze the game instead of
+  // leaving vsComputerGameOver stuck true — which would otherwise silently
+  // re-lock the board again the moment this new position was navigated back
+  // to, and stop the computer from ever replying to the new line at all
+  // (maybeTriggerComputerMove bails out whenever vsComputerGameOver is true).
+  if (vsComputerMode && vsComputerGameOver) {
+    vsComputerGameOver = false;
+    hideResultBanner();
+    if (els.resignBtn) els.resignBtn.hidden = false;
+    if (els.vsComputerSetup) els.vsComputerSetup.hidden = true;
+  }
   plyFens = plyFens.slice(0, currentPly + 1);
   plyMoves = plyMoves.slice(0, currentPly);
   plyMoves.push(moveResult);
