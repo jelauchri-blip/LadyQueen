@@ -649,7 +649,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
       minmax(150px, var(--movelist-col-w, 190px));
   }
   .analyse-board-col { grid-column: 1; grid-row: 1; }
-  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; }
+  /* Shifted left to sit directly on the board's own gold border instead of
+     floating in the neutral gap after it — "grab the board's edge itself",
+     the way an OS window's edge is what you drag, not a separate strip next
+     to it. */
+  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; margin-left: -10px; }
+  .resize-handle-analyse.handle-board-side::after { background: var(--brass); width: 3px; }
   .analyse-side-col { grid-column: 3; grid-row: 1; }
   .resize-handle-analyse.handle-side-movelist { grid-column: 4; grid-row: 1; align-self: stretch; }
   .movelist-wrap { grid-column: 5; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0; }
