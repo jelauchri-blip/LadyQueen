@@ -149,6 +149,7 @@ export function initAnalysisView() {
   els.helpSpeakBtn = document.getElementById("helpSpeakBtn");
   els.openEditorBtn = document.getElementById("openEditorBtn");
   els.editorMount = document.getElementById("editorMount");
+  els.editorControlsMount = document.getElementById("editorControlsMount");
   els.setupControls = document.getElementById("setupControls");
   els.boardWrap = document.querySelector(".board-wrap");
   els.boardActionsRow = document.querySelector(".board-actions-row");
@@ -389,21 +390,21 @@ export function initAnalysisView() {
     const isOpen = !els.editorMount.hidden;
     if (isOpen) {
       els.editorMount.hidden = true;
+      if (els.editorControlsMount) els.editorControlsMount.hidden = true;
       setBoardChromeVisible(true);
       els.openEditorBtn.textContent = "✎ Créer une position";
       return;
     }
     els.editorMount.hidden = false;
+    if (els.editorControlsMount) els.editorControlsMount.hidden = false;
     setBoardChromeVisible(false);
     els.openEditorBtn.textContent = "✕ Fermer l'éditeur";
     if (!editorInited) {
       editorInited = true;
       const boardHolder = document.createElement("div");
-      const controlsHolder = document.createElement("div");
       els.editorMount.appendChild(boardHolder);
-      els.editorMount.appendChild(controlsHolder);
       const api = initPositionEditor({
-        mount: controlsHolder,
+        mount: els.editorControlsMount,
         onValidate: (fen) => {
           deactivateComputerMode();
           chess.load(fen);
@@ -414,6 +415,7 @@ export function initAnalysisView() {
           els.moveExplanation.hidden = true;
           requestEval();
           els.editorMount.hidden = true;
+          if (els.editorControlsMount) els.editorControlsMount.hidden = true;
           setBoardChromeVisible(true);
           els.openEditorBtn.textContent = "✎ Créer une position";
         },

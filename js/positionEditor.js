@@ -21,16 +21,23 @@ const FEN_ERRORS_FR = {
 };
 
 const FILES = ["a","b","c","d","e","f","g","h"];
-const PIECE_GLYPH = {
-  p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚",
-  P: "♙", N: "♘", B: "♗", R: "♖", Q: "♕", K: "♔",
-};
-const PALETTE_ORDER = ["K","Q","R","B","N","P","k","q","r","b","n","p"];
+const SVG_NS = "http://www.w3.org/2000/svg";
+const XLINK_NS = "http://www.w3.org/1999/xlink";
+const TYPES_ORDER = ["K","Q","R","B","N","P"];
 
 let els = {};
 let onValidated = null;
 let placedPieces = {}; // square -> letter (upper=white, lower=black)
-let selectedTool = "K"; // piece letter, or "erase"
+let selectedType = "K"; // K/Q/R/B/N/P, or "erase"
+let selectedColor = "w"; // "w" or "b" — which color the palette places
+
+// The letter to actually place on the board: the selected piece type cased
+// by the selected color (independent controls, since telling white/black
+// apart in the palette was the whole point of adding the color toggle).
+function selectedLetter() {
+  if (selectedType === "erase") return "erase";
+  return selectedColor === "w" ? selectedType : selectedType.toLowerCase();
+}
 
 export function initPositionEditor({ mount, onValidate }) {
   onValidated = onValidate;
@@ -40,6 +47,10 @@ export function initPositionEditor({ mount, onValidate }) {
   panel.innerHTML = `
     <div class="editor-toolbar">
       <p class="eyebrow">Placer les pièces</p>
+      <div class="editor-color-toggle" id="editorColorToggle">
+        <button type="button" class="sel" data-color="w">Blancs</button>
+        <button type="button" data-color="b">Noirs</button>
+      </div>
       <div class="editor-palette" id="editorPalette"></div>
       <div class="editor-quick">
         <button class="btn-ghost" id="editorStartPos">Position de départ</button>
@@ -71,22 +82,49 @@ export function initPositionEditor({ mount, onValidate }) {
   els.palette = panel.querySelector("#editorPalette");
   els.error = panel.querySelector("#editorError");
   els.validateBtn = panel.querySelector("#editorValidateBtn");
+  els.colorToggle = panel.querySelector("#editorColorToggle");
 
-  PALETTE_ORDER.forEach((letter) => {
+  // Real piece artwork (same SVGs as the board) instead of chess unicode
+  // glyphs — those looked nearly identical between colors even with a
+  // text-stroke hack. Piece type and color are now separate controls: one
+  // button per type, plus a Blancs/Noirs toggle that recolors them.
+  TYPES_ORDER.forEach((type) => {
     const btn = document.createElement("button");
-    btn.className = "editor-piece-btn" + (letter === selectedTool ? " sel" : "");
-    btn.dataset.letter = letter;
-    btn.innerHTML = `<span class="${letter === letter.toUpperCase() ? 'pw' : 'pb'}">${PIECE_GLYPH[letter]}</span>`;
+    btn.className = "editor-piece-btn" + (type === selectedType ? " sel" : "");
+    btn.dataset.type = type;
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("class", "editor-piece-icon");
+    svg.setAttribute("viewBox", pieceViewBox());
+    const use = document.createElementNS(SVG_NS, "use");
+    const href = pieceHref(selectedColor, type.toLowerCase());
+    use.setAttributeNS(XLINK_NS, "href", href);
+    use.setAttribute("href", href);
+    svg.appendChild(use);
+    btn.appendChild(svg);
     btn.addEventListener("click", () => {
-      selectedTool = letter;
+      selectedType = type;
       panel.querySelectorAll(".editor-piece-btn, #editorErase").forEach((b) => b.classList.remove("sel"));
       btn.classList.add("sel");
     });
     els.palette.appendChild(btn);
   });
 
+  els.colorToggle.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedColor = btn.dataset.color;
+      els.colorToggle.querySelectorAll("button").forEach((b) => b.classList.remove("sel"));
+      btn.classList.add("sel");
+      els.palette.querySelectorAll(".editor-piece-btn").forEach((pieceBtn) => {
+        const href = pieceHref(selectedColor, pieceBtn.dataset.type.toLowerCase());
+        const use = pieceBtn.querySelector("use");
+        use.setAttributeNS(XLINK_NS, "href", href);
+        use.setAttribute("href", href);
+      });
+    });
+  });
+
   panel.querySelector("#editorErase").addEventListener("click", (e) => {
-    selectedTool = "erase";
+    selectedType = "erase";
     panel.querySelectorAll(".editor-piece-btn, #editorErase").forEach((b) => b.classList.remove("sel"));
     e.currentTarget.classList.add("sel");
   });
@@ -161,10 +199,10 @@ function renderBoardFromPieces() {
         el.appendChild(svg);
       }
       el.addEventListener("click", () => {
-        if (selectedTool === "erase") {
+        if (selectedLetter() === "erase") {
           delete placedPieces[sq];
         } else {
-          placedPieces[sq] = selectedTool;
+          placedPieces[sq] = selectedLetter();
         }
         renderBoardFromPieces();
       });
