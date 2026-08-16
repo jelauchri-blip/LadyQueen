@@ -292,7 +292,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .tab-btn.active { color: var(--ink); border-bottom-color: var(--brass); }
 @media (min-width: 861px) {
-  .tabs { gap: 1px; padding: 4px 10px 8px; }
+  .tabs { gap: 1px; padding: 4px 0 8px 10px; }
   .tab-btn { padding: 7px 12px; }
 }
 
