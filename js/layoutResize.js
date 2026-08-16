@@ -96,7 +96,7 @@ export function initLayoutResize() {
       const sideColW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--side-col-w")) || 320;
       const layoutW = layout.getBoundingClientRect().width;
       const left = boardCol.getBoundingClientRect().left;
-      const maxW = layoutW - sideColW - 150 - 16; // reserve side-col + movelist floor + 2 handles
+      const maxW = layoutW - sideColW - 150 - 32; // reserve side-col + movelist floor + 2 handles
       const w = Math.max(480, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--board-col-w", w + "px");
     });
@@ -110,7 +110,7 @@ export function initLayoutResize() {
       const boardColW = document.querySelector(".analyse-board-col").getBoundingClientRect().width;
       const layoutW = layout.getBoundingClientRect().width;
       const left = sideCol.getBoundingClientRect().left;
-      const maxW = layoutW - boardColW - 150 - 16; // reserve board-col + movelist floor + 2 handles
+      const maxW = layoutW - boardColW - 150 - 32; // reserve board-col + movelist floor + 2 handles
       const w = Math.max(230, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--side-col-w", w + "px");
     });

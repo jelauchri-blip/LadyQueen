@@ -63,18 +63,27 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .content-col { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0; }
 .sidebar { position: relative; }
 
-/* ---------- RESIZE HANDLES (drag to resize sidebar / Analyse columns) ---------- */
+/* ---------- RESIZE HANDLES (drag to resize sidebar / Analyse columns) ----------
+   16px hit target (not just a 1-2px line) so it's easy to actually grab with
+   a real mouse, especially under Windows display scaling — a thin 8px strip
+   proved too fiddly to reliably click. The line + grip dots stay visible at
+   rest (not hover-only) so there's something to see before you even try. */
 .resize-handle {
-  display: none; flex: none; width: 8px; position: relative; cursor: col-resize;
-  touch-action: none; z-index: 5;
+  display: none; flex: none; width: 16px; position: relative; cursor: col-resize;
+  touch-action: none; z-index: 5; align-items: center; justify-content: center;
 }
 .resize-handle::after {
-  content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
-  background: var(--border-soft); transform: translateX(-50%);
+  content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 3px;
+  background: var(--border-soft); transform: translateX(-50%); border-radius: 2px;
 }
-.resize-handle:hover::after, .resize-handle.dragging::after { background: var(--brass); width: 3px; }
-@media (min-width: 861px) { .resize-handle-sidebar { display: block; } }
-@media (min-width: 1180px) { .resize-handle-analyse { display: block; align-self: stretch; } }
+.resize-handle::before {
+  content: "⋮⋮"; position: relative; z-index: 1; color: var(--ink-faint); font-size: 11px;
+  letter-spacing: -2px; line-height: 1; pointer-events: none;
+}
+.resize-handle:hover::after, .resize-handle.dragging::after { background: var(--brass); width: 4px; }
+.resize-handle:hover::before, .resize-handle.dragging::before { color: var(--brass); }
+@media (min-width: 861px) { .resize-handle-sidebar { display: flex; } }
+@media (min-width: 1180px) { .resize-handle-analyse { display: flex; align-self: stretch; } }
 .layout-confirm-bar {
   position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
   display: flex; align-items: center; gap: 10px; background: var(--bg-panel-raised);
@@ -622,9 +631,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .analyse-layout {
     grid-template-columns:
       minmax(480px, var(--board-col-w, 1fr))
-      8px
+      16px
       minmax(230px, var(--side-col-w, 320px))
-      8px
+      16px
       minmax(150px, var(--movelist-col-w, 190px));
   }
   .analyse-board-col { grid-column: 1; grid-row: 1; }
