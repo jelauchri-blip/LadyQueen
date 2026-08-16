@@ -258,6 +258,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   padding: 10px; display: flex; flex-direction: column; gap: 4px;
   box-shadow: 0 12px 28px rgba(0,0,0,0.45);
 }
+/* Desktop only: the swatch/slider/piece-style buttons should reach the
+   panel's true right edge (matching Accueil/Jouer, which have no such
+   inset) instead of stopping short at this padding — this was the real
+   remaining mismatch: content elsewhere in the sidebar reaches the edge,
+   theme-panel content didn't, so they visibly disagreed. */
+@media (min-width: 861px) {
+  .theme-panel { padding-right: 0; }
+}
 .theme-panel[hidden] { display: none; }
 .theme-panel-title {
   font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em;
