@@ -738,7 +738,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .analyse-board-col { grid-column: 1; grid-row: 1; }
   .analyse-side-col { grid-column: 2; grid-row: 1; }
   .resize-handle-analyse.handle-side-movelist { grid-column: 3; grid-row: 1; align-self: stretch; }
-  .movelist-wrap { grid-column: 4; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0; }
+  /* Free repositioning via #movelistMoveGrip in js/layoutResize.js, same
+     transform-based nudge as the board/side-col — applies on top of the
+     sticky positioning below rather than replacing it. */
+  .movelist-wrap {
+    grid-column: 4; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0;
+    transform: translate(var(--movelist-move-x, 0px), var(--movelist-move-y, 0px));
+  }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
      (with quality marks) — the plain move list next to them is redundant, so

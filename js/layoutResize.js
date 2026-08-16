@@ -6,11 +6,11 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
-const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override", "--movelist-col-w", "--side-move-x", "--side-move-y"];
+const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override", "--movelist-col-w", "--side-move-x", "--side-move-y", "--movelist-move-x", "--movelist-move-y"];
 const DEFAULTS = {
   "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null,
   "--board-move-x": 0, "--board-move-y": 0, "--board-sq-override": null, "--movelist-col-w": null,
-  "--side-move-x": 0, "--side-move-y": 0,
+  "--side-move-x": 0, "--side-move-y": 0, "--movelist-move-x": 0, "--movelist-move-y": 0,
 };
 
 function loadSaved() {
@@ -130,6 +130,7 @@ export function initLayoutResize() {
   const boardGrip = document.getElementById("boardCornerGrip");
   const moveGrip = document.getElementById("boardMoveGrip");
   const sideMoveGrip = document.getElementById("sideColMoveGrip");
+  const movelistMoveGrip = document.getElementById("movelistMoveGrip");
 
   function positionBoardGrip() {
     if (!boardGrip) return;
@@ -169,7 +170,22 @@ export function initLayoutResize() {
     sideMoveGrip.style.top = (rect.top - 13) + "px";
   }
 
-  function positionGrips() { positionBoardGrip(); positionMoveGrip(); positionSideMoveGrip(); }
+  // Same idea again, for "Coups joués" — hidden not just when the Analyse
+  // tab isn't active, but also whenever the move-list itself is (the
+  // full-game-results 2-column mode removes it from the layout entirely).
+  function positionMovelistMoveGrip() {
+    if (!movelistMoveGrip) return;
+    const analyseView = document.getElementById("view-analyse");
+    const movelist = analyseView && analyseView.classList.contains("active")
+      ? document.querySelector(".movelist-wrap") : null;
+    if (!movelist || !movelist.offsetParent) { movelistMoveGrip.style.display = "none"; return; }
+    movelistMoveGrip.style.display = "";
+    const rect = movelist.getBoundingClientRect();
+    movelistMoveGrip.style.left = (rect.left - 13) + "px";
+    movelistMoveGrip.style.top = (rect.top - 13) + "px";
+  }
+
+  function positionGrips() { positionBoardGrip(); positionMoveGrip(); positionSideMoveGrip(); positionMovelistMoveGrip(); }
 
   if (boardGrip) {
     dragHandle(boardGrip, (clientX) => {
@@ -341,7 +357,63 @@ export function initLayoutResize() {
     });
   }
 
-  if (boardGrip || moveGrip || sideMoveGrip) {
+  // Same free-repositioning idea once more, for "Coups joués". Simpler than
+  // the side-col case: the move-list only ever appears in the normal 4-track
+  // layout (grid is board | side-col | handle | move-list), always the last
+  // column, so its left neighbor is always the handle and there's never
+  // anything to its right except the layout's own edge — no mode-switching
+  // to account for.
+  if (movelistMoveGrip) {
+    let movelistMoveStart = null;
+    movelistMoveGrip.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      try { movelistMoveGrip.setPointerCapture(e.pointerId); } catch (err) {}
+      movelistMoveGrip.classList.add("dragging");
+      const movelist = document.querySelector(".movelist-wrap");
+      const handle = document.getElementById("sideMovelistResizeHandle");
+      const layout = document.querySelector(".analyse-layout");
+      const movelistRect = movelist.getBoundingClientRect();
+      const cs = getComputedStyle(document.documentElement);
+      const offsetX = parseFloat(cs.getPropertyValue("--movelist-move-x")) || 0;
+      const offsetY = parseFloat(cs.getPropertyValue("--movelist-move-y")) || 0;
+      const leftBoundary = handle && handle.offsetParent ? handle.getBoundingClientRect().right : movelistRect.left;
+      const rightBoundary = layout.getBoundingClientRect().right;
+      movelistMoveStart = { startX: e.clientX, startY: e.clientY, offsetX, offsetY, movelistRect, leftBoundary, rightBoundary };
+      markDirty();
+      const onPointerMove = (ev) => {
+        if (!movelistMoveStart) return;
+        const dx = ev.clientX - movelistMoveStart.startX;
+        const dy = ev.clientY - movelistMoveStart.startY;
+        const naturalLeft = movelistMoveStart.movelistRect.left - movelistMoveStart.offsetX;
+        const naturalRight = movelistMoveStart.movelistRect.right - movelistMoveStart.offsetX;
+        const minX = movelistMoveStart.leftBoundary - naturalLeft;
+        const maxX = movelistMoveStart.rightBoundary - naturalRight;
+        const newX = Math.max(minX, Math.min(maxX, movelistMoveStart.offsetX + dx));
+        const naturalTop = movelistMoveStart.movelistRect.top - movelistMoveStart.offsetY;
+        const naturalBottom = movelistMoveStart.movelistRect.bottom - movelistMoveStart.offsetY;
+        const minY = 8 - naturalTop;
+        const maxY = window.innerHeight - 8 - naturalBottom;
+        const newY = Math.max(minY, Math.min(maxY, movelistMoveStart.offsetY + dy));
+        document.documentElement.style.setProperty("--movelist-move-x", newX + "px");
+        document.documentElement.style.setProperty("--movelist-move-y", newY + "px");
+        positionMovelistMoveGrip();
+        markDirty();
+      };
+      const onPointerUp = (ev) => {
+        movelistMoveGrip.classList.remove("dragging");
+        try { movelistMoveGrip.releasePointerCapture(ev.pointerId); } catch (err) {}
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+        document.removeEventListener("pointercancel", onPointerUp);
+        movelistMoveStart = null;
+      };
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+      document.addEventListener("pointercancel", onPointerUp);
+    });
+  }
+
+  if (boardGrip || moveGrip || sideMoveGrip || movelistMoveGrip) {
     positionGrips();
     window.addEventListener("resize", positionGrips);
     // Catches the editor opening/closing, switching tabs, and any other
