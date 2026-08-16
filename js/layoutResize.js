@@ -6,10 +6,10 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
-const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override"];
+const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override", "--movelist-col-w"];
 const DEFAULTS = {
   "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null,
-  "--board-move-x": 0, "--board-move-y": 0, "--board-sq-override": null,
+  "--board-move-x": 0, "--board-move-y": 0, "--board-sq-override": null, "--movelist-col-w": null,
 };
 
 function loadSaved() {
@@ -265,15 +265,27 @@ export function initLayoutResize() {
 
   const sideMovelistHandle = document.getElementById("sideMovelistResizeHandle");
   if (sideMovelistHandle) {
+    const SIDE_COL_DEFAULT = 320, MOVELIST_DEFAULT = 190, MOVELIST_FLOOR = 150;
     dragHandle(sideMovelistHandle, (clientX) => {
       const layout = document.querySelector(".analyse-layout");
       const sideCol = document.querySelector(".analyse-side-col");
       const boardColW = document.querySelector(".analyse-board-col").getBoundingClientRect().width;
       const layoutW = layout.getBoundingClientRect().width;
       const left = sideCol.getBoundingClientRect().left;
-      const maxW = layoutW - boardColW - 150 - 16; // reserve board-col + movelist floor + 1 handle
+      const maxW = layoutW - boardColW - MOVELIST_FLOOR - 16; // reserve board-col + movelist floor + 1 handle
       const w = Math.max(230, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--side-col-w", w + "px");
+      // The board column is `1fr` (flexible) in the grid, so it silently
+      // absorbed whatever "Moteur & coach" grew into — widening the coach
+      // panel visibly shrank the board even though nothing about the board
+      // itself was touched. The move-list column next to it, on the other
+      // hand, sat untouched at a fixed width regardless of this drag. Taking
+      // the growth out of the move-list's width instead (down to its own
+      // floor) keeps side-col + move-list's combined width constant, so the
+      // board's automatic share of the row never changes from this handle.
+      const growth = Math.max(0, w - SIDE_COL_DEFAULT);
+      const movelistW = Math.max(MOVELIST_FLOOR, MOVELIST_DEFAULT - growth);
+      document.documentElement.style.setProperty("--movelist-col-w", movelistW + "px");
     });
   }
 

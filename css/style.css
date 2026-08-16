@@ -636,7 +636,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .pgn-input-row .btn-ghost { flex: none; white-space: nowrap; }
 
-.analyse-side-col { max-width: 320px; min-width: 0; min-height: var(--side-col-h, 0px); }
+.analyse-side-col { max-width: var(--side-col-w, 320px); min-width: 0; min-height: var(--side-col-h, 0px); }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
 
 /* ---------- OPPONENT / VS COMPUTER ---------- */
