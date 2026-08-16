@@ -6,8 +6,8 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
-const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w"];
-const DEFAULTS = { "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320 };
+const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h"];
+const DEFAULTS = { "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null };
 
 function loadSaved() {
   try {
@@ -67,7 +67,7 @@ export function initLayoutResize() {
     handle.addEventListener("mousedown", (e) => {
       e.preventDefault();
       handle.classList.add("dragging");
-      const onMouseMove = (ev) => { onMove(ev.clientX); markDirty(); };
+      const onMouseMove = (ev) => { onMove(ev.clientX, ev.clientY); markDirty(); };
       const onMouseUp = () => {
         handle.classList.remove("dragging");
         document.removeEventListener("mousemove", onMouseMove);
@@ -113,6 +113,17 @@ export function initLayoutResize() {
       const maxW = layoutW - boardColW - 150 - 32; // reserve board-col + movelist floor + 2 handles
       const w = Math.max(230, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--side-col-w", w + "px");
+    });
+  }
+
+  const sideColHeightHandle = document.getElementById("sideColHeightHandle");
+  if (sideColHeightHandle) {
+    dragHandle(sideColHeightHandle, (clientX, clientY) => {
+      const sideCol = document.querySelector(".analyse-side-col");
+      const top = sideCol.getBoundingClientRect().top;
+      const maxH = window.innerHeight - top - 16;
+      const h = Math.max(120, Math.min(maxH, clientY - top));
+      document.documentElement.style.setProperty("--side-col-h", h + "px");
     });
   }
 }

@@ -82,7 +82,19 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .resize-handle:hover::after, .resize-handle.dragging::after { background: var(--brass); width: 4px; }
 .resize-handle:hover::before, .resize-handle.dragging::before { color: var(--brass); }
-@media (min-width: 861px) { .resize-handle-sidebar { display: flex; } }
+/* Horizontal variant (drags height, not width) — same handle, rotated. */
+.resize-handle-height {
+  width: 100%; height: 16px; cursor: row-resize; margin-top: 8px;
+}
+.resize-handle-height::after {
+  top: 50%; bottom: auto; left: 0; right: 0; width: auto; height: 3px;
+  transform: translateY(-50%);
+}
+.resize-handle-height::before { content: "⋯"; }
+@media (min-width: 861px) {
+  .resize-handle-sidebar { display: flex; }
+  .resize-handle-height { display: flex; }
+}
 @media (min-width: 1180px) { .resize-handle-analyse { display: flex; align-self: stretch; } }
 .layout-confirm-bar {
   position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
@@ -548,7 +560,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .pgn-input-row .btn-ghost { flex: none; white-space: nowrap; }
 
-.analyse-side-col { max-width: 320px; min-width: 0; }
+.analyse-side-col { max-width: 320px; min-width: 0; min-height: var(--side-col-h, 0px); }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
 
 /* ---------- OPPONENT / VS COMPUTER ---------- */
