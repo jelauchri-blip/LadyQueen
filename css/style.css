@@ -182,6 +182,15 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .sidebar-opponent .opponent-panel { background: var(--bg-panel-raised); margin-bottom: 0; }
 @media (min-width: 861px) {
   .sidebar-opponent { padding: 0 0 8px 10px; border-bottom: 1px solid var(--border-soft); }
+  /* One flat panel instead of a card nested inside the sidebar section: the
+     card's own border/background/padding were a second layer of inset on
+     top of .sidebar-opponent's, which is what kept pushing "Jouer" away
+     from the resize handle even after .sidebar-opponent's own padding was
+     fixed. .sidebar-opponent is now the only "window" — its content sits
+     directly in it, right-padding only what's needed to clear the handle. */
+  .sidebar-opponent .opponent-panel {
+    background: none; border: none; border-radius: 0; padding: 0;
+  }
 }
 #views { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
