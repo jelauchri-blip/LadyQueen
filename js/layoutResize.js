@@ -230,21 +230,35 @@ export function initLayoutResize() {
     movelistMoveGrip.style.top = (rect.top - 13) + "px";
   }
 
-  // A --side-col-w/--movelist-col-w saved from before "Coups joués" was
-  // always shown (or saved on a wider screen than this one) can add up to
-  // more than the row actually has room for — the grid can't fix that on
-  // its own once both are past their floors, so the whole page ends up
-  // wider than the viewport with a horizontal scrollbar at the very bottom.
-  // Silently falling back to the defaults (which are always guaranteed to
-  // fit) self-heals this instead of leaving it broken until someone manually
-  // resets it — the stale localStorage value is left alone, so a wider
-  // screen later just picks the saved size back up normally.
+  // Right around the 1180-1250px boundary (common on a maximized window
+  // under heavy Windows display scaling — confirmed on the user's own 4K
+  // screen at 300%), the board's own 480px floor plus side-col/move-list's
+  // *default* widths (320/190, not their floors) can add up to just barely
+  // more than the viewport has — even with NO custom sizing saved at all.
+  // Confirmed this happened with an *empty* localStorage via the user's own
+  // devtools, so falling back to defaults (this function's original fix)
+  // was a no-op — the defaults themselves didn't fit.
+  //
+  // The scrollbar this produces is NOT on the document/body — `html, body`
+  // have `overflow-x: hidden` as a deliberate safety net, so
+  // document.documentElement.scrollWidth can never actually reflect this
+  // overflow (checking it here was the bug in the first version of this
+  // fix). It shows up on #views instead: that element sets `overflow-y:
+  // auto` without an explicit overflow-x, and CSS silently upgrades an
+  // unset/visible overflow-x to 'auto' too whenever the other axis isn't
+  // 'visible' — so #views ends up with its own independent horizontal
+  // scrollbar the moment its content is wider than it is, regardless of
+  // what html/body do.
   function clampOverflow() {
     const analyseView = document.getElementById("view-analyse");
     if (!analyseView || !analyseView.classList.contains("active")) return;
-    if (document.documentElement.scrollWidth > document.documentElement.clientWidth + 1) {
-      document.documentElement.style.removeProperty("--side-col-w");
-      document.documentElement.style.removeProperty("--movelist-col-w");
+    const views = document.getElementById("views");
+    if (!views || views.scrollWidth <= views.clientWidth + 1) return;
+    document.documentElement.style.removeProperty("--side-col-w");
+    document.documentElement.style.removeProperty("--movelist-col-w");
+    if (views.scrollWidth > views.clientWidth + 1) {
+      document.documentElement.style.setProperty("--side-col-w", "230px");
+      document.documentElement.style.setProperty("--movelist-col-w", "150px");
     }
   }
 

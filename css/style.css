@@ -203,7 +203,16 @@ body.layout-locked .move-grip {
     background: none; border: none; border-radius: 0; padding: 0;
   }
 }
-#views { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* overflow-x explicit (not left to default 'visible'): with only overflow-y
+   set, CSS silently upgrades overflow-x to 'auto' too (visible + non-visible
+   on the other axis isn't a valid combination per spec) — meaning this
+   element got its own independent horizontal scrollbar the moment its
+   content ran a little wide, even though `html, body` already declare
+   overflow-x:hidden as a deliberate site-wide "never scroll sideways" rule
+   right above. That mismatch was invisible in most testing (nothing to
+   measure it against) and only showed up as a stray scrollbar under the
+   board on a real narrow-effective-width screen. */
+#views { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 
 .app-footer {
   max-width: 980px; margin: 0 auto; padding: 18px 20px 30px; text-align: center;
