@@ -655,7 +655,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      to it. No grip dots here (they'd look like stray clutter sitting on top
      of the board's border) — the gold line IS the board's border, just a
      little thicker, which is affordance enough once you know it's there. */
-  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; margin-left: -14px; }
+  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; width: 28px; margin-left: -26px; }
   .resize-handle-analyse.handle-board-side::before { content: none; }
   .resize-handle-analyse.handle-board-side::after { background: var(--brass); width: 4px; }
   .analyse-side-col { grid-column: 3; grid-row: 1; }
