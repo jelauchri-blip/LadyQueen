@@ -843,7 +843,12 @@ body.layout-locked .move-grip {
 .coach-error-explain { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0 0 8px; }
 .coach-error-best { font-size: 13.5px; color: var(--ink-dim); margin: 0 0 14px; }
 .coach-error-best .best-move { color: var(--brass-soft); font-family: var(--font-mono); font-weight: 600; }
-.coach-error-actions { display: flex; gap: 5px; flex-wrap: nowrap; }
+/* wrap (not nowrap): the buttons are now short enough to usually fit one
+   line, but this is a safety net rather than an exact-width guarantee — a
+   narrower column or slightly different label ("Terminer" vs "▶") should
+   drop the 4th button to its own line instead of silently overflowing into
+   a horizontal scrollbar again. */
+.coach-error-actions { display: flex; gap: 5px; flex-wrap: wrap; }
 .coach-error-actions .btn-ghost, .coach-error-actions .btn-primary { padding: 6px 8px; font-size: 11px; white-space: nowrap; }
 
 /* ---------- FULL GAME ANALYSIS ---------- */
@@ -862,12 +867,15 @@ body.layout-locked .move-grip {
 .fullgame-results { display: flex; flex-direction: column; gap: 10px; }
 
 .elo-cards { display: flex; gap: 8px; flex-wrap: nowrap; }
+/* Shrunk to match how compact the "Coup par coup" section right above it
+   already is (just a title + one button) — this card used to be noticeably
+   taller for no real reason, one line of side label + value is enough. */
 .elo-card {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
-  padding: 9px 12px; flex: 1; min-width: 0;
+  padding: 6px 10px; flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 6px;
 }
 .elo-card .elo-side { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
-.elo-card .elo-value { display: block; font-family: var(--font-display); font-size: 19px; color: var(--brass-soft); font-weight: 600; margin: 2px 0; }
+.elo-card .elo-value { font-family: var(--font-display); font-size: 15px; color: var(--brass-soft); font-weight: 600; }
 
 .phase-block { background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 10px 12px; }
 .phase-block h4 { font-family: var(--font-body); font-size: 11px; color: var(--brass-soft); margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.06em; }

@@ -354,10 +354,10 @@ function renderErrorCoach(reports) {
       <p class="coach-error-explain">${m.explanation}</p>
       ${bestSan ? `<p class="coach-error-best">Coup suggéré à la place : <span class="best-move">${bestSan}</span></p>` : ""}
       <div class="coach-error-actions">
-        <button class="btn-ghost" id="errPrevBtn" ${index === 0 ? "disabled" : ""}>◀ Précédente</button>
-        ${isVoiceSupported() ? '<button class="btn-ghost" id="errSpeakBtn">🔊 Écouter</button>' : ""}
-        <button class="btn-primary" id="errResumeBtn">↩ Reprendre à partir d'ici</button>
-        <button class="btn-ghost" id="errIgnoreBtn">${index === mistakes.length - 1 ? "Terminer" : "Ignorer → Suivante ▶"}</button>
+        <button class="btn-ghost" id="errPrevBtn" title="Erreur précédente" aria-label="Erreur précédente" ${index === 0 ? "disabled" : ""}>◀</button>
+        ${isVoiceSupported() ? '<button class="btn-ghost" id="errSpeakBtn" title="Écouter l\'explication" aria-label="Écouter l\'explication">🔊</button>' : ""}
+        <button class="btn-primary" id="errResumeBtn">↩ Reprendre ici</button>
+        <button class="btn-ghost" id="errIgnoreBtn" ${index === mistakes.length - 1 ? "" : 'title="Ignorer, aller à l\'erreur suivante" aria-label="Ignorer, aller à l\'erreur suivante"'}>${index === mistakes.length - 1 ? "Terminer" : "▶"}</button>
       </div>
     `;
 
