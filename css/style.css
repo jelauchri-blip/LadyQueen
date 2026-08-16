@@ -411,7 +411,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
    has no way to know that, so it was rendering wider than the column and
    bleeding out past the left edge into the sidebar. */
 .analyse-board-col { display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; container-type: inline-size; }
-.analyse-board-col .board { --sq: clamp(40px, min(11cqw, 8.5vh), 92px); }
+.analyse-board-col .board { --sq: clamp(40px, min(11.8cqw, 8.5vh), 92px); }
 .board-actions-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; }
 .analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
@@ -478,7 +478,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .pgn-input-row .btn-ghost { flex: none; white-space: nowrap; }
 
-.analyse-side-col { max-width: 360px; min-width: 0; }
+.analyse-side-col { max-width: 320px; min-width: 0; }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
 
 /* ---------- OPPONENT / VS COMPUTER ---------- */
@@ -552,7 +552,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      itself can't shrink, since its size comes from the --sq custom
      property, not intrinsic content sizing), and the board silently
      overflows off the left edge instead of the layout just being tight. */
-  .analyse-layout { grid-template-columns: minmax(430px, auto) minmax(260px, 360px) minmax(170px, 1fr); }
+  .analyse-layout { grid-template-columns: minmax(480px, auto) minmax(230px, 320px) minmax(150px, 1fr); }
   .movelist-wrap { grid-column: 3; grid-row: 1; align-self: start; position: sticky; top: 20px; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
