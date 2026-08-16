@@ -119,6 +119,20 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .resize-corner-grip:hover::after, .resize-corner-grip.dragging::after { opacity: 1; }
 @media (min-width: 1180px) { .resize-corner-grip { display: block; } }
+
+/* Move handle for the board — a small 4-way-arrow grip pinned to the board's
+   top-left corner (positioned the same dynamic way as .resize-corner-grip).
+   Dragging it nudges the board + its actions/nav rows as one unit via
+   .analyse-board-col's transform, independent of the resize corner. */
+.move-grip {
+  display: none; position: fixed; width: 26px; height: 26px; cursor: move;
+  z-index: 8; touch-action: none; align-items: center; justify-content: center;
+  background: var(--bg-panel-raised); border: 1px solid var(--brass); border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4); opacity: 0.85;
+}
+.move-grip::after { content: "✥"; color: var(--brass); font-size: 13px; line-height: 1; pointer-events: none; }
+.move-grip:hover, .move-grip.dragging { opacity: 1; }
+@media (min-width: 1180px) { .move-grip { display: flex; } }
 .layout-confirm-bar {
   position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
   display: flex; align-items: center; gap: 10px; background: var(--bg-panel-raised);
@@ -505,6 +519,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .analyse-board-col {
   display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; container-type: inline-size;
   --analyse-sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 92px);
+  /* Free repositioning: js/layoutResize.js writes these while dragging the
+     move handle. transform doesn't affect layout (the grid track keeps its
+     normal size/position), so this just visually nudges the board+its
+     actions/nav rows together as one unit, without disturbing anything else
+     in the grid. */
+  transform: translate(var(--board-move-x, 0px), var(--board-move-y, 0px));
 }
 .analyse-board-col .board { --sq: var(--analyse-sq); }
 /* On a screen wide enough that the board hits its 92px/square ceiling, it

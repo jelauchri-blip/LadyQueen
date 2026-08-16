@@ -6,8 +6,11 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
-const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h"];
-const DEFAULTS = { "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null };
+const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y"];
+const DEFAULTS = {
+  "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null,
+  "--board-move-x": 0, "--board-move-y": 0,
+};
 
 function loadSaved() {
   try {
@@ -124,6 +127,8 @@ export function initLayoutResize() {
   }
 
   const boardGrip = document.getElementById("boardCornerGrip");
+  const moveGrip = document.getElementById("boardMoveGrip");
+
   function positionBoardGrip() {
     if (!boardGrip) return;
     const analyseView = document.getElementById("view-analyse");
@@ -134,6 +139,19 @@ export function initLayoutResize() {
     boardGrip.style.left = (rect.right - 24) + "px";
     boardGrip.style.top = (rect.bottom - 24) + "px";
   }
+
+  function positionMoveGrip() {
+    if (!moveGrip) return;
+    const analyseView = document.getElementById("view-analyse");
+    const board = analyseView && analyseView.classList.contains("active") ? activeBoard() : null;
+    if (!board) { moveGrip.style.display = "none"; return; }
+    moveGrip.style.display = "";
+    const rect = board.getBoundingClientRect();
+    moveGrip.style.left = (rect.left - 13) + "px";
+    moveGrip.style.top = (rect.top - 13) + "px";
+  }
+
+  function positionGrips() { positionBoardGrip(); positionMoveGrip(); }
 
   if (boardGrip) {
     dragHandle(boardGrip, (clientX) => {
@@ -146,15 +164,74 @@ export function initLayoutResize() {
       const maxW = layoutW - sideColW - 150 - 16; // reserve side-col + movelist floor + 1 handle
       const w = Math.max(480, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--board-col-w", w + "px");
-      positionBoardGrip();
+      positionGrips();
     });
-    positionBoardGrip();
-    window.addEventListener("resize", positionBoardGrip);
+  }
+
+  // Free repositioning: drag delta (not absolute position, unlike the other
+  // handles) added to whatever offset was already in effect, clamped so the
+  // board can be nudged around but never dragged into the sidebar or the
+  // side column, or off the top/bottom of the screen.
+  if (moveGrip) {
+    let moveStart = null;
+    moveGrip.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      try { moveGrip.setPointerCapture(e.pointerId); } catch (err) {}
+      moveGrip.classList.add("dragging");
+      const boardCol = document.querySelector(".analyse-board-col");
+      const sidebar = document.querySelector(".sidebar");
+      const sideCol = document.querySelector(".analyse-side-col");
+      const cs = getComputedStyle(document.documentElement);
+      const offsetX = parseFloat(cs.getPropertyValue("--board-move-x")) || 0;
+      const offsetY = parseFloat(cs.getPropertyValue("--board-move-y")) || 0;
+      moveStart = {
+        startX: e.clientX, startY: e.clientY, offsetX, offsetY,
+        boardColRect: boardCol.getBoundingClientRect(),
+        sidebarRight: sidebar ? sidebar.getBoundingClientRect().right : 0,
+        sideColLeft: sideCol ? sideCol.getBoundingClientRect().left : window.innerWidth,
+      };
+      markDirty();
+      const onPointerMove = (ev) => {
+        if (!moveStart) return;
+        const dx = ev.clientX - moveStart.startX;
+        const dy = ev.clientY - moveStart.startY;
+        const naturalLeft = moveStart.boardColRect.left - moveStart.offsetX;
+        const naturalRight = moveStart.boardColRect.right - moveStart.offsetX;
+        const minX = moveStart.sidebarRight + 8 - naturalLeft;
+        const maxX = moveStart.sideColLeft - 8 - naturalRight;
+        const newX = Math.max(minX, Math.min(maxX, moveStart.offsetX + dx));
+        const naturalTop = moveStart.boardColRect.top - moveStart.offsetY;
+        const naturalBottom = moveStart.boardColRect.bottom - moveStart.offsetY;
+        const minY = 8 - naturalTop;
+        const maxY = window.innerHeight - 8 - naturalBottom;
+        const newY = Math.max(minY, Math.min(maxY, moveStart.offsetY + dy));
+        document.documentElement.style.setProperty("--board-move-x", newX + "px");
+        document.documentElement.style.setProperty("--board-move-y", newY + "px");
+        positionGrips();
+        markDirty();
+      };
+      const onPointerUp = (ev) => {
+        moveGrip.classList.remove("dragging");
+        try { moveGrip.releasePointerCapture(ev.pointerId); } catch (err) {}
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+        document.removeEventListener("pointercancel", onPointerUp);
+        moveStart = null;
+      };
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+      document.addEventListener("pointercancel", onPointerUp);
+    });
+  }
+
+  if (boardGrip || moveGrip) {
+    positionGrips();
+    window.addEventListener("resize", positionGrips);
     // Catches the editor opening/closing, switching tabs, and any other
     // change to the board area (a plain resize listener alone wouldn't fire
-    // for those) — recomputing the grip's position is cheap enough that
+    // for those) — recomputing the grips' position is cheap enough that
     // there's no need to be selective about which mutation actually mattered.
-    new MutationObserver(positionBoardGrip).observe(document.body, {
+    new MutationObserver(positionGrips).observe(document.body, {
       attributes: true, attributeFilter: ["hidden", "class"], subtree: true, childList: true,
     });
   }
