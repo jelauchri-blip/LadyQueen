@@ -469,7 +469,7 @@ function gameOverMessage(chessInst) {
     const loser = chessInst.turn();
     return `Échec et mat — ${winnerLabel(loser === "w" ? "b" : "w")} gagnent.`;
   }
-  if (chessInst.isStalemate()) return "Pat — partie nulle (aucun coup légal, pas d'échec).";
+  if (chessInst.isStalemate()) return "Pat — Match nul";
   if (chessInst.isThreefoldRepetition()) return "Nulle par répétition de position (3 fois la même position).";
   if (chessInst.isDrawByFiftyMoves()) return "Nulle par la règle des 50 coups (sans capture ni poussée de pion).";
   if (chessInst.isInsufficientMaterial()) return "Nulle par matériel insuffisant pour mater.";

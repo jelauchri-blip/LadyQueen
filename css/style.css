@@ -581,11 +581,16 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 /* ---------- GAME RESULT BANNER (centered over the board) ---------- */
 .game-result-banner {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  z-index: 7; text-align: center; white-space: nowrap; pointer-events: none;
+  z-index: 7; text-align: center; white-space: normal; pointer-events: none;
   font-family: var(--font-display); font-size: 21px; font-weight: 700;
   padding: 10px 22px; border-radius: 12px;
   background: rgba(27,31,29,0.85);
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  /* Longer results (checkmate/repetition/50-move messages) used to overflow
+     the board's edges at `nowrap` — capped to 4 squares wide (the board's
+     own --sq, inherited from .analyse-board-col) and allowed to wrap so it
+     always stays centered over the board regardless of message length. */
+  max-width: calc(4 * var(--board-sq-override, var(--analyse-sq)));
 }
 .game-result-banner[hidden] { display: none; }
 .game-result-banner.win { color: var(--success); }
