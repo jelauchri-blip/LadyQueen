@@ -734,14 +734,24 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
      (with quality marks) — the plain move list next to them is redundant, so
-     it steps aside and the analysis column takes the freed-up width. */
+     it steps aside and the analysis column takes the freed-up width. The
+     `auto` fallback this used to have for an unset --board-col-w collapsed
+     the board down to its bare 400px floor (grid `auto` sizing has nothing
+     to size itself off here, unlike the board's own --sq formula elsewhere)
+     while the uncapped `1fr` side-col grabbed everything else — the board
+     visibly shrinking/moving every time full-game results appeared. `1fr`
+     for the board (same fallback the normal 4-track layout already uses)
+     lets it keep its usual automatic size instead of collapsing, and a real
+     cap on the side-col (still driven by --side-col-w, so the width handle's
+     saved value still applies here too) stops it from taking the board's
+     freed-up width for itself. */
   .analyse-layout:has(#fullgameResults:not(:empty)) {
-    grid-template-columns: minmax(400px, var(--board-col-w, auto)) 1fr;
+    grid-template-columns: minmax(400px, var(--board-col-w, 1fr)) minmax(300px, var(--side-col-w, 400px));
   }
   .analyse-layout:has(#fullgameResults:not(:empty)) .handle-side-movelist { display: none; }
 }
 .analyse-layout:has(#fullgameResults:not(:empty)) .movelist-wrap { display: none; }
-.analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { max-width: none; }
+.analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { max-width: var(--side-col-w, 400px); }
 .movelist {
   font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); line-height: 1.9;
   list-style-position: inside; padding-left: 4px; max-height: 220px; overflow-y: auto;
