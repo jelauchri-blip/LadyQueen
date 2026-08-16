@@ -405,7 +405,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 
 /* ---------- ANALYSE ---------- */
-.analyse-layout { display: grid; grid-template-columns: auto auto; gap: 12px; align-items: start; justify-content: center; width: 100%; }
+.analyse-layout { display: grid; grid-template-columns: auto auto; column-gap: 0; row-gap: 16px; align-items: start; justify-content: center; width: 100%; }
+/* No left padding + no grid gap here: the board should touch the sidebar on
+   its left and the "Moteur & coach"/editor column on its right, with no
+   wasted gutter — the movelist column (3rd column, ≥1180px) gets its own
+   margin-left back below so it doesn't end up flush against that column too. */
+#view-analyse { padding-left: 0; }
 /* container-type lets the board below size itself off this column's ACTUAL
    width (cqw) instead of raw viewport width (vw) — the multi-column Analyse
    grid can allocate this column less width than 11vw implies (e.g. the side
@@ -413,7 +418,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
    has no way to know that, so it was rendering wider than the column and
    bleeding out past the left edge into the sidebar. */
 .analyse-board-col { display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; container-type: inline-size; }
-.analyse-board-col .board { --sq: clamp(40px, min(11.8cqw, 8.5vh), 92px); }
+/* Exact-fill formula: --gutter (18px) + the 2 borders (3px each) are FIXED
+   pixels layered on top of the 8 proportional squares, so a plain cqw
+   percentage always leaves a small sliver unfilled. Solving for
+   8×sq + 24px = 100cqw makes the board's rendered width match its column's
+   width almost exactly, instead of just approximately. */
+.analyse-board-col .board { --sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 92px); }
 .board-actions-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; }
 .analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
@@ -555,7 +565,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      property, not intrinsic content sizing), and the board silently
      overflows off the left edge instead of the layout just being tight. */
   .analyse-layout { grid-template-columns: minmax(480px, 1fr) minmax(230px, 320px) minmax(150px, 190px); }
-  .movelist-wrap { grid-column: 3; grid-row: 1; align-self: start; position: sticky; top: 20px; }
+  .movelist-wrap { grid-column: 3; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 14px; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
      (with quality marks) — the plain move list next to them is redundant, so
