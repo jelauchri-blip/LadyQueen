@@ -152,8 +152,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .theme-btn:hover { border-color: var(--brass); }
 .theme-panel {
+  /* Positioned relative to .sidebar (the nearest non-static ancestor) — must
+     stay at or under the sidebar's own width (195px), otherwise it overflows
+     past the sidebar's right edge and .sidebar's overflow-x:hidden silently
+     clips it (cut off slider value labels: "100%" rendering as just "10"). */
   position: absolute; left: 0; z-index: 20;
-  width: 220px; max-width: calc(100vw - 24px);
+  width: 185px; max-width: calc(100vw - 24px);
   background: var(--bg-panel-raised); border: 1px solid var(--border-soft);
   padding: 10px; display: flex; flex-direction: column; gap: 4px;
   box-shadow: 0 12px 28px rgba(0,0,0,0.45);
