@@ -118,8 +118,12 @@ function updateMaterialCounts() {
     if (mv.color === "w") whiteCaptured += value;
     else blackCaptured += value;
   }
-  els.materialWhite.textContent = `Blanc ${whiteCaptured}`;
-  els.materialBlack.textContent = `Noir ${blackCaptured}`;
+  // Only the leading side's advantage is shown (chess.com-style "+N"), not
+  // each side's raw capture total — the trailing side's badge is left empty
+  // rather than showing a number that just restates who's behind.
+  const diff = whiteCaptured - blackCaptured;
+  els.materialWhite.textContent = diff > 0 ? `Blanc ${diff}` : "";
+  els.materialBlack.textContent = diff < 0 ? `Noir ${-diff}` : "";
 }
 
 export function initAnalysisView() {

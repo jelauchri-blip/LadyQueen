@@ -592,6 +592,11 @@ body.layout-locked .move-grip {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 999px;
   padding: 4px 9px; flex: none; white-space: nowrap;
 }
+/* The trailing (or, at material equality, both) side's badge is left with
+   no text — collapse the pill outline itself rather than showing an empty
+   bubble with nothing in it. Stays in the DOM (not display:none) so the row
+   doesn't visually shift its balance as the lead changes hands. */
+.material-count:empty { padding: 0; border: none; background: none; }
 
 /* ---------- GAME RESULT BANNER (centered over the board) ---------- */
 .game-result-banner {
