@@ -561,17 +561,15 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 /* On a screen wide enough that the board hits its square-size ceiling, it
    stops growing and sits centered (narrower than the column) — width:100%
    alone would keep stretching this row to the full column width regardless,
-   so Blanc/Noir would spill past the board's actual edges. Capping its
-   max-width to the same 8×sq+24px the board uses keeps it exactly as wide
-   as the board, capped or not — using the same --board-sq-override fallback
-   as the board itself, so a manual corner-grip drag keeps this row in sync
-   too. (.nav-controls doesn't need this — it's already content-sized, not
-   width:100%, so it was never affected.) */
+   so Blanc/nav-controls/Noir would spill past the board's actual edges.
+   Capping its max-width to the same 8×sq+24px the board uses keeps it
+   exactly as wide as the board, capped or not — using the same
+   --board-sq-override fallback as the board itself, so a manual corner-grip
+   drag keeps this row in sync too. */
 .board-actions-row {
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
   width: 100%; max-width: calc(8 * var(--board-sq-override, var(--analyse-sq)) + 24px);
 }
-.board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
 
 /* ---------- MATERIAL COUNT (flanking Retourner/Enregistrer, below the board) ---------- */
 .material-count {
