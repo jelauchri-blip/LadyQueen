@@ -264,7 +264,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
    remaining mismatch: content elsewhere in the sidebar reaches the edge,
    theme-panel content didn't, so they visibly disagreed. */
 @media (min-width: 861px) {
-  .theme-panel { padding-right: 0; }
+  .theme-panel { padding-right: 6px; }
 }
 .theme-panel[hidden] { display: none; }
 .theme-panel-title {
