@@ -181,7 +181,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .sidebar-opponent { padding: 0 16px 12px; }
 .sidebar-opponent .opponent-panel { background: var(--bg-panel-raised); margin-bottom: 0; }
 @media (min-width: 861px) {
-  .sidebar-opponent { padding: 0 10px 8px; border-bottom: 1px solid var(--border-soft); }
+  .sidebar-opponent { padding: 0 0 8px 10px; border-bottom: 1px solid var(--border-soft); }
 }
 #views { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
