@@ -637,7 +637,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 .pgn-input-row .btn-ghost { flex: none; white-space: nowrap; }
 
-.analyse-side-col { max-width: var(--side-col-w, 320px); min-width: 0; min-height: var(--side-col-h, 0px); }
+.analyse-side-col {
+  max-width: var(--side-col-w, 320px); min-width: 0; min-height: var(--side-col-h, 0px);
+  /* Free repositioning via #sideColMoveGrip in js/layoutResize.js, same
+     transform-based nudge as .analyse-board-col — doesn't affect layout
+     (the grid track keeps its normal size/position), just visually offsets
+     the panel within whatever slack is available. */
+  transform: translate(var(--side-move-x, 0px), var(--side-move-y, 0px));
+}
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
 
 /* ---------- OPPONENT / VS COMPUTER ---------- */

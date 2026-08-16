@@ -6,10 +6,11 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
-const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override", "--movelist-col-w"];
+const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override", "--movelist-col-w", "--side-move-x", "--side-move-y"];
 const DEFAULTS = {
   "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null,
   "--board-move-x": 0, "--board-move-y": 0, "--board-sq-override": null, "--movelist-col-w": null,
+  "--side-move-x": 0, "--side-move-y": 0,
 };
 
 function loadSaved() {
@@ -128,6 +129,7 @@ export function initLayoutResize() {
 
   const boardGrip = document.getElementById("boardCornerGrip");
   const moveGrip = document.getElementById("boardMoveGrip");
+  const sideMoveGrip = document.getElementById("sideColMoveGrip");
 
   function positionBoardGrip() {
     if (!boardGrip) return;
@@ -151,7 +153,23 @@ export function initLayoutResize() {
     moveGrip.style.top = (rect.top - 13) + "px";
   }
 
-  function positionGrips() { positionBoardGrip(); positionMoveGrip(); }
+  // Same idea as positionMoveGrip, but for the "Moteur & coach" column
+  // instead of the board — pinned to its live top-left corner, hidden
+  // whenever that column isn't actually on screen (e.g. mobile layout, or
+  // the Analyse tab isn't the active view).
+  function positionSideMoveGrip() {
+    if (!sideMoveGrip) return;
+    const analyseView = document.getElementById("view-analyse");
+    const sideCol = analyseView && analyseView.classList.contains("active")
+      ? document.querySelector(".analyse-side-col") : null;
+    if (!sideCol || !sideCol.offsetParent) { sideMoveGrip.style.display = "none"; return; }
+    sideMoveGrip.style.display = "";
+    const rect = sideCol.getBoundingClientRect();
+    sideMoveGrip.style.left = (rect.left - 13) + "px";
+    sideMoveGrip.style.top = (rect.top - 13) + "px";
+  }
+
+  function positionGrips() { positionBoardGrip(); positionMoveGrip(); positionSideMoveGrip(); }
 
   if (boardGrip) {
     dragHandle(boardGrip, (clientX) => {
@@ -251,7 +269,79 @@ export function initLayoutResize() {
     });
   }
 
-  if (boardGrip || moveGrip) {
+  // Same free-repositioning idea as the board's move grip, for "Moteur &
+  // coach" instead. Its left boundary is whatever sits immediately to its
+  // left (the board/move-list handle when visible, the column's own current
+  // position otherwise — i.e. no leftward slack) and its right boundary is
+  // the move-list column when that's showing, or the layout's own right
+  // edge when it isn't (the 2-column "full-game results" mode) — covering
+  // both grid layouts this column can appear in.
+  if (sideMoveGrip) {
+    let sideMoveStart = null;
+    sideMoveGrip.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      try { sideMoveGrip.setPointerCapture(e.pointerId); } catch (err) {}
+      sideMoveGrip.classList.add("dragging");
+      const sideCol = document.querySelector(".analyse-side-col");
+      const boardCol = document.querySelector(".analyse-board-col");
+      const handle = document.getElementById("sideMovelistResizeHandle");
+      const movelist = document.querySelector(".movelist-wrap");
+      const layout = document.querySelector(".analyse-layout");
+      const sideColRect = sideCol.getBoundingClientRect();
+      const cs = getComputedStyle(document.documentElement);
+      const offsetX = parseFloat(cs.getPropertyValue("--side-move-x")) || 0;
+      const offsetY = parseFloat(cs.getPropertyValue("--side-move-y")) || 0;
+      // The handle sits on OPPOSITE sides of the side-col depending on which
+      // grid layout is active: normal mode is board | side-col | handle |
+      // move-list (handle to the right), full-game-results mode is board |
+      // handle | side-col (handle to the left) — using it as "the left
+      // boundary" unconditionally was backwards in normal mode and threw
+      // the panel clear across the screen the instant a vertical-only drag
+      // read a stale boundary from the wrong side.
+      const handleVisible = handle && handle.offsetParent;
+      const movelistVisible = movelist && movelist.offsetParent;
+      const leftBoundary = (handleVisible && !movelistVisible)
+        ? handle.getBoundingClientRect().right
+        : boardCol.getBoundingClientRect().right;
+      const rightBoundary = (handleVisible && movelistVisible)
+        ? handle.getBoundingClientRect().left
+        : layout.getBoundingClientRect().right;
+      sideMoveStart = { startX: e.clientX, startY: e.clientY, offsetX, offsetY, sideColRect, leftBoundary, rightBoundary };
+      markDirty();
+      const onPointerMove = (ev) => {
+        if (!sideMoveStart) return;
+        const dx = ev.clientX - sideMoveStart.startX;
+        const dy = ev.clientY - sideMoveStart.startY;
+        const naturalLeft = sideMoveStart.sideColRect.left - sideMoveStart.offsetX;
+        const naturalRight = sideMoveStart.sideColRect.right - sideMoveStart.offsetX;
+        const minX = sideMoveStart.leftBoundary - naturalLeft;
+        const maxX = sideMoveStart.rightBoundary - naturalRight;
+        const newX = Math.max(minX, Math.min(maxX, sideMoveStart.offsetX + dx));
+        const naturalTop = sideMoveStart.sideColRect.top - sideMoveStart.offsetY;
+        const naturalBottom = sideMoveStart.sideColRect.bottom - sideMoveStart.offsetY;
+        const minY = 8 - naturalTop;
+        const maxY = window.innerHeight - 8 - naturalBottom;
+        const newY = Math.max(minY, Math.min(maxY, sideMoveStart.offsetY + dy));
+        document.documentElement.style.setProperty("--side-move-x", newX + "px");
+        document.documentElement.style.setProperty("--side-move-y", newY + "px");
+        positionSideMoveGrip();
+        markDirty();
+      };
+      const onPointerUp = (ev) => {
+        sideMoveGrip.classList.remove("dragging");
+        try { sideMoveGrip.releasePointerCapture(ev.pointerId); } catch (err) {}
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+        document.removeEventListener("pointercancel", onPointerUp);
+        sideMoveStart = null;
+      };
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+      document.addEventListener("pointercancel", onPointerUp);
+    });
+  }
+
+  if (boardGrip || moveGrip || sideMoveGrip) {
     positionGrips();
     window.addEventListener("resize", positionGrips);
     // Catches the editor opening/closing, switching tabs, and any other
