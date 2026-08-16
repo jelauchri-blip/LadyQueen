@@ -86,6 +86,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   }
   .tab-btn { width: 100%; justify-content: flex-start; border-radius: 8px; border-bottom: none; }
   .tab-btn.active { background: var(--bg-panel-raised); border-bottom-color: transparent; }
+  /* Match the sidebar's own width exactly instead of a separate fixed number
+     — the two drifting apart (this panel narrower than .sidebar) is what
+     made it stop lining up flush with the nav below it. The extra `.sidebar`
+     ancestor here isn't just for scoping: it also raises this rule's
+     specificity above the base `.theme-panel` width rule below it in the
+     file, since a later media query alone doesn't win a cascade tie against
+     an unconditional rule that simply comes after it in source order. */
+  .sidebar .theme-panel { width: 100%; }
 }
 
 .topbar, .tabs, .app-footer, .sidebar-opponent { flex: none; }
