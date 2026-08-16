@@ -741,10 +741,18 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      cap on the side-col (still driven by --side-col-w, so the width handle's
      saved value still applies here too) stops it from taking the board's
      freed-up width for itself. */
+  /* The move-list's own handle is reused here rather than adding a second
+     one — it still just drags --side-col-w, same as in the 4-column mode,
+     but now sits directly between board and side-col since there's no
+     move-list column to be "between side-col and move-list" of anymore.
+     Leaving it display:none (as before) removed the *only* way to resize
+     this panel's width whenever results were showing — the panel was stuck
+     wide open with no handle in sight. */
   .analyse-layout:has(#fullgameResults:not(:empty)) {
-    grid-template-columns: minmax(400px, var(--board-col-w, 1fr)) minmax(300px, var(--side-col-w, 400px));
+    grid-template-columns: minmax(400px, var(--board-col-w, 1fr)) 16px minmax(300px, var(--side-col-w, 400px));
   }
-  .analyse-layout:has(#fullgameResults:not(:empty)) .handle-side-movelist { display: none; }
+  .analyse-layout:has(#fullgameResults:not(:empty)) .handle-side-movelist { grid-column: 2; }
+  .analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { grid-column: 3; }
 }
 .analyse-layout:has(#fullgameResults:not(:empty)) .movelist-wrap { display: none; }
 .analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { max-width: var(--side-col-w, 400px); }

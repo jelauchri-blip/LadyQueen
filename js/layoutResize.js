@@ -269,23 +269,40 @@ export function initLayoutResize() {
     dragHandle(sideMovelistHandle, (clientX) => {
       const layout = document.querySelector(".analyse-layout");
       const sideCol = document.querySelector(".analyse-side-col");
-      const boardColW = document.querySelector(".analyse-board-col").getBoundingClientRect().width;
+      // Reserve the board's own rendered size, not its grid column's — the
+      // column can be wider than the board actually needs (e.g. when the
+      // board's automatic size is capped by the 8.5vh term rather than by
+      // its column's width), and reserving that unused slack as if the
+      // board needed it artificially capped how far this handle could grow
+      // the side panel, well short of the space genuinely available.
+      const board = activeBoard();
+      const boardColW = board ? board.getBoundingClientRect().width : document.querySelector(".analyse-board-col").getBoundingClientRect().width;
       const layoutW = layout.getBoundingClientRect().width;
       const left = sideCol.getBoundingClientRect().left;
-      const maxW = layoutW - boardColW - MOVELIST_FLOOR - 16; // reserve board-col + movelist floor + 1 handle
+      // Once full-game results are showing, the move-list column doesn't
+      // exist at all (see the .analyse-layout:has(#fullgameResults...) rule
+      // in style.css) — reserving its 150px floor here as if it still did
+      // would just cut this drag's range short for no reason.
+      const fullgameResults = document.getElementById("fullgameResults");
+      const resultsMode = !!(fullgameResults && fullgameResults.children.length > 0);
+      const maxW = layoutW - boardColW - (resultsMode ? 0 : MOVELIST_FLOOR) - 16; // reserve board-col + (movelist floor) + 1 handle
       const w = Math.max(230, Math.min(maxW, clientX - left));
       document.documentElement.style.setProperty("--side-col-w", w + "px");
-      // The board column is `1fr` (flexible) in the grid, so it silently
-      // absorbed whatever "Moteur & coach" grew into — widening the coach
-      // panel visibly shrank the board even though nothing about the board
-      // itself was touched. The move-list column next to it, on the other
-      // hand, sat untouched at a fixed width regardless of this drag. Taking
-      // the growth out of the move-list's width instead (down to its own
-      // floor) keeps side-col + move-list's combined width constant, so the
-      // board's automatic share of the row never changes from this handle.
-      const growth = Math.max(0, w - SIDE_COL_DEFAULT);
-      const movelistW = Math.max(MOVELIST_FLOOR, MOVELIST_DEFAULT - growth);
-      document.documentElement.style.setProperty("--movelist-col-w", movelistW + "px");
+      if (!resultsMode) {
+        // The board column is `1fr` (flexible) in the grid, so it silently
+        // absorbed whatever "Moteur & coach" grew into — widening the coach
+        // panel visibly shrank the board even though nothing about the board
+        // itself was touched. The move-list column next to it, on the other
+        // hand, sat untouched at a fixed width regardless of this drag.
+        // Taking the growth out of the move-list's width instead (down to
+        // its own floor) keeps side-col + move-list's combined width
+        // constant, so the board's automatic share of the row never changes
+        // from this handle. Irrelevant in results mode — no move-list column
+        // to shrink there, --movelist-col-w isn't even read by that layout.
+        const growth = Math.max(0, w - SIDE_COL_DEFAULT);
+        const movelistW = Math.max(MOVELIST_FLOOR, MOVELIST_DEFAULT - growth);
+        document.documentElement.style.setProperty("--movelist-col-w", movelistW + "px");
+      }
     });
   }
 
