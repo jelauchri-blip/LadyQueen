@@ -72,7 +72,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 @media (min-width: 861px) {
   #app { max-width: 1600px; flex-direction: row; align-items: stretch; }
   .sidebar {
-    width: 220px; flex: none; display: flex; flex-direction: column;
+    width: 195px; flex: none; display: flex; flex-direction: column;
     background: var(--bg-panel); border-right: 1px solid var(--border-soft);
     overflow-y: auto; overflow-x: hidden;
   }
@@ -552,7 +552,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      itself can't shrink, since its size comes from the --sq custom
      property, not intrinsic content sizing), and the board silently
      overflows off the left edge instead of the layout just being tight. */
-  .analyse-layout { grid-template-columns: minmax(400px, auto) minmax(300px, 420px) minmax(200px, 1fr); }
+  .analyse-layout { grid-template-columns: minmax(430px, auto) minmax(260px, 360px) minmax(170px, 1fr); }
   .movelist-wrap { grid-column: 3; grid-row: 1; align-self: start; position: sticky; top: 20px; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
