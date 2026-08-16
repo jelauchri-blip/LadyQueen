@@ -46,7 +46,6 @@ export function initPositionEditor({ mount, onValidate }) {
   panel.className = "editor-panel";
   panel.innerHTML = `
     <div class="editor-toolbar">
-      <p class="eyebrow">Placer les pièces</p>
       <div class="editor-color-toggle" id="editorColorToggle">
         <button type="button" class="sel" data-color="w">Blancs</button>
         <button type="button" data-color="b">Noirs</button>

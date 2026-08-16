@@ -280,7 +280,7 @@
         </div>
 
         <div class="analyse-side-col">
-          <details class="side-section">
+          <details class="side-section" name="sideAccordion">
           <summary>Moteur &amp; coach</summary>
           <div class="engine-toggle-row">
             <span>Moteur d'analyse</span>
@@ -316,7 +316,7 @@
           <div id="moveExplanation" class="move-explanation" hidden></div>
           </details>
 
-          <details class="side-section">
+          <details class="side-section" name="sideAccordion">
           <summary>Analyse complète de la partie</summary>
           <div class="fullgame-panel">
             <div class="fullgame-controls">
@@ -332,7 +332,9 @@
           </div>
           </details>
 
-          <div id="editorControlsMount" class="editor-controls-mount" hidden></div>
+          <details id="editorControlsMount" class="side-section" name="sideAccordion" hidden>
+          <summary>Placer les pièces</summary>
+          </details>
           <div class="resize-handle resize-handle-height" id="sideColHeightHandle" title="Glisser pour étirer"></div>
         </div>
 

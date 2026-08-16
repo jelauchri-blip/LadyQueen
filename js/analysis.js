@@ -150,6 +150,7 @@ export function initAnalysisView() {
   els.openEditorBtn = document.getElementById("openEditorBtn");
   els.editorMount = document.getElementById("editorMount");
   els.editorControlsMount = document.getElementById("editorControlsMount");
+  els.sideSections = document.querySelectorAll(".analyse-side-col > details.side-section");
   els.setupControls = document.getElementById("setupControls");
   els.boardWrap = document.querySelector(".board-wrap");
   els.boardActionsRow = document.querySelector(".board-actions-row");
@@ -385,6 +386,23 @@ export function initAnalysisView() {
     if (els.navControls) els.navControls.style.display = visible ? "" : "none";
   }
 
+  // Exclusive accordion: opening one of "Moteur & coach" / "Analyse complète
+  // de la partie" / "Placer les pièces" hides the other two headers entirely
+  // instead of just leaving them closed-but-visible, so only the section
+  // currently in use takes up space. Closing it brings the others back. The
+  // shared name="sideAccordion" on all three <details> already makes the
+  // browser auto-close whichever was open when another one is opened; this
+  // only adds the "hide the closed ones' headers too" part on top.
+  function syncSideSections() {
+    const open = Array.from(els.sideSections).find(s => s.open && !s.hidden);
+    els.sideSections.forEach(s => {
+      if (s.hidden) return; // base visibility (e.g. editor not active) is untouched
+      s.style.display = open && s !== open ? "none" : "";
+    });
+  }
+  els.sideSections.forEach(s => s.addEventListener("toggle", syncSideSections));
+  syncSideSections();
+
   let editorInited = false;
   els.openEditorBtn.onclick = () => {
     const isOpen = !els.editorMount.hidden;
@@ -393,12 +411,17 @@ export function initAnalysisView() {
       if (els.editorControlsMount) els.editorControlsMount.hidden = true;
       setBoardChromeVisible(true);
       els.openEditorBtn.textContent = "✎ Créer une position";
+      syncSideSections();
       return;
     }
     els.editorMount.hidden = false;
-    if (els.editorControlsMount) els.editorControlsMount.hidden = false;
+    if (els.editorControlsMount) {
+      els.editorControlsMount.hidden = false;
+      els.editorControlsMount.open = true;
+    }
     setBoardChromeVisible(false);
     els.openEditorBtn.textContent = "✕ Fermer l'éditeur";
+    syncSideSections();
     if (!editorInited) {
       editorInited = true;
       const boardHolder = document.createElement("div");
@@ -418,6 +441,7 @@ export function initAnalysisView() {
           if (els.editorControlsMount) els.editorControlsMount.hidden = true;
           setBoardChromeVisible(true);
           els.openEditorBtn.textContent = "✎ Créer une position";
+          syncSideSections();
         },
       });
       api.mountBoard(boardHolder);

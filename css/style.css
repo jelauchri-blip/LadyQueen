@@ -758,12 +758,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .editor-board .sq { cursor: pointer; }
 /* The controls (palette, turn, castling, validate) live in the side column
    next to "Analyse complète de la partie", not under the board anymore —
-   only the editor board itself stays there. Styled like the .side-section
-   cards above it for visual consistency. */
-.editor-controls-mount {
-  background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
-  padding: 14px 16px; margin-top: 14px;
-}
+   only the editor board itself stays there. #editorControlsMount is itself
+   a .side-section <details> (see index.html), so it already gets the same
+   card background/border/padding and collapsible header as its siblings —
+   nothing extra needed here. */
 .editor-panel { width: 100%; display: flex; flex-direction: column; gap: 14px; }
 .editor-toolbar { display: flex; flex-direction: column; gap: 8px; }
 .editor-color-toggle { display: flex; gap: 6px; }
