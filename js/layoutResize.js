@@ -474,19 +474,7 @@ export function initLayoutResize() {
       const boardColW = board ? board.getBoundingClientRect().width : document.querySelector(".analyse-board-col").getBoundingClientRect().width;
       const layoutW = layout.getBoundingClientRect().width;
       const left = sideCol.getBoundingClientRect().left;
-      const fullgameResults = document.getElementById("fullgameResults");
-      const resultsMode = !!(fullgameResults && fullgameResults.children.length > 0);
-      if (resultsMode) {
-        // Once full-game results are showing, the move-list column doesn't
-        // exist at all (see .analyse-layout:has(#fullgameResults...) in
-        // style.css) — nothing to split with, side-col just gets whatever's
-        // left after the (protected) board.
-        const maxW = layoutW - boardColW - 16;
-        const w = Math.max(SIDE_COL_FLOOR, Math.min(maxW, clientX - left));
-        document.documentElement.style.setProperty("--side-col-w", w + "px");
-        return;
-      }
-      // Normal mode: side-col and move-list share a fixed combined budget —
+      // side-col and move-list share a fixed combined budget —
       // whatever's left of the row after the board's own (protected) width —
       // so this is a genuine two-way splitter between them, not side-col
       // alone chasing the cursor while move-list could only ever passively

@@ -766,34 +766,15 @@ body.layout-locked .move-grip {
     transform: translate(var(--movelist-move-x, 0px), var(--movelist-move-y, 0px));
   }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
-  /* Once "Coup par coup" results are showing, they already repeat every move
-     (with quality marks) — the plain move list next to them is redundant, so
-     it steps aside and the analysis column takes the freed-up width. The
-     `auto` fallback this used to have for an unset --board-col-w collapsed
-     the board down to its bare 400px floor (grid `auto` sizing has nothing
-     to size itself off here, unlike the board's own --sq formula elsewhere)
-     while the uncapped `1fr` side-col grabbed everything else — the board
-     visibly shrinking/moving every time full-game results appeared. `1fr`
-     for the board (same fallback the normal 4-track layout already uses)
-     lets it keep its usual automatic size instead of collapsing, and a real
-     cap on the side-col (still driven by --side-col-w, so the width handle's
-     saved value still applies here too) stops it from taking the board's
-     freed-up width for itself. */
-  /* The move-list's own handle is reused here rather than adding a second
-     one — it still just drags --side-col-w, same as in the 4-column mode,
-     but now sits directly between board and side-col since there's no
-     move-list column to be "between side-col and move-list" of anymore.
-     Leaving it display:none (as before) removed the *only* way to resize
-     this panel's width whenever results were showing — the panel was stuck
-     wide open with no handle in sight. */
-  .analyse-layout:has(#fullgameResults:not(:empty)) {
-    grid-template-columns: minmax(400px, var(--board-col-w, 1fr)) 16px minmax(300px, var(--side-col-w, 400px));
-  }
-  .analyse-layout:has(#fullgameResults:not(:empty)) .handle-side-movelist { grid-column: 2; }
-  .analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { grid-column: 3; }
+  /* "Coup par coup" results used to hide this whole move-list column,
+     reasoning it was redundant once results list every move themselves —
+     but the user explicitly wants to keep seeing it alongside the results
+     too, so the 4-track layout above now applies uniformly whether or not
+     #fullgameResults has content. (This is also why there's no separate
+     "results mode" grid-template-columns override here anymore — the one
+     that used to live here caused its own bugs, see git history, not worth
+     maintaining two parallel grid definitions for no reason now.) */
 }
-.analyse-layout:has(#fullgameResults:not(:empty)) .movelist-wrap { display: none; }
-.analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { max-width: var(--side-col-w, 400px); }
 .movelist {
   font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); line-height: 1.9;
   list-style-position: inside; padding-left: 4px; max-height: 220px; overflow-y: auto;
