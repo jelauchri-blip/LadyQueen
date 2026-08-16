@@ -32,6 +32,7 @@ const CORE_ASSETS = [
   "./js/dataBackup.js",
   "./js/sounds.js",
   "./js/playerNames.js",
+  "./js/layoutResize.js",
 ];
 
 self.addEventListener("install", (event) => {

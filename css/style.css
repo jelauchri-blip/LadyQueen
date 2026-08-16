@@ -63,6 +63,27 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .content-col { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0; }
 .sidebar { position: relative; }
 
+/* ---------- RESIZE HANDLES (drag to resize sidebar / Analyse columns) ---------- */
+.resize-handle {
+  display: none; flex: none; width: 8px; position: relative; cursor: col-resize;
+  touch-action: none; z-index: 5;
+}
+.resize-handle::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+  background: var(--border-soft); transform: translateX(-50%);
+}
+.resize-handle:hover::after, .resize-handle.dragging::after { background: var(--brass); width: 3px; }
+@media (min-width: 861px) { .resize-handle-sidebar { display: block; } }
+@media (min-width: 1180px) { .resize-handle-analyse { display: block; align-self: stretch; } }
+.layout-confirm-bar {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
+  display: flex; align-items: center; gap: 10px; background: var(--bg-panel-raised);
+  border: 1px solid var(--brass); border-radius: 999px; padding: 8px 10px 8px 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); font-size: 12.5px; color: var(--ink-dim);
+}
+.layout-confirm-bar[hidden] { display: none; }
+.layout-confirm-bar button { font-size: 12px; padding: 6px 12px; }
+
 /* ---------- SIDEBAR LAYOUT (desktop) ----------
    Below 861px the app keeps its original phone/tablet layout: topbar row
    + horizontal tab strip, both stacked above the views, #app capped at
@@ -72,7 +93,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 @media (min-width: 861px) {
   #app { max-width: 1600px; flex-direction: row; align-items: stretch; }
   .sidebar {
-    width: 195px; flex: none; display: flex; flex-direction: column;
+    width: var(--sidebar-w, 195px); flex: none; display: flex; flex-direction: column;
     background: var(--bg-panel); border-right: 1px solid var(--border-soft);
     overflow-y: auto; overflow-x: hidden;
     scrollbar-width: none; /* still scrollable (wheel/trackpad), just not drawn */
@@ -592,13 +613,34 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      itself can't shrink, since its size comes from the --sq custom
      property, not intrinsic content sizing), and the board silently
      overflows off the left edge instead of the layout just being tight. */
-  .analyse-layout { grid-template-columns: minmax(480px, 1fr) minmax(230px, 320px) minmax(150px, 190px); }
-  .movelist-wrap { grid-column: 3; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 14px; }
+  /* 5 tracks: board | drag handle | side-col | drag handle | movelist.
+     Board/side-col/movelist widths are CSS custom properties (js/layoutResize.js
+     writes them on drag), each with a minmax() floor so a handle dragged to
+     an extreme can't collapse a column below a usable size. Explicit
+     grid-column below (not DOM order) is what actually places each track —
+     robust regardless of when/where the handle elements get inserted. */
+  .analyse-layout {
+    grid-template-columns:
+      minmax(480px, var(--board-col-w, 1fr))
+      8px
+      minmax(230px, var(--side-col-w, 320px))
+      8px
+      minmax(150px, var(--movelist-col-w, 190px));
+  }
+  .analyse-board-col { grid-column: 1; grid-row: 1; }
+  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; }
+  .analyse-side-col { grid-column: 3; grid-row: 1; }
+  .resize-handle-analyse.handle-side-movelist { grid-column: 4; grid-row: 1; align-self: stretch; }
+  .movelist-wrap { grid-column: 5; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
      (with quality marks) — the plain move list next to them is redundant, so
      it steps aside and the analysis column takes the freed-up width. */
-  .analyse-layout:has(#fullgameResults:not(:empty)) { grid-template-columns: minmax(400px, auto) 1fr; }
+  .analyse-layout:has(#fullgameResults:not(:empty)) {
+    grid-template-columns: minmax(400px, var(--board-col-w, auto)) 1fr;
+  }
+  .analyse-layout:has(#fullgameResults:not(:empty)) .handle-board-side,
+  .analyse-layout:has(#fullgameResults:not(:empty)) .handle-side-movelist { display: none; }
 }
 .analyse-layout:has(#fullgameResults:not(:empty)) .movelist-wrap { display: none; }
 .analyse-layout:has(#fullgameResults:not(:empty)) .analyse-side-col { max-width: none; }

@@ -6,6 +6,9 @@ import { initAnalysisView, loadPgnString } from "./analysis.js";
 import { getPieceStyle, setPieceStyle } from "./pieceStyle.js";
 import { isSoundEnabled, setSoundEnabled } from "./sounds.js";
 import { initLibraryView } from "./libraryView.js";
+import { initLayoutResize } from "./layoutResize.js";
+
+initLayoutResize();
 
 const tabButtons = document.querySelectorAll(".tab-btn");
 const views = document.querySelectorAll(".view");

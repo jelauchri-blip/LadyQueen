@@ -179,6 +179,8 @@
 
   </div>
 
+  <div class="resize-handle resize-handle-sidebar" id="sidebarResizeHandle" title="Glisser pour redimensionner"></div>
+
   <div class="content-col">
 
   <main id="views">
@@ -276,6 +278,9 @@
           </div>
           <div id="editorMount" class="editor-mount" hidden></div>
         </div>
+
+        <div class="resize-handle resize-handle-analyse handle-board-side" id="boardSideResizeHandle" title="Glisser pour redimensionner"></div>
+
         <div class="analyse-side-col">
           <details class="side-section">
           <summary>Moteur &amp; coach</summary>
@@ -332,6 +337,8 @@
           <div id="editorControlsMount" class="editor-controls-mount" hidden></div>
         </div>
 
+        <div class="resize-handle resize-handle-analyse handle-side-movelist" id="sideMovelistResizeHandle" title="Glisser pour redimensionner"></div>
+
         <div class="movelist-wrap">
           <p class="eyebrow">Coups joués</p>
           <ol id="moveList" class="movelist"></ol>
@@ -379,6 +386,12 @@
       <button class="btn-primary" id="onboardingCloseBtn">Commencer →</button>
     </div>
   </div>
+</div>
+
+<div class="layout-confirm-bar" id="layoutConfirmBar" hidden>
+  <span>Nouvelle disposition</span>
+  <button class="btn-ghost" id="layoutResetBtn">↺ Annuler</button>
+  <button class="btn-primary" id="layoutValidateBtn">✓ Valider</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
