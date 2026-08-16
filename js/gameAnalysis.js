@@ -208,11 +208,11 @@ export function buildExplanation(mv, classification, cpLoss, tags, beforeSigned,
   const sideLabel = mv.color === "w" ? "Les Blancs" : "Les Noirs";
 
   const engineSentence = {
-    excellent: `${classification.label} : ce coup ne cède quasiment rien par rapport au meilleur coup du moteur (perte ≈ ${cpLoss} centipions).`,
-    good: `${classification.label} : coup solide, proche de l'optimum du moteur (perte ≈ ${cpLoss} centipions).`,
-    inaccuracy: `${classification.label} : un coup plus précis existait ; l'évaluation se dégrade légèrement (perte ≈ ${cpLoss} centipions).`,
-    mistake: `${classification.label} : ce coup cède un avantage significatif (perte ≈ ${cpLoss} centipions).`,
-    blunder: `${classification.label} : ce coup change probablement l'issue de la partie (perte ≈ ${cpLoss} centipions).`,
+    excellent: `${classification.label} : coup quasi optimal.`,
+    good: `${classification.label} : coup solide, proche de l'optimum du moteur.`,
+    inaccuracy: `${classification.label} : un coup plus précis existait.`,
+    mistake: `${classification.label} : ce coup cède un avantage significatif.`,
+    blunder: `${classification.label} : ce coup change probablement l'issue de la partie.`,
   }[classification.key];
   parts.push(engineSentence);
 
