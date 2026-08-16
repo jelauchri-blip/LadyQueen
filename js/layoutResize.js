@@ -195,10 +195,17 @@ export function initLayoutResize() {
         if (!moveStart) return;
         const dx = ev.clientX - moveStart.startX;
         const dy = ev.clientY - moveStart.startY;
+        // No safety buffer here: the board sits flush (0 gap) against the
+        // sidebar/side-col by default, and that flush position must stay
+        // reachable — an earlier version reserved 8px on each side "just in
+        // case", which doesn't sound like much but as a hard minimum it
+        // shoved the board 8px away from flush the instant a drag started,
+        // and then refused to let it back to flush ("un mur infranchissable"
+        // for a gap the fix itself had just created).
         const naturalLeft = moveStart.boardColRect.left - moveStart.offsetX;
         const naturalRight = moveStart.boardColRect.right - moveStart.offsetX;
-        const minX = moveStart.sidebarRight + 8 - naturalLeft;
-        const maxX = moveStart.sideColLeft - 8 - naturalRight;
+        const minX = moveStart.sidebarRight - naturalLeft;
+        const maxX = moveStart.sideColLeft - naturalRight;
         const newX = Math.max(minX, Math.min(maxX, moveStart.offsetX + dx));
         const naturalTop = moveStart.boardColRect.top - moveStart.offsetY;
         const naturalBottom = moveStart.boardColRect.bottom - moveStart.offsetY;
