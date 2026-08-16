@@ -403,7 +403,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 }
 
 /* ---------- ANALYSE ---------- */
-.analyse-layout { display: grid; grid-template-columns: auto auto; gap: 28px; align-items: start; justify-content: center; width: 100%; }
+.analyse-layout { display: grid; grid-template-columns: auto auto; gap: 12px; align-items: start; justify-content: center; width: 100%; }
 /* container-type lets the board below size itself off this column's ACTUAL
    width (cqw) instead of raw viewport width (vw) — the multi-column Analyse
    grid can allocate this column less width than 11vw implies (e.g. the side
@@ -552,7 +552,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      itself can't shrink, since its size comes from the --sq custom
      property, not intrinsic content sizing), and the board silently
      overflows off the left edge instead of the layout just being tight. */
-  .analyse-layout { grid-template-columns: minmax(480px, auto) minmax(230px, 320px) minmax(150px, 1fr); }
+  .analyse-layout { grid-template-columns: minmax(480px, 1fr) minmax(230px, 320px) minmax(150px, 190px); }
   .movelist-wrap { grid-column: 3; grid-row: 1; align-self: start; position: sticky; top: 20px; }
   .movelist-wrap .movelist { max-height: calc(100vh - 220px); }
   /* Once "Coup par coup" results are showing, they already repeat every move
