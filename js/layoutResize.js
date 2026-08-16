@@ -63,18 +63,40 @@ export function initLayoutResize() {
     confirmBar.hidden = true;
   };
 
+  // Pointer Events + setPointerCapture instead of plain mouse events: once
+  // the drag starts, every subsequent move/up for that pointer is routed to
+  // this element even if the cursor moves faster than the browser can track
+  // it or briefly leaves the element — a plain mousemove-on-document listener
+  // can drop/desync in exactly that situation, which reads to the user as
+  // "the handle just doesn't do anything".
   function dragHandle(handle, onMove) {
-    handle.addEventListener("mousedown", (e) => {
+    handle.addEventListener("pointerdown", (e) => {
       e.preventDefault();
+      // setPointerCapture can throw (e.g. no "active" pointer by the time
+      // this runs, seen with some browser/extension combos) — if it does,
+      // the drag must still work, just without capture's benefit of staying
+      // tracked past the element's edges. A throw here must never abort the
+      // rest of the handler, or the whole handle would silently do nothing.
+      try { handle.setPointerCapture(e.pointerId); } catch (err) {}
       handle.classList.add("dragging");
-      const onMouseMove = (ev) => { onMove(ev.clientX, ev.clientY); markDirty(); };
-      const onMouseUp = () => {
+      onMove(e.clientX, e.clientY);
+      markDirty();
+      const onPointerMove = (ev) => { onMove(ev.clientX, ev.clientY); markDirty(); };
+      const onPointerUp = (ev) => {
         handle.classList.remove("dragging");
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+        try { handle.releasePointerCapture(ev.pointerId); } catch (err) {}
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+        document.removeEventListener("pointercancel", onPointerUp);
       };
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+      // Listen on `document`, not just `handle`: pointer capture (when it
+      // succeeds) already redirects events to `handle` regardless of where
+      // the cursor physically is, but if capture failed above, only a
+      // document-level listener keeps receiving moves once the cursor drifts
+      // off the 16px-wide handle — which, dragging fast, it always will.
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+      document.addEventListener("pointercancel", onPointerUp);
     });
   }
 
