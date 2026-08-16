@@ -421,14 +421,30 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
    column + move list eating into it), and .board's normal vw-based formula
    has no way to know that, so it was rendering wider than the column and
    bleeding out past the left edge into the sidebar. */
-.analyse-board-col { display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; container-type: inline-size; }
 /* Exact-fill formula: --gutter (18px) + the 2 borders (3px each) are FIXED
    pixels layered on top of the 8 proportional squares, so a plain cqw
    percentage always leaves a small sliver unfilled. Solving for
    8×sq + 24px = 100cqw makes the board's rendered width match its column's
-   width almost exactly, instead of just approximately. */
-.analyse-board-col .board { --sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 92px); }
-.board-actions-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; }
+   width almost exactly, instead of just approximately. Set here (not just on
+   .board) so board-actions-row/nav-controls below can read the same value —
+   they're siblings of .board, not descendants, so they can't see a custom
+   property declared only on .board itself. */
+.analyse-board-col {
+  display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; container-type: inline-size;
+  --analyse-sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 92px);
+}
+.analyse-board-col .board { --sq: var(--analyse-sq); }
+/* On a screen wide enough that the board hits its 92px/square ceiling, it
+   stops growing and sits centered (narrower than the column) — width:100%
+   alone would keep stretching this row to the full column width regardless,
+   so Blanc/Retourner/Noir would spill past the board's actual edges. Capping
+   its max-width to the same 8×sq+24px the board uses keeps it exactly as
+   wide as the board, capped or not. (.nav-controls doesn't need this — it's
+   already content-sized, not width:100%, so it was never affected.) */
+.board-actions-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  width: 100%; max-width: calc(8 * var(--analyse-sq) + 24px);
+}
 .analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
 
