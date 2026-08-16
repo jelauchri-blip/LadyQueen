@@ -133,6 +133,17 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .move-grip::after { content: "✥"; color: var(--brass); font-size: 13px; line-height: 1; pointer-events: none; }
 .move-grip:hover, .move-grip.dragging { opacity: 1; }
 @media (min-width: 1180px) { .move-grip { display: flex; } }
+
+/* Double-clicking any handle locks the whole layout (js/layoutResize.js) —
+   every handle disappears instead of just closing/resetting, so nothing can
+   be nudged by accident once the sizing suits you. The elements stay in the
+   DOM at the same position/size, still clickable, just invisible — double-
+   clicking that same spot again brings everything back. */
+body.layout-locked .resize-handle,
+body.layout-locked .resize-corner-grip,
+body.layout-locked .move-grip {
+  opacity: 0;
+}
 .layout-confirm-bar {
   position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
   display: flex; align-items: center; gap: 10px; background: var(--bg-panel-raised);

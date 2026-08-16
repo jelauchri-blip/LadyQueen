@@ -6,6 +6,7 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
+const LOCK_KEY = "echiquier_layout_locked";
 const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override", "--movelist-col-w", "--side-move-x", "--side-move-y", "--movelist-move-x", "--movelist-move-y"];
 const DEFAULTS = {
   "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null,
@@ -67,6 +68,30 @@ export function initLayoutResize() {
     confirmBar.hidden = true;
   };
 
+  // Double-clicking any handle locks the whole layout in place: saves
+  // whatever's currently in effect (same as clicking "Valider"), then hides
+  // every handle so nothing can be nudged by accident. Double-clicking again
+  // (same spot — the elements stay in the DOM, just invisible, so the hit
+  // target doesn't move) brings them all back. Locked state persists across
+  // reloads, separately from the sizes themselves.
+  let locked = localStorage.getItem(LOCK_KEY) === "1";
+  function applyLockedClass() { document.body.classList.toggle("layout-locked", locked); }
+  applyLockedClass();
+  function toggleLock() {
+    if (!locked) {
+      const merged = { ...loadSaved(), ...currentVars() };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(merged)); } catch (e) {}
+      sessionStart = null;
+      confirmBar.hidden = true;
+    }
+    locked = !locked;
+    try { localStorage.setItem(LOCK_KEY, locked ? "1" : "0"); } catch (e) {}
+    applyLockedClass();
+  }
+  function registerLockToggle(el) {
+    if (el) el.addEventListener("dblclick", (e) => { e.preventDefault(); toggleLock(); });
+  }
+
   // Pointer Events + setPointerCapture instead of plain mouse events: once
   // the drag starts, every subsequent move/up for that pointer is routed to
   // this element even if the cursor moves faster than the browser can track
@@ -74,7 +99,9 @@ export function initLayoutResize() {
   // can drop/desync in exactly that situation, which reads to the user as
   // "the handle just doesn't do anything".
   function dragHandle(handle, onMove) {
+    registerLockToggle(handle);
     handle.addEventListener("pointerdown", (e) => {
+      if (locked) return;
       e.preventDefault();
       // setPointerCapture can throw (e.g. no "active" pointer by the time
       // this runs, seen with some browser/extension combos) — if it does,
@@ -227,8 +254,10 @@ export function initLayoutResize() {
   // board can be nudged around but never dragged into the sidebar or the
   // side column, or off the top/bottom of the screen.
   if (moveGrip) {
+    registerLockToggle(moveGrip);
     let moveStart = null;
     moveGrip.addEventListener("pointerdown", (e) => {
+      if (locked) return;
       e.preventDefault();
       try { moveGrip.setPointerCapture(e.pointerId); } catch (err) {}
       moveGrip.classList.add("dragging");
@@ -293,8 +322,10 @@ export function initLayoutResize() {
   // edge when it isn't (the 2-column "full-game results" mode) — covering
   // both grid layouts this column can appear in.
   if (sideMoveGrip) {
+    registerLockToggle(sideMoveGrip);
     let sideMoveStart = null;
     sideMoveGrip.addEventListener("pointerdown", (e) => {
+      if (locked) return;
       e.preventDefault();
       try { sideMoveGrip.setPointerCapture(e.pointerId); } catch (err) {}
       sideMoveGrip.classList.add("dragging");
@@ -364,8 +395,10 @@ export function initLayoutResize() {
   // anything to its right except the layout's own edge — no mode-switching
   // to account for.
   if (movelistMoveGrip) {
+    registerLockToggle(movelistMoveGrip);
     let movelistMoveStart = null;
     movelistMoveGrip.addEventListener("pointerdown", (e) => {
+      if (locked) return;
       e.preventDefault();
       try { movelistMoveGrip.setPointerCapture(e.pointerId); } catch (err) {}
       movelistMoveGrip.classList.add("dragging");
