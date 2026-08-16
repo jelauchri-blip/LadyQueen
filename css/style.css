@@ -152,7 +152,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   #app { max-width: 1600px; flex-direction: row; align-items: stretch; }
   .sidebar {
     width: var(--sidebar-w, 195px); flex: none; display: flex; flex-direction: column;
-    background: var(--bg-panel); border-right: 1px solid var(--border-soft);
+    background: var(--bg-panel); /* border-right removed: the resize handle draws its own line ~8px further right, so keeping both looked like two parallel lines */
     overflow-y: auto; overflow-x: hidden;
     scrollbar-width: none; /* still scrollable (wheel/trackpad), just not drawn */
   }
