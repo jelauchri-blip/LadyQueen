@@ -345,16 +345,18 @@ export function initAnalysisView() {
         els.moveExplanation.textContent = "Aucun coup possible : la partie est terminée dans cette position.";
       } else {
         let pieceLabel = "";
+        let fromSquare = result.bestMove.slice(0, 2);
         let destSquare = result.bestMove.slice(2, 4);
         try {
           const testChess = new Chess(chess.fen());
           const from = result.bestMove.slice(0, 2), to = result.bestMove.slice(2, 4), promo = result.bestMove.slice(4) || undefined;
           const r = testChess.move({ from, to, promotion: promo });
-          if (r) { pieceLabel = pieceNameFr(r.piece); destSquare = r.to; }
-        } catch (e) { /* keep raw square */ }
+          if (r) { pieceLabel = pieceNameFr(r.piece); fromSquare = r.from; destSquare = r.to; }
+        } catch (e) { /* keep raw squares */ }
         els.moveExplanation.innerHTML = `${pieceLabel} <span class="best-move">→ ${destSquare}</span>`;
         lastHelpSpeech = `${pieceLabel} vers ${destSquare}`;
         if (isVoiceSupported()) els.helpSpeakBtn.hidden = false;
+        board.setHintMove({ from: fromSquare, to: destSquare });
       }
     } catch (e) {
       els.moveExplanation.textContent = "Impossible d'obtenir une explication pour le moment (moteur indisponible, vérifiez la connexion internet).";

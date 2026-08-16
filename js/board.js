@@ -14,6 +14,7 @@ export function createBoard(mountEl, chess, opts = {}) {
     selected: null,
     legalTargets: [],
     lastMove: opts.lastMove || null,
+    hintMove: null,
     showCoords: opts.showCoords !== false,
   };
 
@@ -83,6 +84,8 @@ export function createBoard(mountEl, chess, opts = {}) {
 
       if (state.lastMove && (sq === state.lastMove.from)) el.classList.add("last-from");
       if (state.lastMove && (sq === state.lastMove.to)) el.classList.add("last-to");
+      if (state.hintMove && (sq === state.hintMove.from)) el.classList.add("hint-from");
+      if (state.hintMove && (sq === state.hintMove.to)) el.classList.add("hint-to");
       if (state.selected === sq) el.classList.add("selected");
       if (state.legalTargets.includes(sq)) el.classList.add("legal");
       if (kingInCheckSquare === sq) el.classList.add("check-king");
@@ -234,6 +237,7 @@ export function createBoard(mountEl, chess, opts = {}) {
       animatePieceSlide(from, to, () => {
         state.animating = false;
         state.lastMove = { from, to };
+        state.hintMove = null;
         render();
         if (state.chess.isGameOver()) playGameEnd();
         else if (state.chess.inCheck()) playCheck();
@@ -255,6 +259,7 @@ export function createBoard(mountEl, chess, opts = {}) {
       if (fen) state.chess.load(fen);
       clearSelection();
       state.lastMove = lastMove || null;
+      state.hintMove = null;
       render();
     },
     setChess(newChess, lastMove) {
@@ -265,12 +270,14 @@ export function createBoard(mountEl, chess, opts = {}) {
           state.chess = newChess;
           clearSelection();
           state.lastMove = lastMove;
+          state.hintMove = null;
           render();
         });
       } else {
         state.chess = newChess;
         clearSelection();
         state.lastMove = lastMove || null;
+        state.hintMove = null;
         render();
       }
     },
@@ -288,6 +295,10 @@ export function createBoard(mountEl, chess, opts = {}) {
     },
     setLastMove(lm) {
       state.lastMove = lm;
+      render();
+    },
+    setHintMove(hm) {
+      state.hintMove = hm;
       render();
     },
     clearSelection() {
