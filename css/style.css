@@ -561,17 +561,16 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 /* On a screen wide enough that the board hits its square-size ceiling, it
    stops growing and sits centered (narrower than the column) — width:100%
    alone would keep stretching this row to the full column width regardless,
-   so Blanc/Retourner/Noir would spill past the board's actual edges. Capping
-   its max-width to the same 8×sq+24px the board uses keeps it exactly as
-   wide as the board, capped or not — using the same --board-sq-override
-   fallback as the board itself, so a manual corner-grip drag keeps this row
-   in sync too. (.nav-controls doesn't need this — it's already
-   content-sized, not width:100%, so it was never affected.) */
+   so Blanc/Noir would spill past the board's actual edges. Capping its
+   max-width to the same 8×sq+24px the board uses keeps it exactly as wide
+   as the board, capped or not — using the same --board-sq-override fallback
+   as the board itself, so a manual corner-grip drag keeps this row in sync
+   too. (.nav-controls doesn't need this — it's already content-sized, not
+   width:100%, so it was never affected.) */
 .board-actions-row {
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
   width: 100%; max-width: calc(8 * var(--board-sq-override, var(--analyse-sq)) + 24px);
 }
-.analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }
 
 /* ---------- MATERIAL COUNT (flanking Retourner/Enregistrer, below the board) ---------- */
@@ -626,7 +625,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
   border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 8px;
 }
 .nav-btn { padding: 5px 10px; font-size: 13px; border-radius: 999px; }
-.nav-position { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-dim); min-width: 110px; text-align: center; }
 .pgn-row { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 6px; }
 .pgn-row label { font-size: 12px; color: var(--ink-dim); }
 .pgn-input-row { display: flex; gap: 6px; align-items: stretch; }

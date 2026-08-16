@@ -102,9 +102,6 @@ function updateNavButtons() {
   els.navPrevBtn.disabled = atStart;
   els.navNextBtn.disabled = atEnd;
   els.navLastBtn.disabled = atEnd;
-  els.navPosition.textContent = currentPly === 0
-    ? "Début de partie"
-    : `Coup ${Math.ceil(currentPly / 2)}${currentPly % 2 === 1 ? "" : " (Noirs)"} / ${plyMoves.length}`;
   updateMaterialCounts();
 }
 
@@ -136,7 +133,6 @@ export function initAnalysisView() {
   els.navPrevBtn = document.getElementById("navPrevBtn");
   els.navNextBtn = document.getElementById("navNextBtn");
   els.navLastBtn = document.getElementById("navLastBtn");
-  els.navPosition = document.getElementById("navPosition");
   els.engineToggle = document.getElementById("engineToggle");
   els.engineStatus = document.getElementById("engineStatus");
   els.evalBar = document.getElementById("evalBar");

@@ -55,6 +55,7 @@
     </div>
     <button id="installBtn" class="install-btn" hidden>Installer</button>
     <button id="soundToggleBtn" class="theme-btn" title="Activer/couper le son" aria-label="Activer ou couper le son">🔊</button>
+    <button class="theme-btn" id="saveGameBtn" title="Enregistrer la partie" aria-label="Enregistrer la partie">💾</button>
     <div class="theme-picker">
       <button id="themeBtn" class="theme-btn" title="Thème du plateau" aria-label="Changer le thème du plateau">🎨</button>
       <div id="themePanel" class="theme-panel" hidden>
@@ -263,16 +264,12 @@
           </div>
           <div class="board-actions-row">
             <span class="material-count" id="materialWhite" title="Points capturés par les Blancs">Blanc 0</span>
-            <div class="analyse-controls">
-              <button class="btn-ghost" id="flipBtn">↕ Retourner</button>
-              <button class="btn-ghost" id="saveGameBtn" title="Enregistrer la partie" aria-label="Enregistrer la partie">💾</button>
-            </div>
             <span class="material-count" id="materialBlack" title="Points capturés par les Noirs">Noir 0</span>
           </div>
           <div class="nav-controls">
             <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
             <button class="btn-ghost nav-btn" id="navPrevBtn" title="Coup précédent">◀</button>
-            <span class="nav-position" id="navPosition">Début de partie</span>
+            <button class="btn-ghost nav-btn" id="flipBtn" title="Retourner le plateau">↕</button>
             <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
             <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
           </div>
