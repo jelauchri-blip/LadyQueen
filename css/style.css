@@ -535,7 +535,14 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
    property declared only on .board itself. */
 .analyse-board-col {
   display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; container-type: inline-size;
-  --analyse-sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 92px);
+  /* Ceiling raised from 92px to 200px: that lower cap was my own "don't let
+     it get huge" design call from earlier in the session, before the
+     corner-grip resize existed — now that the user drags this manually, a
+     low hard ceiling just means the drag silently stops doing anything
+     ("comme si j'étais au maximum") long before the column/viewport limits
+     (the other two clamp() terms) actually run out. 200px is high enough
+     that those two remain the real limits in practice. */
+  --analyse-sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 200px);
   /* Free repositioning: js/layoutResize.js writes these while dragging the
      move handle. transform doesn't affect layout (the grid track keeps its
      normal size/position), so this just visually nudges the board+its
@@ -543,17 +550,26 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
      in the grid. */
   transform: translate(var(--board-move-x, 0px), var(--board-move-y, 0px));
 }
-.analyse-board-col .board { --sq: var(--analyse-sq); }
-/* On a screen wide enough that the board hits its 92px/square ceiling, it
+/* --board-sq-override (set by the corner-grip drag in js/layoutResize.js)
+   wins over the automatic formula when present: the 8.5vh term above exists
+   to keep the *automatic* size sane on a short screen, but once the user is
+   manually dragging, that same term silently stops any further growth ("je
+   ne peux pas faire d'agrandissement, comme si j'étais au maximum") long
+   before the column actually runs out of width — dragging should be able to
+   go past whatever the auto-formula would have picked. */
+.analyse-board-col .board { --sq: var(--board-sq-override, var(--analyse-sq)); }
+/* On a screen wide enough that the board hits its square-size ceiling, it
    stops growing and sits centered (narrower than the column) — width:100%
    alone would keep stretching this row to the full column width regardless,
    so Blanc/Retourner/Noir would spill past the board's actual edges. Capping
    its max-width to the same 8×sq+24px the board uses keeps it exactly as
-   wide as the board, capped or not. (.nav-controls doesn't need this — it's
-   already content-sized, not width:100%, so it was never affected.) */
+   wide as the board, capped or not — using the same --board-sq-override
+   fallback as the board itself, so a manual corner-grip drag keeps this row
+   in sync too. (.nav-controls doesn't need this — it's already
+   content-sized, not width:100%, so it was never affected.) */
 .board-actions-row {
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
-  width: 100%; max-width: calc(8 * var(--analyse-sq) + 24px);
+  width: 100%; max-width: calc(8 * var(--board-sq-override, var(--analyse-sq)) + 24px);
 }
 .analyse-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .board-actions-row .btn-ghost { padding: 7px 10px; font-size: 12.5px; }

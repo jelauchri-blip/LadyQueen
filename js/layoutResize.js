@@ -6,10 +6,10 @@
 // without validating) reverts to whatever was last saved.
 
 const STORAGE_KEY = "echiquier_layout_sizes";
-const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y"];
+const VARS = ["--sidebar-w", "--board-col-w", "--side-col-w", "--side-col-h", "--board-move-x", "--board-move-y", "--board-sq-override"];
 const DEFAULTS = {
   "--sidebar-w": 195, "--board-col-w": null, "--side-col-w": 320, "--side-col-h": null,
-  "--board-move-x": 0, "--board-move-y": 0,
+  "--board-move-x": 0, "--board-move-y": 0, "--board-sq-override": null,
 };
 
 function loadSaved() {
@@ -158,12 +158,32 @@ export function initLayoutResize() {
       const board = activeBoard();
       if (!board) return;
       const layout = document.querySelector(".analyse-layout");
-      const sideColW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--side-col-w")) || 320;
       const layoutW = layout.getBoundingClientRect().width;
-      const left = board.getBoundingClientRect().left;
-      const maxW = layoutW - sideColW - 150 - 16; // reserve side-col + movelist floor + 1 handle
-      const w = Math.max(480, Math.min(maxW, clientX - left));
+      const boardRect = board.getBoundingClientRect();
+      const left = boardRect.left;
+      // Reserve actual rendered widths, not guessed constants: the movelist
+      // column's minmax(150px, 190px) track does NOT shrink to its 150px
+      // floor just because the board wants more room — the grid shrinks the
+      // board's own track instead (it has the widest min/max range), so a
+      // reserve based on movelist's 150px floor let --board-col-w be set
+      // past what the grid would actually grant it, and the board (sized off
+      // that too-generous value) overflowed past its own column box.
+      const sideColEl = document.querySelector(".analyse-side-col");
+      const movelistEl = document.querySelector(".movelist-wrap");
+      const sideColW = sideColEl ? sideColEl.getBoundingClientRect().width : 320;
+      const movelistW = movelistEl && movelistEl.offsetParent ? movelistEl.getBoundingClientRect().width : 0;
+      const maxW = layoutW - sideColW - movelistW - 16; // reserve side-col + movelist + 1 handle, from their real widths
+      const maxH = window.innerHeight - boardRect.top - 16; // reserve bottom margin so a wide-but-short window can't push the board off-screen
+      const w = Math.max(480, Math.min(maxW, maxH, clientX - left));
       document.documentElement.style.setProperty("--board-col-w", w + "px");
+      // Also drive --sq directly: the automatic formula's own 8.5vh term
+      // caps square size to a flat guess at the viewport's height regardless
+      // of how much column width dragging frees up, which on a tall window
+      // made the drag stop moving the board well before it ran out of real
+      // space. This override replaces that flat guess with the board's
+      // actual available width/height (maxW/maxH above) while dragging.
+      const sq = Math.max(40, (w - 24) / 8);
+      document.documentElement.style.setProperty("--board-sq-override", sq + "px");
       positionGrips();
     });
   }
