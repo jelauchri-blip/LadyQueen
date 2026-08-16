@@ -649,12 +649,15 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
       minmax(150px, var(--movelist-col-w, 190px));
   }
   .analyse-board-col { grid-column: 1; grid-row: 1; }
-  /* Shifted left to sit directly on the board's own gold border instead of
+  /* Shifted almost entirely onto the board's own gold border instead of
      floating in the neutral gap after it — "grab the board's edge itself",
      the way an OS window's edge is what you drag, not a separate strip next
-     to it. */
-  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; margin-left: -10px; }
-  .resize-handle-analyse.handle-board-side::after { background: var(--brass); width: 3px; }
+     to it. No grip dots here (they'd look like stray clutter sitting on top
+     of the board's border) — the gold line IS the board's border, just a
+     little thicker, which is affordance enough once you know it's there. */
+  .resize-handle-analyse.handle-board-side { grid-column: 2; grid-row: 1; align-self: stretch; margin-left: -14px; }
+  .resize-handle-analyse.handle-board-side::before { content: none; }
+  .resize-handle-analyse.handle-board-side::after { background: var(--brass); width: 4px; }
   .analyse-side-col { grid-column: 3; grid-row: 1; }
   .resize-handle-analyse.handle-side-movelist { grid-column: 4; grid-row: 1; align-self: stretch; }
   .movelist-wrap { grid-column: 5; grid-row: 1; align-self: start; position: sticky; top: 20px; margin-left: 0; }
