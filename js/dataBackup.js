@@ -10,6 +10,8 @@ const KEYS = [
   "echiquier_engine_depth",
   "echiquier_library",
   "echiquier_sound_enabled",
+  "echiquier_layout_sizes",
+  "echiquier_layout_locked",
 ];
 
 export function exportData() {
