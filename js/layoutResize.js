@@ -249,14 +249,27 @@ export function initLayoutResize() {
   // 'visible' — so #views ends up with its own independent horizontal
   // scrollbar the moment its content is wider than it is, regardless of
   // what html/body do.
+  // The tolerance here is deliberately generous (not +1px): #views now has
+  // its own explicit overflow-x:hidden (see style.css), so a stray few
+  // pixels of overflow is already invisible — clipped, not scrolling —
+  // regardless of this function. This is only meant to catch genuinely
+  // broken states (hundreds of px, from some future bug), not to police
+  // sub-pixel DPI-scaling rounding noise. It used to fire at +1px, and
+  // because positionGrips (which calls this) runs on every MutationObserver
+  // tick — including a handle's own "dragging" class toggling on pointerup —
+  // that meant a resize landing even 2-3px past some edge got silently
+  // reverted the instant the user released the handle: dragging felt like
+  // "an elastic band snapping back" the moment you let go, for a difference
+  // nobody could actually see.
   function clampOverflow() {
     const analyseView = document.getElementById("view-analyse");
     if (!analyseView || !analyseView.classList.contains("active")) return;
     const views = document.getElementById("views");
-    if (!views || views.scrollWidth <= views.clientWidth + 1) return;
+    const OVERFLOW_TOLERANCE = 50;
+    if (!views || views.scrollWidth <= views.clientWidth + OVERFLOW_TOLERANCE) return;
     document.documentElement.style.removeProperty("--side-col-w");
     document.documentElement.style.removeProperty("--movelist-col-w");
-    if (views.scrollWidth > views.clientWidth + 1) {
+    if (views.scrollWidth > views.clientWidth + OVERFLOW_TOLERANCE) {
       document.documentElement.style.setProperty("--side-col-w", "230px");
       document.documentElement.style.setProperty("--movelist-col-w", "150px");
     }
