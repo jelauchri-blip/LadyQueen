@@ -284,9 +284,78 @@ export function initLayoutResize() {
     }
   }
 
+  // A saved --*-move-x/y offset only makes sense relative to the screen it
+  // was dragged on: it's a raw pixel nudge, not a percentage. The width
+  // vars (--side-col-w etc.) get re-validated by CSS Grid itself plus
+  // clampOverflow above, but nothing previously re-checked these transform
+  // offsets against whatever screen the page happens to load on — saved on
+  // a big screen with generous slack, then loaded on a smaller one, the
+  // same offset can push a panel half off-screen or on top of a neighbor,
+  // with no drag ever having happened in the new session to re-clamp it.
+  // Re-runs the exact same boundary math each move-grip's own drag handler
+  // uses, just against the CURRENT natural (un-transformed) position,
+  // whenever the layout might have changed size (window resize, tab
+  // switch) instead of only while actively dragging.
+  function clampMoveOffset(el, xVar, yVar, getBoundaries) {
+    if (!el || !el.offsetParent) return;
+    const cs = getComputedStyle(document.documentElement);
+    const offsetX = parseFloat(cs.getPropertyValue(xVar)) || 0;
+    const offsetY = parseFloat(cs.getPropertyValue(yVar)) || 0;
+    if (!offsetX && !offsetY) return;
+    const rect = el.getBoundingClientRect();
+    const naturalLeft = rect.left - offsetX, naturalRight = rect.right - offsetX;
+    const naturalTop = rect.top - offsetY, naturalBottom = rect.bottom - offsetY;
+    const { leftBoundary, rightBoundary } = getBoundaries();
+    const minX = leftBoundary - naturalLeft, maxX = rightBoundary - naturalRight;
+    const minY = 8 - naturalTop, maxY = window.innerHeight - 8 - naturalBottom;
+    const newX = Math.max(minX, Math.min(maxX, offsetX));
+    const newY = Math.max(minY, Math.min(maxY, offsetY));
+    if (newX !== offsetX) document.documentElement.style.setProperty(xVar, newX + "px");
+    if (newY !== offsetY) document.documentElement.style.setProperty(yVar, newY + "px");
+  }
+
+  function reclampMoveOffsets() {
+    const analyseView = document.getElementById("view-analyse");
+    if (!analyseView || !analyseView.classList.contains("active")) return;
+    const board = activeBoard();
+    if (board) {
+      clampMoveOffset(board.closest(".analyse-board-col"), "--board-move-x", "--board-move-y", () => {
+        const sidebar = document.querySelector(".sidebar");
+        const sideCol = document.querySelector(".analyse-side-col");
+        return {
+          leftBoundary: sidebar ? sidebar.getBoundingClientRect().right : 0,
+          rightBoundary: sideCol ? sideCol.getBoundingClientRect().left : window.innerWidth,
+        };
+      });
+    }
+    const sideCol = document.querySelector(".analyse-side-col");
+    clampMoveOffset(sideCol, "--side-move-x", "--side-move-y", () => {
+      const boardCol = document.querySelector(".analyse-board-col");
+      const handle = document.getElementById("sideMovelistResizeHandle");
+      const movelist = document.querySelector(".movelist-wrap");
+      const layout = document.querySelector(".analyse-layout");
+      const handleVisible = handle && handle.offsetParent;
+      const movelistVisible = movelist && movelist.offsetParent;
+      return {
+        leftBoundary: (handleVisible && !movelistVisible) ? handle.getBoundingClientRect().right : boardCol.getBoundingClientRect().right,
+        rightBoundary: (handleVisible && movelistVisible) ? handle.getBoundingClientRect().left : layout.getBoundingClientRect().right,
+      };
+    });
+    const movelist = document.querySelector(".movelist-wrap");
+    clampMoveOffset(movelist, "--movelist-move-x", "--movelist-move-y", () => {
+      const handle = document.getElementById("sideMovelistResizeHandle");
+      const layout = document.querySelector(".analyse-layout");
+      return {
+        leftBoundary: handle && handle.offsetParent ? handle.getBoundingClientRect().right : movelist.getBoundingClientRect().left,
+        rightBoundary: layout.getBoundingClientRect().right,
+      };
+    });
+  }
+
   function positionGrips() {
     positionBoardGrip(); positionMoveGrip(); positionSideMoveGrip(); positionMovelistMoveGrip();
     clampOverflow();
+    reclampMoveOffsets();
   }
 
   if (boardGrip) {
