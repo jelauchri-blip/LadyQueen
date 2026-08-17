@@ -81,7 +81,16 @@ export function initLayoutResize() {
       applyVars({ ...DEFAULTS });
       sessionStart = null;
       confirmBar.hidden = true;
-      if (locked) { locked = false; try { localStorage.setItem(LOCK_KEY, "0"); } catch (e) {} applyLockedClass(); }
+      // Unconditional, not "if (locked)": the in-memory flag and the saved
+      // value can end up out of sync (e.g. a double-click landing while a
+      // page was already mid-navigation), which left the handles looking
+      // unlocked (visible) while every drag was still silently rejected —
+      // and reloading kept reviving the stale locked value from storage
+      // every time, since this button used to only clear it when the
+      // in-memory flag agreed there was something to clear.
+      locked = false;
+      try { localStorage.setItem(LOCK_KEY, "0"); } catch (e) {}
+      applyLockedClass();
       positionGrips();
     };
   }
