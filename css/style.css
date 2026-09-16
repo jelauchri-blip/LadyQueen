@@ -165,9 +165,12 @@ body.layout-locked .move-grip {
     width: var(--sidebar-w, 195px); flex: none; display: flex; flex-direction: column;
     background: var(--bg-panel); /* border-right removed: the resize handle draws its own line ~8px further right, so keeping both looked like two parallel lines */
     overflow-y: auto; overflow-x: hidden;
-    scrollbar-width: none; /* still scrollable (wheel/trackpad), just not drawn */
+    /* Scrollbar left visible on purpose: when the panel's content (e.g. the
+       PGN loader at the bottom) overflows a short window, a hidden scrollbar
+       gave no visual cue that more content existed below — it just looked
+       cut off/broken. */
+    scrollbar-width: thin;
   }
-  .sidebar::-webkit-scrollbar { display: none; }
   .topbar { flex-wrap: wrap; }
   .topbar .brand { width: 100%; }
   .tabs {
@@ -566,7 +569,7 @@ body.layout-locked .move-grip {
      ("comme si j'étais au maximum") long before the column/viewport limits
      (the other two clamp() terms) actually run out. 200px is high enough
      that those two remain the real limits in practice. */
-  --analyse-sq: clamp(40px, min(calc((100cqw - 24px) / 8), 8.5vh), 200px);
+  --analyse-sq: clamp(40px, min(calc((100cqw - 24px - var(--eval-bar-reserve, 0px)) / 8), 8.5vh), 200px);
   /* Free repositioning: js/layoutResize.js writes these while dragging the
      move handle. transform doesn't affect layout (the grid track keeps its
      normal size/position), so this just visually nudges the board+its
@@ -590,10 +593,16 @@ body.layout-locked .move-grip {
    exactly as wide as the board, capped or not — using the same
    --board-sq-override fallback as the board itself, so a manual corner-grip
    drag keeps this row in sync too. */
+/* grid (not flex+space-between) so nav-controls sits at a fixed center point:
+   the material-count pills' width varies with the score text (or goes empty),
+   which with space-between shifted the middle group sideways every move. */
 .board-actions-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px;
   width: 100%; max-width: calc(8 * var(--board-sq-override, var(--analyse-sq)) + 24px);
 }
+.board-actions-row .material-count:first-child { justify-self: start; }
+.board-actions-row .material-count:last-child { justify-self: end; }
+.board-actions-row .nav-controls { justify-self: center; }
 
 /* ---------- MATERIAL COUNT (flanking Retourner/Enregistrer, below the board) ---------- */
 .material-count {
@@ -651,7 +660,26 @@ body.layout-locked .move-grip {
 .confetti-piece:nth-child(13) { left: 50%; background: var(--success); animation-delay: 0.4s; }
 .confetti-piece:nth-child(14) { left: 10%; background: var(--error); animation-delay: 0.36s; }
 
-.board-wrap { position: relative; display: inline-block; }
+/* .board-wrap is now the flex row (eval bar + board); .board-stage takes over
+   the position:relative anchoring the confetti/result-banner overlays used
+   to rely on .board-wrap for — moving the overlays one level deeper doesn't
+   change that, :has() below still matches through descendants either way. */
+.board-wrap { display: flex; align-items: stretch; gap: 8px; }
+.board-stage { position: relative; display: inline-block; }
+.eval-bar-vert {
+  position: relative; width: 16px; flex: none; border-radius: 6px; overflow: hidden;
+  background: #1a1208; border: 1px solid var(--brass);
+}
+.eval-bar-vert[hidden] { display: none; }
+.eval-bar-vert-fill {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 50%;
+  background: var(--brass); transition: height 0.3s ease, background 0.3s ease;
+}
+/* Reserves the bar's width (+gap) out of the board column's budget so the
+   board doesn't overflow it by that amount — see the "Exact-fill formula"
+   comment above .analyse-board-col. 0px when the bar is hidden (Défi mode,
+   or engine off) so the board keeps using the full column as before. */
+.analyse-board-col:has(#evalBarVert:not([hidden])) { --eval-bar-reserve: 26px; }
 .nav-controls {
   display: flex; align-items: center; gap: 6px; background: var(--bg-panel);
   border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 8px;
@@ -852,6 +880,8 @@ body.layout-locked .move-grip {
 .coach-error-explain { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0 0 8px; }
 .coach-error-best { font-size: 13.5px; color: var(--ink-dim); margin: 0 0 14px; }
 .coach-error-best .best-move { color: var(--brass-soft); font-family: var(--font-mono); font-weight: 600; }
+.coach-error-why { font-size: 13.5px; line-height: 1.55; color: var(--ink); margin: -8px 0 14px; padding: 8px 10px; background: var(--bg-panel-raised); border-radius: 8px; }
+.coach-error-why[hidden] { display: none; }
 /* wrap (not nowrap): the buttons are now short enough to usually fit one
    line, but this is a safety net rather than an exact-width guarantee — a
    narrower column or slightly different label ("Terminer" vs "▶") should

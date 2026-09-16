@@ -316,6 +316,26 @@ function bestMoveSan(fenBefore, uci) {
   }
 }
 
+// Explique pourquoi le coup suggéré (bestSan) était meilleur que le coup joué :
+// rejoue le coup suggéré pour récupérer ses propriétés (capture, roque, centre…)
+// et réutilise les mêmes tags heuristiques que pour le coup joué.
+function explainBestMove(fenBefore, uci, bestSan, cpLoss, plyIndex) {
+  if (!uci || uci.length < 4) return null;
+  try {
+    const c = new Chess(fenBefore);
+    const from = uci.slice(0, 2), to = uci.slice(2, 4), promo = uci.slice(4) || undefined;
+    const r = c.move({ from, to, promotion: promo });
+    if (!r) return null;
+    const tags = buildHeuristicTags(r, plyIndex, { w: {}, b: {} });
+    const pros = tags.filter((t) => t.kind === "pro").map((t) => t.text);
+    const parts = [`${bestSan} évitait de céder environ ${cpLoss} centipions d'avantage.`];
+    if (pros.length) parts.push(`Ce coup ${pros.join(", ")}.`);
+    return parts.join(" ");
+  } catch (e) {
+    return null;
+  }
+}
+
 function renderErrorCoach(reports) {
   const mistakes = reports.filter((r) => r.classification.key === "mistake" || r.classification.key === "blunder");
 
@@ -353,9 +373,11 @@ function renderErrorCoach(reports) {
       </div>
       <p class="coach-error-explain">${m.explanation}</p>
       ${bestSan ? `<p class="coach-error-best">Coup suggéré à la place : <span class="best-move">${bestSan}</span></p>` : ""}
+      ${bestSan ? `<p class="coach-error-why" id="errWhyText" hidden></p>` : ""}
       <div class="coach-error-actions">
         <button class="btn-ghost" id="errPrevBtn" title="Erreur précédente" aria-label="Erreur précédente" ${index === 0 ? "disabled" : ""}>◀</button>
         ${isVoiceSupported() ? '<button class="btn-ghost" id="errSpeakBtn" title="Écouter l\'explication" aria-label="Écouter l\'explication">🔊</button>' : ""}
+        ${bestSan ? `<button class="btn-ghost" id="errWhyBtn" title="Pourquoi ${bestSan} est meilleur ?" aria-label="Pourquoi ce coup est meilleur">💡</button>` : ""}
         <button class="btn-primary" id="errResumeBtn">↩ Reprendre ici</button>
         <button class="btn-ghost" id="errIgnoreBtn" ${index === mistakes.length - 1 ? "" : 'title="Ignorer, aller à l\'erreur suivante" aria-label="Ignorer, aller à l\'erreur suivante"'}>${index === mistakes.length - 1 ? "Terminer" : "▶"}</button>
       </div>
@@ -376,6 +398,17 @@ function renderErrorCoach(reports) {
         const text = `Erreur ${index + 1} sur ${mistakes.length}. Coup ${m.moveNumber}, ${sideLabel}, ${m.san}. ${m.explanation}` +
           (bestSan ? ` Le coup suggéré à la place était ${bestSan}.` : "");
         speakOne(text);
+      };
+    }
+    const whyBtn = body.querySelector("#errWhyBtn");
+    if (whyBtn) {
+      whyBtn.onclick = () => {
+        const whyText = explainBestMove(m.fenBefore, m.bestMoveUci, bestSan, m.cpLoss, m.ply);
+        if (!whyText) return;
+        const whyEl = body.querySelector("#errWhyText");
+        whyEl.textContent = whyText;
+        whyEl.hidden = false;
+        speakOne(whyText);
       };
     }
   }

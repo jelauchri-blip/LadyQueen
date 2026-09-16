@@ -147,6 +147,8 @@ export function initAnalysisView() {
   els.engineStatus = document.getElementById("engineStatus");
   els.evalBar = document.getElementById("evalBar");
   els.evalBarFill = document.getElementById("evalBarFill");
+  els.evalBarVert = document.getElementById("evalBarVert");
+  els.evalBarVertFill = document.getElementById("evalBarVertFill");
   els.engineOutput = document.getElementById("engineOutput");
   els.moveList = document.getElementById("moveList");
   els.fullgameResults = document.getElementById("fullgameResults");
@@ -208,6 +210,7 @@ export function initAnalysisView() {
     } else {
       els.engineStatus.textContent = "Moteur désactivé";
       els.evalBar.hidden = true;
+      els.evalBarVert.hidden = true;
       els.engineOutput.innerHTML = "";
     }
   };
@@ -892,6 +895,15 @@ function renderEval(final) {
   els.evalBarFill.style.width = pct + "%";
   els.evalBarFill.style.background = cpForWhite >= 0 ? "var(--brass)" : "var(--ink-faint)";
 
+  // Side bar stays hidden in "Défi" mode against the computer — showing the
+  // engine's verdict there would give away exactly what the mode is meant to
+  // test. Visible for plain analysis and for "Coach" mode.
+  els.evalBarVert.hidden = vsComputerMode && challengeMode;
+  if (!els.evalBarVert.hidden) {
+    els.evalBarVertFill.style.height = pct + "%";
+    els.evalBarVertFill.style.background = cpForWhite >= 0 ? "var(--brass)" : "var(--ink-faint)";
+  }
+
   const evalText = lastScore.mate !== undefined
     ? `Mat en ${Math.abs(lastScore.mate)} coup${Math.abs(lastScore.mate) > 1 ? "s" : ""} pour ${(lastScore.mate > 0) === (turn === "w") ? "les Blancs" : "les Noirs"}`
     : `Évaluation : ${(cpForWhite / 100).toFixed(2)} (${cpForWhite >= 0 ? "avantage Blancs" : "avantage Noirs"})`;
@@ -924,6 +936,7 @@ function requestEval() {
   if (chess.isGameOver()) {
     els.engineOutput.textContent = gameOverMessage(chess) || "Partie terminée.";
     els.evalBar.hidden = true;
+    els.evalBarVert.hidden = true;
     return;
   }
   clearTimeout(evalTimeout);
