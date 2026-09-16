@@ -165,11 +165,22 @@ body.layout-locked .move-grip {
     width: var(--sidebar-w, 195px); flex: none; display: flex; flex-direction: column;
     background: var(--bg-panel); /* border-right removed: the resize handle draws its own line ~8px further right, so keeping both looked like two parallel lines */
     overflow-y: auto; overflow-x: hidden;
-    /* Scrollbar left visible on purpose: when the panel's content (e.g. the
-       PGN loader at the bottom) overflows a short window, a hidden scrollbar
-       gave no visual cue that more content existed below — it just looked
-       cut off/broken. */
-    scrollbar-width: thin;
+    /* A visible native scrollbar was tried here to hint that content
+       continues below on a short window, but it eats ~12px of width out of
+       this already-narrow (195px default) column, which was enough to wrap
+       the topbar's 4 icons onto 2 lines. scrollbar-width:none costs no
+       layout width — still scrollable (wheel/trackpad) — and the ::after
+       fade below gives the same "more below" cue instead. */
+    scrollbar-width: none;
+    position: relative;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+  /* Sticks to the bottom of the scrollable area (not the viewport) and fades
+     out, hinting more content is scrollable below without costing any width. */
+  .sidebar::after {
+    content: ""; position: sticky; bottom: 0; left: 0; display: block;
+    height: 20px; margin-top: -20px; pointer-events: none;
+    background: linear-gradient(transparent, var(--bg-panel));
   }
   .topbar { flex-wrap: wrap; }
   .topbar .brand { width: 100%; }
@@ -332,8 +343,8 @@ body.layout-locked .move-grip {
 }
 .tab-btn.active { color: var(--ink); border-bottom-color: var(--brass); }
 @media (min-width: 861px) {
-  .tabs { gap: 1px; padding: 4px 0 8px 10px; }
-  .tab-btn { padding: 7px 12px; }
+  .tabs { gap: 1px; padding: 4px 0 4px 10px; }
+  .tab-btn { padding: 5px 12px; font-size: 13px; }
 }
 
 /* ---------- SIDEBAR SHORTCUTS: Créer une position / Position de départ
