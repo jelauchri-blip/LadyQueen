@@ -108,9 +108,14 @@
         <div class="opponent-row opponent-row-relative">
           <span class="opponent-label-group">Force
             <button type="button" class="info-icon-btn" id="eloInfoBtn" aria-label="Informations sur ce niveau">i</button>
+            <button type="button" class="info-icon-btn" id="creditsInfoBtn" aria-label="Crédits et licences">&copy;</button>
           </span>
           <select id="opponentEloSelect"></select>
           <p class="opponent-hint" id="opponentEloHint" hidden></p>
+          <div class="opponent-hint" id="creditsHint" hidden>
+            <p>Pièces d'échecs « Cburnett » : Colin M.L. Burnett, sous licence BSD 3 clauses / CC BY-SA 3.0 / GFDL — <a href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces" target="_blank" rel="noopener">source</a>.</p>
+            <p>Moteur d'analyse Stockfish, sous licence GPL-3.0 — <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noopener">code source</a>.</p>
+          </div>
         </div>
         <div class="opponent-vsmode-row">
           <label title="Pas de retour en arrière"><input type="radio" name="vsComputerBehavior" value="defi" checked> Défi</label>
@@ -169,9 +174,9 @@
       ✎ Créer une position
     </button>
     <details id="setupControls" class="setup-controls sidebar-action-group">
-      <summary class="tab-btn">Position de départ</summary>
+      <summary class="tab-btn">Coller une partie</summary>
       <div class="pgn-row">
-        <label for="pgnInput">Coller une partie (PGN)</label>
+        <label for="pgnInput" class="sr-only">Coller une partie (PGN)</label>
         <div class="pgn-input-row">
           <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
           <button class="btn-ghost" id="loadPgnBtn">Charger</button>
@@ -368,11 +373,6 @@
     </section>
 
   </main>
-
-  <footer class="app-footer">
-    <p>Pièces d'échecs « Cburnett » : Colin M.L. Burnett, sous licence BSD 3 clauses / CC BY-SA 3.0 / GFDL — <a href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces" target="_blank" rel="noopener">source</a>.</p>
-    <p>Moteur d'analyse Stockfish, sous licence GPL-3.0 — <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noopener">code source</a>.</p>
-  </footer>
 
   </div>
 

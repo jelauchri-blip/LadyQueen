@@ -263,18 +263,34 @@ export function initAnalysisView() {
   els.opponentEloSelect.onchange = updateEloHint;
   updateEloHint();
 
+  // Small "(i)"-style icon + bubble pattern, shared by the Elo hint and the
+  // credits bubble: click the icon to toggle its bubble (closing any other
+  // open one first, since they share the same anchor point), click anywhere
+  // outside to close.
+  const infoBubbles = [];
+  function wireInfoBubble(btn, bubble) {
+    infoBubbles.push({ btn, bubble });
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const willShow = bubble.hidden;
+      infoBubbles.forEach(({ btn: b, bubble: h }) => {
+        h.hidden = true;
+        b.setAttribute("aria-expanded", "false");
+      });
+      bubble.hidden = !willShow;
+      btn.setAttribute("aria-expanded", String(willShow));
+    };
+  }
   els.eloInfoBtn = document.getElementById("eloInfoBtn");
-  els.eloInfoBtn.onclick = (e) => {
-    e.stopPropagation();
-    const willShow = els.opponentEloHint.hidden;
-    els.opponentEloHint.hidden = !willShow;
-    els.eloInfoBtn.setAttribute("aria-expanded", String(willShow));
-  };
+  wireInfoBubble(els.eloInfoBtn, els.opponentEloHint);
+  wireInfoBubble(document.getElementById("creditsInfoBtn"), document.getElementById("creditsHint"));
   document.addEventListener("click", (e) => {
-    if (!els.opponentEloHint.hidden && !els.opponentEloHint.contains(e.target) && e.target !== els.eloInfoBtn) {
-      els.opponentEloHint.hidden = true;
-      els.eloInfoBtn.setAttribute("aria-expanded", "false");
-    }
+    infoBubbles.forEach(({ btn, bubble }) => {
+      if (!bubble.hidden && !bubble.contains(e.target) && e.target !== btn) {
+        bubble.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+      }
+    });
   });
 
   els.vsComputerSetup = document.getElementById("vsComputerSetup");
@@ -331,6 +347,7 @@ export function initAnalysisView() {
     const modeLabel = challengeMode ? "Mode Défi" : "Mode Coach";
     els.engineStatus.textContent = `${modeLabel} — ${getBotName()} joue les ${computerSide === "w" ? "Blancs" : "Noirs"} (≈ ${computerElo} Elo).`;
     maybeTriggerComputerMove();
+    updateBoardPromotion();
   };
 
   els.resignBtn.onclick = () => {
@@ -343,6 +360,7 @@ export function initAnalysisView() {
     showResultBanner(`${getBotName()} gagne.`, "loss");
     if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
     if (els.resignBtn) els.resignBtn.hidden = true;
+    updateBoardPromotion();
   };
 
   updateMoveList();
@@ -579,6 +597,7 @@ function recordMove(fenBefore, moveResult, opts = {}) {
       els.engineStatus.textContent = "Partie terminée."; // full message already shown in the banner above
       if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
       if (els.resignBtn) els.resignBtn.hidden = true;
+      updateBoardPromotion();
     } else {
       els.engineStatus.textContent = overMsg;
     }
@@ -606,6 +625,7 @@ function handleFlag(loserColor) {
   showResultBanner(msg, humanWins ? "win" : "loss");
   if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
   if (els.resignBtn) els.resignBtn.hidden = true;
+  updateBoardPromotion();
 }
 
 // Serializes every engine interaction (setoption commands, position/go
@@ -646,7 +666,37 @@ function deactivateComputerMode() {
   if (els.openEditorBtn) els.openEditorBtn.hidden = false;
   hideResultBanner();
   if (board) board.setInteractive(true);
+  updateBoardPromotion();
 }
+
+// Phone-only: once a Coach-mode game is actually under way, the settings
+// panel above the board has already collapsed down to just "Abandonner" —
+// this moves the board itself up into that panel's old spot (ahead of it,
+// right under the topbar) so it gets the prime spot instead of sitting below
+// the now-mostly-empty panel and the tab strip. Physically reparents
+// .analyse-board-col (not just a CSS reorder) so it renders inside
+// .sidebar, which is what's visible above the tab strip on a stacked phone
+// layout; moved back the moment any condition stops holding. Left out of
+// Défi mode on purpose — that mode already hides the eval bar and other
+// engine "tells", and the settings panel there also still shows the clock.
+const MOBILE_BOARD_PROMOTE_MQ = window.matchMedia("(max-width: 760px)");
+function updateBoardPromotion() {
+  const boardCol = document.querySelector(".analyse-board-col");
+  const sidebarEl = document.querySelector(".sidebar");
+  const opponentEl = document.getElementById("opponentSection");
+  const analyseLayout = document.querySelector(".analyse-layout");
+  if (!boardCol || !sidebarEl || !opponentEl || !analyseLayout) return;
+  const shouldPromote = MOBILE_BOARD_PROMOTE_MQ.matches && vsComputerMode && !challengeMode && !vsComputerGameOver;
+  const isPromoted = boardCol.parentElement === sidebarEl;
+  if (shouldPromote && !isPromoted) {
+    sidebarEl.insertBefore(boardCol, opponentEl);
+    document.body.classList.add("board-promoted-mobile");
+  } else if (!shouldPromote && isPromoted) {
+    analyseLayout.insertBefore(boardCol, analyseLayout.firstChild);
+    document.body.classList.remove("board-promoted-mobile");
+  }
+}
+MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 
 async function maybeTriggerComputerMove() {
   if (!vsComputerMode || vsComputerGameOver) return;
