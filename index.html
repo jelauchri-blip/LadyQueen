@@ -105,11 +105,13 @@
     <div class="opponent-panel">
       <div id="opponentOptions" class="opponent-options">
         <div id="vsComputerSetup">
-        <div class="opponent-row">
-          <span>Force</span>
+        <div class="opponent-row opponent-row-relative">
+          <span class="opponent-label-group">Force
+            <button type="button" class="info-icon-btn" id="eloInfoBtn" aria-label="Informations sur ce niveau">i</button>
+          </span>
           <select id="opponentEloSelect"></select>
+          <p class="opponent-hint" id="opponentEloHint" hidden></p>
         </div>
-        <p class="opponent-hint" id="opponentEloHint"></p>
         <div class="opponent-vsmode-row">
           <label title="Pas de retour en arrière"><input type="radio" name="vsComputerBehavior" value="defi" checked> Défi</label>
           <label title="Retour en arrière possible"><input type="radio" name="vsComputerBehavior" value="coach"> Coach</label>

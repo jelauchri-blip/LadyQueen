@@ -262,6 +262,21 @@ export function initAnalysisView() {
   }
   els.opponentEloSelect.onchange = updateEloHint;
   updateEloHint();
+
+  els.eloInfoBtn = document.getElementById("eloInfoBtn");
+  els.eloInfoBtn.onclick = (e) => {
+    e.stopPropagation();
+    const willShow = els.opponentEloHint.hidden;
+    els.opponentEloHint.hidden = !willShow;
+    els.eloInfoBtn.setAttribute("aria-expanded", String(willShow));
+  };
+  document.addEventListener("click", (e) => {
+    if (!els.opponentEloHint.hidden && !els.opponentEloHint.contains(e.target) && e.target !== els.eloInfoBtn) {
+      els.opponentEloHint.hidden = true;
+      els.eloInfoBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+
   els.vsComputerSetup = document.getElementById("vsComputerSetup");
   els.startVsComputerBtn.textContent = "▶ Jouer";
 
