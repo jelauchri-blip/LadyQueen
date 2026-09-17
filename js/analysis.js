@@ -266,6 +266,9 @@ export function initAnalysisView() {
   els.startVsComputerBtn.textContent = "▶ Jouer";
 
   els.startVsComputerBtn.onclick = async () => {
+    if (!document.getElementById("view-analyse").classList.contains("active")) {
+      document.querySelector('.tab-btn[data-tab="analyse"]')?.click();
+    }
     const userSide = pickBalancedColor();
     computerSide = userSide === "w" ? "b" : "w";
     computerElo = parseInt(els.opponentEloSelect.value, 10);

@@ -950,6 +950,13 @@ body.layout-locked .move-grip {
 @media (max-width: 760px) {
   .analyse-layout { grid-template-columns: 1fr; }
   .analyse-side-col { max-width: none; }
+  /* "Coups joués" used to land after the Moteur & coach / Analyse complète
+     accordions in source order, so seeing it during a live game meant
+     scrolling past both first. Reordered (visual only, DOM unchanged) to sit
+     right after the board + nav row instead — the accordions still follow. */
+  .analyse-board-col { order: 1; }
+  .movelist-wrap { order: 2; }
+  .analyse-side-col { order: 3; }
 }
 
 /* ---------- COLLAPSIBLE SIDE SECTIONS ---------- */
