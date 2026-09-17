@@ -68,11 +68,6 @@ createBoard(document.getElementById("homeBoardMount"), new Chess(), {
   orientation: homeColor === "b" ? "black" : "white",
 });
 
-document.getElementById("homePlayBtn").addEventListener("click", () => {
-  showTab("analyse");
-  document.getElementById("startVsComputerBtn").click();
-});
-
 // ---- Sound toggle ----
 const soundBtn = document.getElementById("soundToggleBtn");
 function refreshSoundBtn() {
