@@ -551,7 +551,15 @@ body.layout-locked .move-grip {
 }
 
 /* ---------- ANALYSE ---------- */
-.analyse-layout { display: grid; grid-template-columns: auto auto; column-gap: 0; row-gap: 16px; align-items: start; justify-content: center; width: 100%; }
+/* Board column is minmax(0, 1fr), not auto: .analyse-board-col has
+   container-type:inline-size (for the board's cqw-based --sq below), and
+   containment strips an element's own content from contributing to an
+   `auto` grid track's intrinsic size — with `auto` here that collapsed the
+   whole column to 0px on any viewport between this and the 1180px
+   breakpoint (which already used an explicit minmax() for the same reason),
+   throwing off everything sized from the board's own width (nav-controls
+   centering, board-actions-row, the board's own square size). */
+.analyse-layout { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 0; row-gap: 16px; align-items: start; justify-content: center; width: 100%; }
 /* No left padding + no grid gap here: the board should touch the sidebar on
    its left and the "Moteur & coach"/editor column on its right, with no
    wasted gutter — the movelist column (3rd column, ≥1180px) gets its own
@@ -723,6 +731,7 @@ body.layout-locked .move-grip {
 .opponent-options { display: flex; flex-direction: column; gap: 7px; }
 .opponent-options[hidden] { display: none; }
 .opponent-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--ink-dim); }
+.opponent-row-controls { display: flex; gap: 6px; }
 .opponent-row select {
   background: var(--bg-panel-raised); border: 1px solid var(--border-soft); color: var(--ink);
   font-family: var(--font-body); font-size: 12.5px; padding: 6px 8px; border-radius: 6px; cursor: pointer;

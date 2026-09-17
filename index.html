@@ -115,27 +115,26 @@
           <label title="Retour en arrière possible"><input type="radio" name="vsComputerBehavior" value="coach"> Coach</label>
         </div>
         <div class="opponent-row">
-          <span>Cadence</span>
-          <select id="timeControlSelect">
-            <option value="0">Illimité</option>
-            <option value="1">1 min</option>
-            <option value="3">3 min</option>
-            <option value="5">5 min</option>
-            <option value="10">10 min</option>
-            <option value="15">15 min</option>
-            <option value="30">30 min</option>
-          </select>
-        </div>
-        <div class="opponent-row">
-          <span>Incrément</span>
-          <select id="incrementSelect">
-            <option value="0">+0 s</option>
-            <option value="1">+1 s</option>
-            <option value="2">+2 s</option>
-            <option value="3">+3 s</option>
-            <option value="4">+4 s</option>
-            <option value="5">+5 s</option>
-          </select>
+          <span>Chrono</span>
+          <div class="opponent-row-controls">
+            <select id="timeControlSelect">
+              <option value="0">Illimité</option>
+              <option value="1">1 min</option>
+              <option value="3">3 min</option>
+              <option value="5">5 min</option>
+              <option value="10">10 min</option>
+              <option value="15">15 min</option>
+              <option value="30">30 min</option>
+            </select>
+            <select id="incrementSelect">
+              <option value="0">+0 s</option>
+              <option value="1">+1 s</option>
+              <option value="2">+2 s</option>
+              <option value="3">+3 s</option>
+              <option value="4">+4 s</option>
+              <option value="5">+5 s</option>
+            </select>
+          </div>
         </div>
         <button class="btn-primary" id="startVsComputerBtn">▶ Jouer</button>
         </div>
