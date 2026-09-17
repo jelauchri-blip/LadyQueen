@@ -12,6 +12,7 @@ initLayoutResize();
 
 const tabButtons = document.querySelectorAll(".tab-btn");
 const views = document.querySelectorAll(".view");
+const mobileTabSelect = document.getElementById("mobileTabSelect");
 const initialized = { regles: false, tactique: false, analyse: false, bibliotheque: false };
 
 function showTab(name) {
@@ -19,6 +20,7 @@ function showTab(name) {
   views.forEach(v => v.classList.toggle("active", v.id === "view-" + name));
   document.body.classList.toggle("wide-view", name === "analyse");
   document.getElementById("views").scrollTop = 0;
+  if (mobileTabSelect.value !== name) mobileTabSelect.value = name;
 
   if (name === "regles" && !initialized.regles) {
     initialized.regles = true;
@@ -41,6 +43,21 @@ function showTab(name) {
 
 tabButtons.forEach(btn => {
   btn.addEventListener("click", () => showTab(btn.dataset.tab));
+});
+
+// Phone-only <select> standing in for the tab strip (see .mobile-tab-select
+// in style.css) — reuses the existing buttons' own click handlers instead of
+// duplicating what they do, so "Créer une position" / "Coller une partie"
+// (not real tabs, just actions) behave exactly as they do from the sidebar.
+mobileTabSelect.addEventListener("change", () => {
+  const value = mobileTabSelect.value;
+  if (value === "editor") {
+    document.getElementById("openEditorBtn").click();
+  } else if (value === "pgn") {
+    document.querySelector("#setupControls > summary").click();
+  } else {
+    showTab(value);
+  }
 });
 
 // The "Adversaire" panel lives in the sidebar and is visible on every tab

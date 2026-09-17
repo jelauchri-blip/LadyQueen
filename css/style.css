@@ -264,6 +264,20 @@ body.layout-locked .move-grip {
 @media (min-width: 861px) {
   .topbar { row-gap: 8px; padding: 10px 14px 8px; }
 }
+/* Phone-only nav: replaces the horizontally-scrolling .tabs strip (a
+   scrollbar for it kept showing on some Android browsers no matter what CSS
+   asked for — a native select has no scrollable strip to begin with, so
+   nothing to hide). Sits in the topbar's own row (no extra height) — flex's
+   space-between naturally centers it between the brand and the icon
+   cluster, since it's just another child of .topbar in source order. */
+.mobile-tab-select { display: none; }
+@media (max-width: 760px) {
+  .mobile-tab-select {
+    display: block; background: var(--bg-panel-raised); border: 1px solid var(--border-soft);
+    color: var(--ink); font-family: var(--font-body); font-size: 13px; font-weight: 600;
+    padding: 7px 10px; border-radius: 999px; cursor: pointer;
+  }
+}
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand-glyph { font-size: 30px; color: var(--brass-soft); line-height: 1; }
 .brand-text h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.02em; }
@@ -341,6 +355,10 @@ body.layout-locked .move-grip {
   scrollbar-width: none;
 }
 .tabs::-webkit-scrollbar { display: none; }
+@media (max-width: 760px) {
+  /* Replaced by .mobile-tab-select in the topbar on phone widths. */
+  .tabs { display: none; }
+}
 .tab-btn {
   background: none; border: none; color: var(--ink-dim); font-family: var(--font-body);
   font-size: 14px; font-weight: 600; padding: 10px 14px 12px; cursor: pointer;
