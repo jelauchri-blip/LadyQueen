@@ -149,7 +149,6 @@
           <div class="clock-box" id="clockWhite"><span class="clock-label">Blancs</span><span class="clock-time">—</span></div>
           <div class="clock-box" id="clockBlack"><span class="clock-label">Noirs</span><span class="clock-time">—</span></div>
         </div>
-        <button class="btn-ghost resign-btn" id="resignBtn" hidden>🏳 Abandonner</button>
       </div>
     </div>
   </div>
@@ -276,11 +275,13 @@
           <div class="board-actions-row">
             <span class="material-count" id="materialWhite" title="Points capturés par les Blancs"></span>
             <div class="nav-controls">
+              <button class="btn-ghost nav-btn resign-btn" id="resignBtn" title="Abandonner la partie" aria-label="Abandonner la partie" hidden>🏳</button>
               <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
               <button class="btn-ghost nav-btn" id="navPrevBtn" title="Coup précédent">◀</button>
               <button class="btn-ghost nav-btn" id="flipBtn" title="Retourner le plateau">↕</button>
               <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
               <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
+              <button class="btn-ghost nav-btn" id="helpMoveBtn" title="Aide : meilleur coup" aria-label="Aide : quelle est la meilleure solution ?">💡</button>
             </div>
             <span class="material-count" id="materialBlack" title="Points capturés par les Noirs"></span>
           </div>
@@ -318,7 +319,6 @@
           </div>
           <div id="engineOutput" class="engine-output"></div>
           <div class="help-row">
-            <button class="btn-ghost help-btn" id="helpMoveBtn">💡 Aide : quelle est la meilleure solution ?</button>
             <button class="btn-ghost coach-btn" id="helpSpeakBtn" hidden title="Écouter l'explication">🔊</button>
           </div>
           <div id="moveExplanation" class="move-explanation" hidden></div>

@@ -776,7 +776,7 @@ body.layout-locked .move-grip {
 .clock-box.active { border-color: var(--brass); }
 .clock-box.active .clock-time { color: var(--brass-soft); }
 .clock-box.flag .clock-time { color: var(--error); }
-.resign-btn { width: 100%; margin-top: 8px; color: var(--error); border-color: rgba(192,106,92,0.4); }
+.resign-btn { color: var(--error); border-color: rgba(192,106,92,0.4); }
 .resign-btn:hover { border-color: var(--error); background: rgba(192,106,92,0.10); }
 .depth-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; color: var(--ink-dim); }
 .depth-row select {
@@ -901,9 +901,10 @@ body.layout-locked .move-grip {
 }
 
 /* ---------- HELP BUTTON ---------- */
-.help-btn { width: 100%; margin: 4px 0 6px; font-size: 12px; padding: 7px 10px; }
+/* helpMoveBtn itself now lives in .nav-controls under the board (icon-only,
+   next to the other nav buttons) — .help-row only holds the "listen to the
+   explanation" button now, shown once a hint has been given. */
 .help-row { display: flex; gap: 6px; align-items: stretch; }
-.help-row .help-btn { flex: 1; margin: 4px 0 6px; }
 .help-row .coach-btn { margin: 4px 0 6px; padding: 0 10px; }
 .move-explanation {
   background: var(--bg-panel); border-left: 3px solid var(--brass); border-radius: 6px;
