@@ -273,10 +273,22 @@ body.layout-locked .move-grip {
 .mobile-tab-select { display: none; }
 @media (max-width: 760px) {
   .mobile-tab-select {
-    display: block; background: var(--bg-panel-raised); border: 1px solid var(--border-soft);
-    color: var(--ink); font-family: var(--font-body); font-size: 13px; font-weight: 600;
-    padding: 7px 10px; border-radius: 999px; cursor: pointer;
+    /* A native <select>'s closed-box width defaults to its WIDEST <option>
+       in most engines (here "✎ Créer une position"), not the one currently
+       shown — without a cap it rendered wide enough to overlap the brand
+       text and push the icon row off-screen. flex-shrink so it also yields
+       first if the topbar itself is ever tighter than this. */
+    display: block; max-width: 160px; flex-shrink: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    background: var(--bg-panel-raised); border: 1px solid var(--border-soft);
+    color: var(--ink); font-family: var(--font-body); font-size: 12.5px; font-weight: 600;
+    padding: 7px 8px; border-radius: 999px; cursor: pointer;
   }
+  /* Brand + select + all 4 topbar icons at full size genuinely don't fit on
+     one row on a phone (the icons alone already used most of the width) —
+     the wordmark is the one piece that's purely decorative here, so it's
+     what gives way; the knight glyph alone still reads as the brand. */
+  .brand-text { display: none; }
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand-glyph { font-size: 30px; color: var(--brass-soft); line-height: 1; }
