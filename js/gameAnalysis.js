@@ -288,6 +288,7 @@ function wireCoachControls(reports) {
       return;
     }
     playing = true;
+    if (ctx.onCoachState) ctx.onCoachState(true);
     playBtn.hidden = true;
     pauseBtn.hidden = false;
     stopBtn.hidden = false;
@@ -308,6 +309,7 @@ function wireCoachControls(reports) {
       },
       onComplete: () => {
         playing = false;
+        if (ctx.onCoachState) ctx.onCoachState(false);
         playBtn.hidden = false;
         playBtn.textContent = "🔊 Coach vocal";
         pauseBtn.hidden = true;
@@ -326,6 +328,7 @@ function wireCoachControls(reports) {
   stopBtn.addEventListener("click", () => {
     stopSpeech();
     playing = false;
+    if (ctx.onCoachState) ctx.onCoachState(false);
     playBtn.hidden = false;
     playBtn.textContent = "🔊 Coach vocal";
     pauseBtn.hidden = true;

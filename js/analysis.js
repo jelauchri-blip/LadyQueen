@@ -506,9 +506,13 @@ export function initAnalysisView() {
         els.reviewBtn.textContent = `Analyse ${i}/${total}`;
       }
     },
+    onCoachState: (playing) => {
+      if (els.gameVoiceBtn) els.gameVoiceBtn.textContent = playing ? "⏹" : "🔊";
+    },
     onAnalysisDone: (ok) => {
       if (els.reviewBtn) { els.reviewBtn.disabled = false; els.reviewBtn.textContent = "Revoir"; }
       if (els.correctionBtn && ok) els.correctionBtn.disabled = false;
+      if (els.gameVoiceBtn && ok) els.gameVoiceBtn.disabled = false;
       if (els.gameOverActions && !els.gameOverActions.hidden) els.engineStatus.textContent = "Partie terminée.";
     },
   });
@@ -526,6 +530,16 @@ export function initAnalysisView() {
     els.reviewBtn.textContent = "Analyse…";
     els.engineStatus.textContent = "Analyse de la partie…";
     document.getElementById("analyzeGameBtn").click();
+  };
+  // 🔊 on the same line: runs the "Coach vocal" of the analysis panel (which
+  // is closed and out of sight here) — again to stop it.
+  els.gameVoiceBtn = document.getElementById("gameVoiceBtn");
+  els.gameVoiceBtn.hidden = !isVoiceSupported();
+  els.gameVoiceBtn.onclick = () => {
+    const stop = document.getElementById("coachStopBtn");
+    const play = document.getElementById("coachPlayBtn");
+    if (stop && !stop.hidden) stop.click();
+    else if (play) play.click();
   };
   els.correctionBtn.onclick = () => {
     const panel = document.getElementById("fullgameResults").closest("details");
@@ -886,6 +900,8 @@ function refreshGameOverActions() {
     els.reviewBtn.disabled = false;
     els.reviewBtn.textContent = "Revoir";
     els.correctionBtn.disabled = true;
+    els.gameVoiceBtn.disabled = true;
+    els.gameVoiceBtn.textContent = "🔊";
     // Panel holding the buttons opens by itself (it's closed by default).
     const engineSection = document.querySelector(".side-section-engine");
     if (engineSection) engineSection.open = true;

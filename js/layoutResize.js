@@ -118,6 +118,17 @@ export function initLayoutResize() {
   function registerLockToggle(el) {
     if (el) el.addEventListener("dblclick", (e) => { e.preventDefault(); toggleLock(); });
   }
+  // With the handles hidden there's nothing left to double-click, so a
+  // double-click on the board itself brings them back. Delegated on the
+  // document because the board element is re-created; it only reacts while
+  // the layout is locked, so ordinary double-clicks on squares do nothing.
+  document.addEventListener("dblclick", (e) => {
+    if (!locked || !e.target.closest) return;
+    if (!e.target.closest("#view-analyse .board")) return;
+    e.preventDefault();
+    toggleLock();
+    positionGrips();
+  });
 
   // Pointer Events + setPointerCapture instead of plain mouse events: once
   // the drag starts, every subsequent move/up for that pointer is routed to
@@ -179,6 +190,17 @@ export function initLayoutResize() {
       if (b) return b;
     }
     return document.querySelector("#analyseBoardMount .board");
+  }
+
+  // Right edge of what the board really occupies. The column's own box isn't
+  // enough: a board enlarged past its column (or nudged) overflows it, and a
+  // panel limited only by the column's edge then lands on top of the board.
+  function boardRightEdge() {
+    const boardCol = document.querySelector(".analyse-board-col");
+    let right = boardCol ? boardCol.getBoundingClientRect().right : 0;
+    const board = activeBoard();
+    if (board) right = Math.max(right, board.getBoundingClientRect().right);
+    return right;
   }
 
   const boardGrip = document.getElementById("boardCornerGrip");
@@ -296,12 +318,12 @@ export function initLayoutResize() {
   // uses, just against the CURRENT natural (un-transformed) position,
   // whenever the layout might have changed size (window resize, tab
   // switch) instead of only while actively dragging.
-  function clampMoveOffset(el, xVar, yVar, getBoundaries) {
+  function clampMoveOffset(el, xVar, yVar, getBoundaries, alwaysCheck) {
     if (!el || !el.offsetParent) return;
     const cs = getComputedStyle(document.documentElement);
     const offsetX = parseFloat(cs.getPropertyValue(xVar)) || 0;
     const offsetY = parseFloat(cs.getPropertyValue(yVar)) || 0;
-    if (!offsetX && !offsetY) return;
+    if (!offsetX && !offsetY && !alwaysCheck) return;
     const rect = el.getBoundingClientRect();
     const naturalLeft = rect.left - offsetX, naturalRight = rect.right - offsetX;
     const naturalTop = rect.top - offsetY, naturalBottom = rect.bottom - offsetY;
@@ -330,17 +352,16 @@ export function initLayoutResize() {
     }
     const sideCol = document.querySelector(".analyse-side-col");
     clampMoveOffset(sideCol, "--side-move-x", "--side-move-y", () => {
-      const boardCol = document.querySelector(".analyse-board-col");
       const handle = document.getElementById("sideMovelistResizeHandle");
       const movelist = document.querySelector(".movelist-wrap");
       const layout = document.querySelector(".analyse-layout");
       const handleVisible = handle && handle.offsetParent;
       const movelistVisible = movelist && movelist.offsetParent;
       return {
-        leftBoundary: (handleVisible && !movelistVisible) ? handle.getBoundingClientRect().right : boardCol.getBoundingClientRect().right,
+        leftBoundary: (handleVisible && !movelistVisible) ? handle.getBoundingClientRect().right : boardRightEdge(),
         rightBoundary: (handleVisible && movelistVisible) ? handle.getBoundingClientRect().left : layout.getBoundingClientRect().right,
       };
-    });
+    }, true);
     const movelist = document.querySelector(".movelist-wrap");
     clampMoveOffset(movelist, "--movelist-move-x", "--movelist-move-y", () => {
       const handle = document.getElementById("sideMovelistResizeHandle");
@@ -493,7 +514,7 @@ export function initLayoutResize() {
       const movelistVisible = movelist && movelist.offsetParent;
       const leftBoundary = (handleVisible && !movelistVisible)
         ? handle.getBoundingClientRect().right
-        : boardCol.getBoundingClientRect().right;
+        : boardRightEdge();
       const rightBoundary = (handleVisible && movelistVisible)
         ? handle.getBoundingClientRect().left
         : layout.getBoundingClientRect().right;

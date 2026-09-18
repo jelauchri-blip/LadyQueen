@@ -486,7 +486,10 @@ body.layout-locked .move-grip {
 /* "💡 Aide : quelle est la meilleure solution ?" highlights the suggested
    move's own two squares (js/board.js setHintMove) — green instead of the
    last-move gold so a suggestion never reads as something already played. */
-.sq.hint-from, .sq.hint-to { box-shadow: inset 0 0 0 3px var(--success); }
+.sq.hint-from, .sq.hint-to {
+  box-shadow: inset 0 0 0 4px #1fdc6a, inset 0 0 0 9999px rgba(31,220,106,0.55);
+}
+.sq.hint-to { box-shadow: inset 0 0 0 6px #1fdc6a, inset 0 0 0 9999px rgba(31,220,106,0.7); }
 .sq.check-king { box-shadow: inset 0 0 0 9999px rgba(192,106,92,0.45); }
 .sq.check-flash { animation: check-pulse 0.3s ease-in-out 3; z-index: 5; }
 @keyframes check-pulse {
@@ -841,6 +844,8 @@ body.layout-locked .move-grip {
 .game-over-btn { padding: 4px 10px; font-size: 12px; }
 #correctionBtn { margin-left: auto; }
 .game-over-btn:disabled { opacity: 0.45; cursor: default; }
+.game-over-btn[hidden] { display: none; }
+#gameVoiceBtn { padding: 4px 6px; }
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-panel-raised); border: 1px solid var(--border-soft); border-radius: 999px; transition: 0.15s; }
@@ -851,6 +856,9 @@ body.layout-locked .move-grip {
 .engine-status { font-size: 12.5px; color: var(--ink-dim); margin-bottom: 6px; font-family: var(--font-mono); }
 .eval-bar { width: 100%; height: 16px; background: #1a1208; border-radius: 999px; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--brass); }
 .eval-bar-fill { height: 100%; width: 50%; background: var(--brass); transition: width 0.3s ease; }
+/* The vertical bar beside the board shows the same evaluation; this
+   horizontal duplicate inside "Moteur & coach" is no longer displayed. */
+.engine-readout .eval-bar { display: none; }
 .engine-output {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 8px; padding: 9px 12px;
   font-size: 13px; line-height: 1.45; color: var(--ink); min-height: 34px; margin-bottom: 10px;
@@ -1092,7 +1100,7 @@ body.layout-locked .move-grip {
   .side-section-engine > *:not(summary) { padding-bottom: 0; }
   .side-section-engine[open] { padding-bottom: 10px; }
   .side-section-engine .engine-toggle-row { margin-bottom: 4px; }
-  .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+  .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
   .engine-readout .engine-status { margin-bottom: 0; }
   .engine-readout .eval-bar { display: none; }
   .engine-readout .engine-output {
