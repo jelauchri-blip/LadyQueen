@@ -58,6 +58,7 @@ async function runAnalysis() {
     const bestMoves = [];
     for (let i = 0; i < fens.length; i++) {
       els.progress.textContent = `Analyse du coup ${i} / ${fens.length - 1} (profondeur ${getDepth()})…`;
+      if (ctx.onAnalysisProgress) ctx.onAnalysisProgress(i, fens.length - 1);
       const result = await ctx.evaluateFen(fens[i], getDepth());
       const turn = fens[i].split(" ")[1]; // 'w' | 'b' — side to move in this position
       evals.push(toWhiteCentipawns(result.score, turn));

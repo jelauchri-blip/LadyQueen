@@ -88,6 +88,9 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
 
 export function goToPly(n) {
   clearVariation();
+  // Reviewing a finished game: the "X gagne." banner sits over the board and
+  // gets in the way — it goes away as soon as the user starts navigating.
+  if (vsComputerGameOver) hideResultBanner();
   currentPly = Math.max(0, Math.min(plyFens.length - 1, n));
   chess.load(plyFens[currentPly]);
   const lastMove = currentPly > 0 ? plyMoves[currentPly - 1] : null;
@@ -495,6 +498,14 @@ export function initAnalysisView() {
     setBusy: (v) => { busy = v; },
     goToPly,
     showHint: (from, to) => board.setHintMove({ from, to }),
+    // The real progress text lives inside the closed "Analyse complète"
+    // panel — a long game takes minutes, so show the count on the button
+    // the user just tapped instead of leaving it looking frozen.
+    onAnalysisProgress: (i, total) => {
+      if (els.gameOverActions && !els.gameOverActions.hidden && els.reviewBtn.disabled) {
+        els.reviewBtn.textContent = `Analyse ${i}/${total}`;
+      }
+    },
     onAnalysisDone: (ok) => {
       if (els.reviewBtn) { els.reviewBtn.disabled = false; els.reviewBtn.textContent = "Revoir"; }
       if (els.correctionBtn && ok) els.correctionBtn.disabled = false;
@@ -510,6 +521,7 @@ export function initAnalysisView() {
   els.reviewBtn.onclick = () => {
     const sideSelect = document.getElementById("playerSideSelect");
     if (sideSelect && computerSide) sideSelect.value = computerSide === "w" ? "b" : "w"; // estimate the human's level
+    hideResultBanner();
     els.reviewBtn.disabled = true;
     els.reviewBtn.textContent = "Analyse…";
     els.engineStatus.textContent = "Analyse de la partie…";
