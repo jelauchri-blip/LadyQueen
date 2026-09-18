@@ -495,7 +495,32 @@ export function initAnalysisView() {
     setBusy: (v) => { busy = v; },
     goToPly,
     showHint: (from, to) => board.setHintMove({ from, to }),
+    onAnalysisDone: (ok) => {
+      if (els.reviewBtn) { els.reviewBtn.disabled = false; els.reviewBtn.textContent = "Revoir"; }
+      if (els.correctionBtn && ok) els.correctionBtn.disabled = false;
+      if (els.gameOverActions && !els.gameOverActions.hidden) els.engineStatus.textContent = "Partie terminée.";
+    },
   });
+
+  // End of a game against the computer: "Partie terminée. [Revoir] [Correction]"
+  // on the engine status line — lets the game be studied without saving it.
+  els.gameOverActions = document.getElementById("gameOverActions");
+  els.reviewBtn = document.getElementById("reviewBtn");
+  els.correctionBtn = document.getElementById("correctionBtn");
+  els.reviewBtn.onclick = () => {
+    const sideSelect = document.getElementById("playerSideSelect");
+    if (sideSelect && computerSide) sideSelect.value = computerSide === "w" ? "b" : "w"; // estimate the human's level
+    els.reviewBtn.disabled = true;
+    els.reviewBtn.textContent = "Analyse…";
+    els.engineStatus.textContent = "Analyse de la partie…";
+    document.getElementById("analyzeGameBtn").click();
+  };
+  els.correctionBtn.onclick = () => {
+    const panel = document.getElementById("fullgameResults").closest("details");
+    if (panel) panel.open = true;
+    const card = document.querySelector(".coach-error-block");
+    if (card) card.scrollIntoView({ block: "center", behavior: "smooth" });
+  };
 
   let lastHelpSpeech = "";
   els.helpBtn.onclick = async () => {
@@ -832,8 +857,27 @@ function updateBoardPromotion() {
     document.body.classList.remove("board-promoted-mobile");
   }
   // Called at every start/end/resign of a computer game — also the moment the
-  // bulb's "live game vs relecture" state changes.
+  // bulb's "live game vs relecture" state changes and the end-of-game
+  // "Revoir / Correction" buttons appear or go away.
   refreshBulb();
+  refreshGameOverActions();
+}
+
+function refreshGameOverActions() {
+  const box = els.gameOverActions;
+  if (!box) return;
+  const show = vsComputerMode && vsComputerGameOver;
+  const justEnded = show && box.hidden;
+  box.hidden = !show;
+  if (justEnded) {
+    els.engineStatus.textContent = "Partie terminée.";
+    els.reviewBtn.disabled = false;
+    els.reviewBtn.textContent = "Revoir";
+    els.correctionBtn.disabled = true;
+    // Panel holding the buttons opens by itself (it's closed by default).
+    const engineSection = document.querySelector(".side-section-engine");
+    if (engineSection) engineSection.open = true;
+  }
 }
 MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 
@@ -1095,6 +1139,9 @@ function handleEngineMessage(e) {
 
 function renderEval(final) {
   if (!lastScore) return;
+  // A finished position (mate, stalemate...) has nothing to evaluate — this
+  // used to print "Mat en 0 coup" from a late engine reply.
+  if (chess.isGameOver()) return;
   els.evalBar.hidden = false;
   const turn = chess.turn();
   let cpForWhite;
@@ -1130,7 +1177,7 @@ function renderEval(final) {
     }
   } catch (e) { /* keep UCI form */ }
 
-  els.engineStatus.textContent = final ? "Analyse terminée." : "Analyse en cours…";
+  els.engineStatus.textContent = vsComputerGameOver ? "Partie terminée." : (final ? "Analyse terminée." : "Analyse en cours…");
   els.engineOutput.innerHTML = `${evalText} · Meilleur coup : <span class="best-move">${bestSan || "…"}</span>`;
 }
 

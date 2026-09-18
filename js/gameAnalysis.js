@@ -100,8 +100,10 @@ async function runAnalysis() {
     renderMoveList(moveReports);
     renderElo(moveReports);
     renderErrorCoach(moveReports);
+    if (ctx.onAnalysisDone) ctx.onAnalysisDone(true);
   } catch (e) {
     els.results.innerHTML = `<div class="phase-block"><p>L'analyse a été interrompue (moteur indisponible). Réessayez avec le moteur activé et une connexion internet stable.</p></div>`;
+    if (ctx.onAnalysisDone) ctx.onAnalysisDone(false);
   } finally {
     running = false;
     els.btn.disabled = false;

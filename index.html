@@ -326,6 +326,10 @@
           </div>
           <div class="engine-readout">
             <div id="engineStatus" class="engine-status">Moteur désactivé</div>
+            <div id="gameOverActions" class="game-over-actions" hidden>
+              <button type="button" class="btn-ghost game-over-btn" id="reviewBtn" title="Analyser la partie qui vient de finir, sans l'enregistrer">Revoir</button>
+              <button type="button" class="btn-ghost game-over-btn" id="correctionBtn" disabled title="Disponible une fois l'analyse terminée">Correction</button>
+            </div>
             <div id="evalBar" class="eval-bar" hidden>
               <div class="eval-bar-fill" id="evalBarFill"></div>
             </div>
