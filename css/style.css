@@ -910,6 +910,38 @@ body.layout-locked .move-grip {
   list-style-position: inside; padding-left: 4px; max-height: 220px; overflow-y: auto;
   background: repeating-linear-gradient(var(--bg-deep) 0 27px, rgba(243,238,225,0.03) 27px 28px);
 }
+/* Ampoule 💡 rouge en relecture quand le moteur voit un mat forcé
+   (js/analysis.js refreshBulb). Le clic donne toujours l'aide habituelle. */
+#helpMoveBtn.bulb-mate { border-color: var(--error); background: rgba(192,106,92,0.30); box-shadow: 0 0 0 2px rgba(192,106,92,0.35); }
+
+/* Suite de coups proposée (mat) : remplace la liste des coups sur
+   téléphone le temps de la variation, s'affiche au-dessus sur grand écran. */
+.variation-strip {
+  display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 6px 4px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); white-space: nowrap;
+}
+.variation-strip[hidden] { display: none; }
+.variation-strip .var-label { font-weight: 700; }
+.variation-strip .var-mate { color: var(--error); }
+.variation-strip .var-go {
+  background: var(--brass); color: #201A08; border: none; border-radius: 6px;
+  font-family: var(--font-body); font-weight: 700; font-size: 12px; padding: 5px 10px; cursor: pointer;
+}
+.variation-strip .var-close {
+  background: none; border: none; color: var(--ink-dim); cursor: pointer; font-size: 15px;
+  padding: 4px 6px; margin-left: auto;
+}
+.variation-strip .var-moves {
+  position: relative; display: flex; gap: 8px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none;
+}
+.variation-strip .var-moves::-webkit-scrollbar { display: none; }
+.variation-strip .var-mv { flex: none; cursor: pointer; padding: 1px 5px; border-radius: 3px; }
+.variation-strip .var-mv.done { color: var(--ink); }
+.variation-strip .var-mv.current { background: var(--brass); color: #201A08; font-weight: 700; }
+.variation-strip .var-count { font-size: 11px; color: var(--ink-faint); flex: none; }
+@media (max-width: 760px) {
+  .movelist-wrap.variation-active > .movelist { display: none; }
+}
 .movelist .mv-pair { cursor: default; }
 .movelist .mv-pair span.mv-clickable { cursor: pointer; padding: 1px 4px; border-radius: 3px; }
 .movelist .mv-pair span.mv-clickable:hover { background: rgba(201,162,39,0.15); color: var(--ink); }
@@ -965,6 +997,9 @@ body.layout-locked .move-grip {
 /* ---------- VOICE COACH ---------- */
 .coach-title-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; margin-bottom: 0; }
 .coach-bar { display: flex; gap: 4px; }
+.coach-elo-slot { display: flex; gap: 8px; align-items: baseline; }
+.elo-inline .elo-side { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); }
+.elo-inline .elo-value { font-family: var(--font-display); font-size: 15px; color: var(--brass-soft); font-weight: 600; }
 .coach-btn { font-size: 10px; padding: 3px 7px; white-space: nowrap; }
 /* ---------- ERROR COACH ---------- */
 .coach-error-block { border: 1px solid var(--brass); }

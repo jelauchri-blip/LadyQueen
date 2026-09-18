@@ -1,6 +1,18 @@
 import { Chess } from "./chess.js";
 import { speakOne, playSequence, pauseSequence, resumeSequence, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { getDepth } from "./engineSettings.js";
+import { sanFr, sanSpoken } from "./notation.js";
+
+// A move counts as "there was a better one" from an inaccuracy up (≥ 25
+// centipawns lost) — below that the difference is too small to act on.
+const BETTER_MOVE_MIN_LOSS = 25;
+// Below this many moves per side the level estimate isn't meaningful (one
+// perfect opening move would read as ~2800 Elo).
+const ELO_MIN_MOVES = 8;
+
+function hasBetterMove(report) {
+  return report.cpLoss >= BETTER_MOVE_MIN_LOSS && !!report.bestMoveUci && report.bestMoveUci !== report.playedUci;
+}
 
 export const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
@@ -81,6 +93,7 @@ async function runAnalysis() {
         explanation,
         evalAfterWhiteCp: afterWhiteCp,
         bestMoveUci: bestMoves[i],
+        playedUci: mv.from + mv.to + (mv.promotion || ""),
       });
     }
 
@@ -234,6 +247,11 @@ function renderMoveList(reports) {
   const title = document.createElement("h4");
   title.textContent = "Coup par coup";
   titleRow.appendChild(title);
+  // Filled by renderElo(): the level estimate sits on this same line.
+  const eloSlot = document.createElement("span");
+  eloSlot.className = "coach-elo-slot";
+  eloSlot.id = "coachEloSlot";
+  titleRow.appendChild(eloSlot);
 
   if (isVoiceSupported()) {
     const coachBar = document.createElement("div");
@@ -272,9 +290,19 @@ function wireCoachControls(reports) {
     stopBtn.hidden = false;
     const items = reports.map((report) => {
       const numWord = report.color === "w" ? `Coup ${report.moveNumber}, les Blancs jouent` : `Coup ${report.moveNumber}, les Noirs jouent`;
-      return { text: `${numWord} ${report.san}. ${report.explanation}` };
+      let text = `${numWord} ${sanSpoken(report.san)}. ${report.explanation}`;
+      if (hasBetterMove(report)) text += " Il y avait un meilleur coup ici. Touche l'ampoule pour le voir.";
+      return { text };
     });
     playSequence(items, {
+      // The board follows the move being commented: on the position BEFORE
+      // it when a better move existed (so the ampoule can show that move),
+      // otherwise on the position after it.
+      onItemStart: (i) => {
+        const report = reports[i];
+        if (!report || !ctx.goToPly) return;
+        ctx.goToPly(hasBetterMove(report) ? report.ply : report.ply + 1);
+      },
       onComplete: () => {
         playing = false;
         playBtn.hidden = false;
@@ -328,7 +356,8 @@ function explainBestMove(fenBefore, uci, bestSan, cpLoss, plyIndex) {
     if (!r) return null;
     const tags = buildHeuristicTags(r, plyIndex, { w: {}, b: {} });
     const pros = tags.filter((t) => t.kind === "pro").map((t) => t.text);
-    const parts = [`${bestSan} évitait de céder environ ${cpLoss} centipions d'avantage.`];
+    const points = (cpLoss / 100).toFixed(1).replace(".", ",");
+    const parts = [`${bestSan} évitait de perdre environ ${points} point${cpLoss >= 200 ? "s" : ""} d'avantage.`];
     if (pros.length) parts.push(`Ce coup ${pros.join(", ")}.`);
     return parts.join(" ");
   } catch (e) {
@@ -346,8 +375,11 @@ function renderErrorCoach(reports) {
   wrap.appendChild(title);
 
   if (mistakes.length === 0) {
+    const perfectible = reports.filter(hasBetterMove).length;
     const p = document.createElement("p");
-    p.textContent = "Aucune erreur ni gaffe détectée dans cette partie — rien à corriger ici !";
+    p.textContent = perfectible === 0
+      ? "Aucune erreur ni gaffe détectée."
+      : `Aucune erreur ni gaffe, mais ${perfectible} coup${perfectible > 1 ? "s" : ""} perfectible${perfectible > 1 ? "s" : ""}.`;
     wrap.appendChild(p);
     els.results.appendChild(wrap);
     return;
@@ -363,16 +395,16 @@ function renderErrorCoach(reports) {
     const m = mistakes[index];
     const sideLabel = m.color === "w" ? "les Blancs" : "les Noirs";
     const numLabel = m.color === "w" ? `${m.moveNumber}.` : `${m.moveNumber}…`;
-    const bestSan = bestMoveSan(m.fenBefore, m.bestMoveUci);
+    const bestSanEn = bestMoveSan(m.fenBefore, m.bestMoveUci);
+    const bestSan = bestSanEn ? sanFr(bestSanEn) : null;
 
     body.innerHTML = `
       <div class="coach-error-counter">Erreur ${index + 1} / ${mistakes.length}</div>
       <div class="coach-error-move">
         <span class="mv-symbol sym-${m.classification.key}">${m.classification.symbol}</span>
-        ${numLabel} <span class="mv-san">${m.san}</span> — ${sideLabel}
+        ${numLabel} <span class="mv-san">${sanFr(m.san)}</span> — ${sideLabel}
       </div>
-      <p class="coach-error-explain">${m.explanation}</p>
-      ${bestSan ? `<p class="coach-error-best">Coup suggéré à la place : <span class="best-move">${bestSan}</span></p>` : ""}
+      ${bestSan ? `<p class="coach-error-best">→ <span class="best-move">${bestSan}</span></p>` : ""}
       ${bestSan ? `<p class="coach-error-why" id="errWhyText" hidden></p>` : ""}
       <div class="coach-error-actions">
         <button class="btn-ghost" id="errPrevBtn" title="Erreur précédente" aria-label="Erreur précédente" ${index === 0 ? "disabled" : ""}>◀</button>
@@ -395,8 +427,8 @@ function renderErrorCoach(reports) {
     const speakBtn = body.querySelector("#errSpeakBtn");
     if (speakBtn) {
       speakBtn.onclick = () => {
-        const text = `Erreur ${index + 1} sur ${mistakes.length}. Coup ${m.moveNumber}, ${sideLabel}, ${m.san}. ${m.explanation}` +
-          (bestSan ? ` Le coup suggéré à la place était ${bestSan}.` : "");
+        const text = `Erreur ${index + 1} sur ${mistakes.length}. Coup ${m.moveNumber}, ${sideLabel}, ${sanSpoken(m.san)}. ${m.explanation}` +
+          (bestSanEn ? ` Le coup suggéré à la place était ${sanSpoken(bestSanEn)}.` : "");
         speakOne(text);
       };
     }
@@ -410,6 +442,13 @@ function renderErrorCoach(reports) {
         whyEl.hidden = false;
         speakOne(whyText);
       };
+    }
+
+    // Put the board on the position BEFORE this move and light up the
+    // suggested move's start and end squares.
+    if (m.bestMoveUci && ctx.goToPly) {
+      ctx.goToPly(m.ply);
+      if (ctx.showHint) ctx.showHint(m.bestMoveUci.slice(0, 2), m.bestMoveUci.slice(2, 4));
     }
   }
 
@@ -438,27 +477,27 @@ function renderElo(reports) {
   const side = els.select.value;
   const sides = side === "both" ? ["w", "b"] : [side];
 
-  const cards = document.createElement("div");
-  cards.className = "elo-cards";
+  // Goes on the "Coup par coup" title line (slot made by renderMoveList).
+  const slot = document.getElementById("coachEloSlot");
+  if (!slot) return;
+  slot.innerHTML = "";
 
   for (const s of sides) {
     const moves = reports.filter((r) => r.color === s);
     if (moves.length === 0) continue;
-    const acpl = Math.round(moves.reduce((sum, r) => sum + r.cpLoss, 0) / moves.length);
-    const elo = acplToElo(acpl);
-    const card = document.createElement("div");
-    card.className = "elo-card";
-    card.innerHTML = `
-      <span class="elo-side">${s === "w" ? "Blancs" : "Noirs"}</span>
-      <span class="elo-value">≈ ${elo}</span>
-    `;
-    cards.appendChild(card);
+    let value = "—";
+    let tip = `Trop peu de coups pour estimer le niveau (il en faut au moins ${ELO_MIN_MOVES} par camp)`;
+    if (moves.length >= ELO_MIN_MOVES) {
+      const acpl = Math.round(moves.reduce((sum, r) => sum + r.cpLoss, 0) / moves.length);
+      value = `≈ ${acplToElo(acpl)}`;
+      tip = "Niveau estimé d'après la qualité des coups joués";
+    }
+    const item = document.createElement("span");
+    item.className = "elo-inline";
+    item.title = tip;
+    item.innerHTML = `<span class="elo-side">${s === "w" ? "Blancs" : "Noirs"}</span> <span class="elo-value">${value}</span>`;
+    slot.appendChild(item);
   }
-
-  const wrap = document.createElement("div");
-  wrap.className = "phase-block";
-  wrap.appendChild(cards);
-  els.results.appendChild(wrap);
 }
 
 // --- Single-move "help" explanation, used by the Analyse tab's Aide button ---

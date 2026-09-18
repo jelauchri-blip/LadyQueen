@@ -10,6 +10,8 @@ import { eloSteps, uciOptionsForElo, resetEngineStrength, weakPlayParams, ELO_CA
 import { createClock, formatClock } from "./chessClock.js";
 import { playMove, playCapture, playCheck, playGameEnd } from "./sounds.js";
 import { getPlayerName, getBotName } from "./playerNames.js";
+import { sanFr, sanSpoken } from "./notation.js";
+import { analyseSignal } from "./signals.js";
 
 // The local copy is tried FIRST — it removes any dependency on an external
 // CDN being reachable, which is the most likely explanation for engine
@@ -52,7 +54,17 @@ let challengeMode = true; // true = "Défi" (read-only history, no branching); f
 let clock = null;
 let vsComputerGameOver = false;
 
+// --- Ampoule 💡 : signal rouge (mat forcé) -----------------------------------
+// signal = résultat de analyseSignal() pour la position `fen` ; `consumed`
+// passe à true quand l'utilisateur touche l'ampoule (elle redevient neutre).
+let signal = null;
+// variation = suite de coups proposée qu'on peut parcourir sur le plateau :
+// { fen, line, step, started, kind, label }. `started` false = simple offre
+// "Voir les coups", true = on parcourt la suite.
+let variation = null;
+
 function startHistoryAt(fen) {
+  clearVariation();
   plyFens = [fen];
   plyMoves = [];
   currentPly = 0;
@@ -61,6 +73,7 @@ function startHistoryAt(fen) {
 }
 
 function rebuildHistoryFromChessObject(chessWithHistory) {
+  clearVariation();
   const hist = chessWithHistory.history({ verbose: true });
   plyFens = [hist.length ? hist[0].before : chessWithHistory.fen()];
   plyMoves = [];
@@ -74,6 +87,7 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
 }
 
 export function goToPly(n) {
+  clearVariation();
   currentPly = Math.max(0, Math.min(plyFens.length - 1, n));
   chess.load(plyFens[currentPly]);
   const lastMove = currentPly > 0 ? plyMoves[currentPly - 1] : null;
@@ -102,13 +116,108 @@ export function goToPly(n) {
 }
 
 function updateNavButtons() {
-  const atStart = currentPly === 0;
-  const atEnd = currentPly === plyFens.length - 1;
+  // While a suggested line is being stepped through, the same four buttons
+  // move along that line instead of the game's history.
+  const stepping = variation && variation.started;
+  const atStart = stepping ? variation.step === 0 : currentPly === 0;
+  const atEnd = stepping ? variation.step === variation.line.length : currentPly === plyFens.length - 1;
   els.navFirstBtn.disabled = atStart;
   els.navPrevBtn.disabled = atStart;
   els.navNextBtn.disabled = atEnd;
   els.navLastBtn.disabled = atEnd;
   updateMaterialCounts();
+  refreshBulb();
+}
+
+// --- Bulb signal + suggested line -------------------------------------------
+
+// "Relecture" = anything but a game being played live against the computer
+// (finished game, loaded PGN, free analysis, or history scrolled back).
+function isReviewing() {
+  return !(vsComputerMode && !vsComputerGameOver) || currentPly < plyFens.length - 1;
+}
+
+function signalActive() {
+  return !!signal && !signal.consumed && signal.fen === chess.fen() && engineEnabled
+    && !(vsComputerMode && challengeMode) && isReviewing() && !variation;
+}
+
+function refreshBulb() {
+  const btn = els.helpBtn;
+  if (!btn) return;
+  const active = signalActive();
+  btn.classList.toggle("bulb-mate", active);
+  btn.title = active ? `${signal.label} — touche pour l'aide` : "Aide : meilleur coup";
+}
+
+function clearVariation() {
+  variation = null;
+  renderVariationStrip();
+}
+
+function exitVariation() {
+  if (!variation) return;
+  clearVariation();
+  goToPly(currentPly);
+}
+
+function openVariationOffer(sig) {
+  variation = { fen: sig.fen, line: sig.line, step: 0, started: false, kind: sig.kind, label: sig.label };
+  renderVariationStrip();
+}
+
+function setVariationStep(n) {
+  if (!variation || !variation.started) return;
+  variation.step = Math.max(0, Math.min(variation.line.length, n));
+  const c = new Chess(variation.fen);
+  for (let i = 0; i < variation.step; i++) {
+    const m = variation.line[i];
+    c.move({ from: m.from, to: m.to, promotion: m.uci.slice(4) || undefined });
+  }
+  const last = variation.step > 0 ? variation.line[variation.step - 1] : null;
+  board.setChess(c, last ? { from: last.from, to: last.to } : null);
+  board.setInteractive(false);
+  // Light up the move to play next from this position.
+  const next = variation.line[variation.step];
+  if (next) board.setHintMove({ from: next.from, to: next.to });
+  renderVariationStrip();
+  updateNavButtons();
+}
+
+function startVariation() {
+  if (!variation) return;
+  variation.started = true;
+  setVariationStep(0);
+}
+
+function renderVariationStrip() {
+  const strip = els.variationStrip;
+  if (!strip) return;
+  const wrap = strip.closest(".movelist-wrap");
+  if (!variation) {
+    strip.hidden = true;
+    strip.innerHTML = "";
+    if (wrap) wrap.classList.remove("variation-active");
+    return;
+  }
+  strip.hidden = false;
+  if (wrap) wrap.classList.add("variation-active");
+  if (!variation.started) {
+    strip.innerHTML = `<span class="var-label var-${variation.kind}">${variation.label}</span>
+      <button type="button" class="var-go" data-var="go">▶ Voir les coups</button>
+      <button type="button" class="var-close" data-var="close" aria-label="Fermer">✕</button>`;
+    return;
+  }
+  const moves = variation.line.map((m, i) => {
+    const cls = "var-mv" + (i < variation.step ? " done" : "") + (i === variation.step - 1 ? " current" : "");
+    return `<span class="${cls}" data-var="step" data-i="${i + 1}">${sanFr(m.san)}</span>`;
+  }).join(" ");
+  strip.innerHTML = `<span class="var-moves">${moves}</span>
+    <span class="var-count">${variation.step}/${variation.line.length}</span>
+    <button type="button" class="var-close" data-var="close" aria-label="Quitter la variation">✕</button>`;
+  const cur = strip.querySelector(".current");
+  const moveBox = strip.querySelector(".var-moves");
+  if (cur && moveBox) moveBox.scrollLeft = cur.offsetLeft - moveBox.clientWidth / 2 + cur.offsetWidth / 2;
 }
 
 // Running total of enemy material captured by each side, up to the ply
@@ -197,10 +306,21 @@ export function initAnalysisView() {
 
   els.flipBtn.onclick = () => { orientation = orientation === "white" ? "black" : "white"; board.flip(); };
 
-  els.navFirstBtn.onclick = () => goToPly(0);
-  els.navPrevBtn.onclick = () => goToPly(currentPly - 1);
-  els.navNextBtn.onclick = () => goToPly(currentPly + 1);
-  els.navLastBtn.onclick = () => goToPly(plyFens.length - 1);
+  const stepping = () => variation && variation.started;
+  els.navFirstBtn.onclick = () => (stepping() ? setVariationStep(0) : goToPly(0));
+  els.navPrevBtn.onclick = () => (stepping() ? setVariationStep(variation.step - 1) : goToPly(currentPly - 1));
+  els.navNextBtn.onclick = () => (stepping() ? setVariationStep(variation.step + 1) : goToPly(currentPly + 1));
+  els.navLastBtn.onclick = () => (stepping() ? setVariationStep(variation.line.length) : goToPly(plyFens.length - 1));
+
+  els.variationStrip = document.getElementById("variationStrip");
+  els.variationStrip.addEventListener("click", (e) => {
+    const target = e.target.closest("[data-var]");
+    if (!target) return;
+    const action = target.dataset.var;
+    if (action === "go") startVariation();
+    else if (action === "close") exitVariation();
+    else if (action === "step") setVariationStep(parseInt(target.dataset.i, 10));
+  });
 
   els.engineToggle.onchange = () => {
     engineEnabled = els.engineToggle.checked;
@@ -213,6 +333,7 @@ export function initAnalysisView() {
       els.evalBarVert.hidden = true;
       els.engineOutput.innerHTML = "";
     }
+    refreshBulb();
   };
 
   els.depthSelect.value = getDepthKey();
@@ -373,10 +494,21 @@ export function initAnalysisView() {
     enableEngine: () => { engineEnabled = true; els.engineToggle.checked = true; ensureEngine(); },
     setBusy: (v) => { busy = v; },
     goToPly,
+    showHint: (from, to) => board.setHintMove({ from, to }),
   });
 
   let lastHelpSpeech = "";
   els.helpBtn.onclick = async () => {
+    // Stepping through a suggested line: help is about the real position, so
+    // leave the line (which puts the board back) before asking.
+    if (variation && variation.started) exitVariation();
+    // Colored bulb: the usual help below still runs whatever the color; the
+    // bulb also goes back to neutral and the moves line offers the sequence.
+    if (signalActive()) {
+      signal.consumed = true;
+      refreshBulb();
+      openVariationOffer(signal);
+    }
     if (vsComputerGameOver && currentPly === plyFens.length - 1) {
       els.moveExplanation.hidden = false;
       els.moveExplanation.textContent = "La partie est terminée — revenez en arrière dans l'historique pour demander de l'aide sur un coup passé.";
@@ -699,6 +831,9 @@ function updateBoardPromotion() {
     analyseLayout.insertBefore(boardCol, analyseLayout.firstChild);
     document.body.classList.remove("board-promoted-mobile");
   }
+  // Called at every start/end/resign of a computer game — also the moment the
+  // bulb's "live game vs relecture" state changes.
+  refreshBulb();
 }
 MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 
@@ -791,10 +926,10 @@ async function runLiveCoach(fenBefore, moveResult, plyIndex) {
     const tags = buildHeuristicTags(moveResult, plyIndex, liveMoveCountByPieceType);
     const explanation = buildExplanation(moveResult, classification, cpLoss, tags, beforeSigned, afterSigned);
 
-    els.moveExplanation.innerHTML = `<span class="mv-symbol sym-${classification.key}">${classification.symbol}</span> <span class="best-move">${moveResult.san}</span><br>${explanation}`;
+    els.moveExplanation.innerHTML = `<span class="mv-symbol sym-${classification.key}">${classification.symbol}</span> <span class="best-move">${sanFr(moveResult.san)}</span><br>${explanation}`;
     if (isVoiceSupported()) {
       stopSpeech();
-      speakOne(`${moveResult.san}. ${explanation}`);
+      speakOne(`${sanSpoken(moveResult.san)}. ${explanation}`);
     }
   } catch (e) {
     els.moveExplanation.textContent = "Coach indisponible pour ce coup (moteur non prêt ou hors ligne).";
@@ -840,14 +975,14 @@ function updateMoveList() {
     const blackMove = plyMoves[i + 1];
     const whiteSpan = document.createElement("span");
     whiteSpan.className = "mv-clickable" + (currentPly === i + 1 ? " current" : "");
-    whiteSpan.textContent = whiteMove.san;
+    whiteSpan.textContent = sanFr(whiteMove.san);
     whiteSpan.addEventListener("click", () => goToPly(i + 1));
     li.appendChild(whiteSpan);
     if (blackMove) {
       li.appendChild(document.createTextNode("  "));
       const blackSpan = document.createElement("span");
       blackSpan.className = "mv-clickable" + (currentPly === i + 2 ? " current" : "");
-      blackSpan.textContent = blackMove.san;
+      blackSpan.textContent = sanFr(blackMove.san);
       blackSpan.addEventListener("click", () => goToPly(i + 2));
       li.appendChild(blackSpan);
     }
@@ -912,6 +1047,7 @@ function whenEngineReady() {
 
 let lastBestMove = null;
 let lastScore = null;
+let lastPv = [];
 let pendingResolve = null;
 
 function handleEngineMessage(e) {
@@ -940,7 +1076,8 @@ function handleEngineMessage(e) {
       lastScore = { cp: parseInt(cpMatch[1], 10) };
     }
     if (pvMatch) {
-      lastBestMove = pvMatch[1].split(" ")[0];
+      lastPv = pvMatch[1].trim().split(" ");
+      lastBestMove = lastPv[0];
     }
     if (!busy) renderEval();
   }
@@ -951,7 +1088,7 @@ function handleEngineMessage(e) {
     if (pendingResolve) {
       const resolve = pendingResolve;
       pendingResolve = null;
-      resolve({ score: lastScore, bestMove: lastBestMove });
+      resolve({ score: lastScore, bestMove: lastBestMove, pv: lastPv });
     }
   }
 }
@@ -989,7 +1126,7 @@ function renderEval(final) {
       const testChess = new Chess(chess.fen());
       const from = lastBestMove.slice(0, 2), to = lastBestMove.slice(2, 4), promo = lastBestMove.slice(4) || undefined;
       const r = testChess.move({ from, to, promotion: promo });
-      if (r) bestSan = r.san;
+      if (r) bestSan = sanFr(r.san);
     }
   } catch (e) { /* keep UCI form */ }
 
@@ -1024,6 +1161,10 @@ function requestEval() {
       lastScore = result.score;
       lastBestMove = result.bestMove;
       renderEval(true);
+      // Bulb signal (forced mate) for this position.
+      const found = analyseSignal({ fen: fenAtRequest, score: result.score, pv: result.pv });
+      signal = found ? { ...found, fen: fenAtRequest, consumed: false } : null;
+      refreshBulb();
     } catch (e) { /* engine unavailable */ }
   }, 250);
 }
@@ -1040,6 +1181,7 @@ export function evaluateFen(fen, depth = 12) {
       if (!engine) { resolve({ score: null, bestMove: null }); return; }
       lastScore = null;
       lastBestMove = null;
+      lastPv = [];
       let settled = false;
       const finish = (value) => {
         if (settled) return;
@@ -1058,7 +1200,7 @@ export function evaluateFen(fen, depth = 12) {
         if (engine) { engine.terminate(); engine = null; }
         engineIsReady = false;
         engineState = "idle";
-        finish({ score: lastScore, bestMove: lastBestMove });
+        finish({ score: lastScore, bestMove: lastBestMove, pv: lastPv });
       }, 20000);
       pendingResolve = finish;
       engine.postMessage("position fen " + fen);

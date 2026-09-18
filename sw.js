@@ -32,6 +32,8 @@ const CORE_ASSETS = [
   "./js/dataBackup.js",
   "./js/sounds.js",
   "./js/playerNames.js",
+  "./js/notation.js",
+  "./js/signals.js",
   "./js/layoutResize.js",
 ];
 
