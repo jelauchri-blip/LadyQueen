@@ -267,28 +267,25 @@ body.layout-locked .move-grip {
 /* Phone-only nav: replaces the horizontally-scrolling .tabs strip (a
    scrollbar for it kept showing on some Android browsers no matter what CSS
    asked for — a native select has no scrollable strip to begin with, so
-   nothing to hide). Sits in the topbar's own row (no extra height) — flex's
-   space-between naturally centers it between the brand and the icon
-   cluster, since it's just another child of .topbar in source order. */
+   nothing to hide). Moved out of the topbar (it didn't have room there
+   alongside the brand text and the 4 icons) into the "Force" row instead —
+   only reachable while that row is visible (i.e. no game actively running),
+   which is an acceptable trade since "Abandonner" is always right there to
+   back out of a game first. */
 .mobile-tab-select { display: none; }
 @media (max-width: 760px) {
   .mobile-tab-select {
     /* A native <select>'s closed-box width defaults to its WIDEST <option>
        in most engines (here "✎ Créer une position"), not the one currently
-       shown — without a cap it rendered wide enough to overlap the brand
-       text and push the icon row off-screen. flex-shrink so it also yields
-       first if the topbar itself is ever tighter than this. */
-    display: block; max-width: 160px; flex-shrink: 1; min-width: 0;
+       shown — without a cap it rendered wide enough to overlap its
+       neighbors. flex-shrink so it also yields first if the row is tighter
+       than this. */
+    display: block; max-width: 92px; flex-shrink: 1; min-width: 0;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     background: var(--bg-panel-raised); border: 1px solid var(--border-soft);
-    color: var(--ink); font-family: var(--font-body); font-size: 12.5px; font-weight: 600;
-    padding: 7px 8px; border-radius: 999px; cursor: pointer;
+    color: var(--ink); font-family: var(--font-body); font-size: 12px; font-weight: 600;
+    padding: 6px 6px; border-radius: 999px; cursor: pointer;
   }
-  /* Brand + select + all 4 topbar icons at full size genuinely don't fit on
-     one row on a phone (the icons alone already used most of the width) —
-     the wordmark is the one piece that's purely decorative here, so it's
-     what gives way; the knight glyph alone still reads as the brand. */
-  .brand-text { display: none; }
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand-glyph { font-size: 30px; color: var(--brass-soft); line-height: 1; }

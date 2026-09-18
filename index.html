@@ -53,15 +53,6 @@
         <h1>LadyQueen</h1>
       </div>
     </div>
-    <select id="mobileTabSelect" class="mobile-tab-select" aria-label="Navigation">
-      <option value="accueil">Accueil</option>
-      <option value="regles">Initiation</option>
-      <option value="tactique">Puzzle</option>
-      <option value="bibliotheque">Bibliothèque</option>
-      <option value="analyse">Analyse</option>
-      <option value="editor">✎ Créer une position</option>
-      <option value="pgn">Coller une partie</option>
-    </select>
     <button id="installBtn" class="install-btn" hidden>Installer</button>
     <button id="soundToggleBtn" class="theme-btn" title="Activer/couper le son" aria-label="Activer ou couper le son">🔊</button>
     <button class="theme-btn" id="saveGameBtn" title="Enregistrer la partie" aria-label="Enregistrer la partie">💾</button>
@@ -115,11 +106,23 @@
       <div id="opponentOptions" class="opponent-options">
         <div id="vsComputerSetup">
         <div class="opponent-row opponent-row-relative">
-          <span class="opponent-label-group">Force
+          <span class="opponent-label-group">
+            <select id="mobileTabSelect" class="mobile-tab-select" aria-label="Navigation">
+              <option value="accueil">Accueil</option>
+              <option value="regles">Initiation</option>
+              <option value="tactique">Puzzle</option>
+              <option value="bibliotheque">Bibliothèque</option>
+              <option value="analyse">Analyse</option>
+              <option value="editor">✎ Créer une position</option>
+              <option value="pgn">Coller une partie</option>
+            </select>
+            Force
+          </span>
+          <span class="opponent-row-controls">
+            <select id="opponentEloSelect"></select>
             <button type="button" class="info-icon-btn" id="eloInfoBtn" aria-label="Informations sur ce niveau">i</button>
             <button type="button" class="info-icon-btn" id="creditsInfoBtn" aria-label="Crédits et licences">&copy;</button>
           </span>
-          <select id="opponentEloSelect"></select>
           <p class="opponent-hint" id="opponentEloHint" hidden></p>
           <div class="opponent-hint" id="creditsHint" hidden>
             <p>Pièces d'échecs « Cburnett » : Colin M.L. Burnett, sous licence BSD 3 clauses / CC BY-SA 3.0 / GFDL — <a href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces" target="_blank" rel="noopener">source</a>.</p>
