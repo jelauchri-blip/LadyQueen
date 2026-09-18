@@ -301,35 +301,36 @@
         </div>
 
         <div class="analyse-side-col">
-          <details class="side-section" name="sideAccordion">
+          <details class="side-section side-section-engine" name="sideAccordion">
           <summary>Moteur &amp; coach</summary>
-          <div class="engine-toggle-row">
-            <span>Moteur d'analyse</span>
+          <div class="engine-main-row">
+            <span class="engine-main-label" title="Moteur d'analyse">Moteur</span>
             <label class="switch">
-              <input type="checkbox" id="engineToggle">
+              <input type="checkbox" id="engineToggle" aria-label="Moteur d'analyse">
               <span class="slider"></span>
             </label>
-          </div>
-          <div class="depth-row">
-            <span>Profondeur</span>
+            <label class="engine-time-label" for="depthSelect" title="Temps de réflexion du moteur par position">Réflexion</label>
             <select id="depthSelect">
-              <option value="rapide">Rapide — ≈ 1 s / position</option>
-              <option value="equilibre">Équilibré — ≈ 3 s / position</option>
-              <option value="approfondi">Approfondi — ≈ 10 s / position</option>
+              <option value="rapide">1 s</option>
+              <option value="equilibre">3 s</option>
+              <option value="approfondi">10 s</option>
             </select>
+            <button type="button" class="side-close-btn" id="engineCloseBtn" aria-label="Refermer Moteur et coach">▾</button>
           </div>
           <div class="engine-toggle-row">
-            <span>🎙️ Coach en direct (commente chaque coup)</span>
+            <span title="Commente chaque coup">🎙️ Coach en direct</span>
             <label class="switch">
-              <input type="checkbox" id="liveCoachToggle">
+              <input type="checkbox" id="liveCoachToggle" aria-label="Coach en direct (commente chaque coup)">
               <span class="slider"></span>
             </label>
           </div>
-          <div id="engineStatus" class="engine-status">Moteur désactivé</div>
-          <div id="evalBar" class="eval-bar" hidden>
-            <div class="eval-bar-fill" id="evalBarFill"></div>
+          <div class="engine-readout">
+            <div id="engineStatus" class="engine-status">Moteur désactivé</div>
+            <div id="evalBar" class="eval-bar" hidden>
+              <div class="eval-bar-fill" id="evalBarFill"></div>
+            </div>
+            <div id="engineOutput" class="engine-output"></div>
           </div>
-          <div id="engineOutput" class="engine-output"></div>
           <div class="help-row">
             <button class="btn-ghost coach-btn" id="helpSpeakBtn" hidden title="Écouter l'explication">🔊</button>
           </div>

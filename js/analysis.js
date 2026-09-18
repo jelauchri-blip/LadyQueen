@@ -449,6 +449,11 @@ export function initAnalysisView() {
   }
   els.sideSections.forEach(s => s.addEventListener("toggle", syncSideSections));
   syncSideSections();
+  // Phone layout hides the "Moteur & coach" title once it's open (see
+  // .side-section-engine in style.css) — this arrow is then the way to close it.
+  document.getElementById("engineCloseBtn").onclick = (e) => {
+    e.currentTarget.closest("details").open = false;
+  };
 
   let editorInited = false;
   els.openEditorBtn.onclick = () => {
@@ -849,9 +854,12 @@ function updateMoveList() {
     }
     els.moveList.appendChild(li);
   }
-  if (currentPly === 0 && els.moveList.children.length) {
-    // no move highlighted yet before first move; nothing to do
-  }
+  // Phone layout scrolls this list sideways as a single line: keep the
+  // current move centered (no-op wherever the list doesn't overflow sideways).
+  const cur = els.moveList.querySelector(".current");
+  els.moveList.scrollLeft = cur
+    ? cur.offsetLeft - els.moveList.clientWidth / 2 + cur.offsetWidth / 2
+    : 0;
 }
 
 function ensureEngine(urlIndex = 0) {
@@ -974,7 +982,7 @@ function renderEval(final) {
 
   const evalText = lastScore.mate !== undefined
     ? `Mat en ${Math.abs(lastScore.mate)} coup${Math.abs(lastScore.mate) > 1 ? "s" : ""} pour ${(lastScore.mate > 0) === (turn === "w") ? "les Blancs" : "les Noirs"}`
-    : `Évaluation : ${(cpForWhite / 100).toFixed(2)} (${cpForWhite >= 0 ? "avantage Blancs" : "avantage Noirs"})`;
+    : `Éval. ${(Math.abs(cpForWhite) / 100).toFixed(2)} ${cpForWhite >= 0 ? "Blancs" : "Noirs"}`;
 
   let bestSan = lastBestMove;
   try {
@@ -987,7 +995,7 @@ function renderEval(final) {
   } catch (e) { /* keep UCI form */ }
 
   els.engineStatus.textContent = final ? "Analyse terminée." : "Analyse en cours…";
-  els.engineOutput.innerHTML = `${evalText}<br>Meilleur coup : <span class="best-move">${bestSan || "…"}</span>`;
+  els.engineOutput.innerHTML = `${evalText} · Meilleur coup : <span class="best-move">${bestSan || "…"}</span>`;
 }
 
 let evalTimeout = null;

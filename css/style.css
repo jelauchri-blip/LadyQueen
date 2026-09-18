@@ -818,11 +818,21 @@ body.layout-locked .move-grip {
 .clock-box.flag .clock-time { color: var(--error); }
 .resign-btn { color: var(--error); border-color: rgba(192,106,92,0.4); }
 .resign-btn:hover { border-color: var(--error); background: rgba(192,106,92,0.10); }
-.depth-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; color: var(--ink-dim); }
-.depth-row select {
+.engine-main-row {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;
+  font-size: 14px; font-weight: 600;
+}
+.engine-main-row .engine-time-label { margin-left: auto; font-size: 13px; font-weight: 400; color: var(--ink-dim); }
+.engine-main-row select {
   background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--ink);
   font-family: var(--font-body); font-size: 12.5px; padding: 6px 8px; border-radius: 6px; cursor: pointer;
 }
+.side-close-btn {
+  display: none; background: none; border: none; color: var(--ink-dim); font-size: 18px;
+  padding: 4px 4px; cursor: pointer; line-height: 1;
+}
+.side-close-btn:hover { color: var(--brass-soft); }
+.engine-readout { display: block; }
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-panel-raised); border: 1px solid var(--border-soft); border-radius: 999px; transition: 0.15s; }
@@ -1021,6 +1031,43 @@ body.layout-locked .move-grip {
   .analyse-board-col { order: 1; }
   .movelist-wrap { order: 2; }
   .analyse-side-col { order: 3; }
+  /* "Coups joués" on a phone: no separate title, the moves themselves are the
+     line — one horizontal row that scrolls sideways (like a timeline; the
+     current move is the highlighted "cursor" and js/analysis.js keeps it
+     centered). Title only shows as a placeholder while no move exists yet. */
+  .analyse-layout { row-gap: 4px; } /* moves line sits right under the nav buttons */
+  /* Same emptiness rule as .opponent-panel, one level up: its wrapper's own
+     bottom padding was still leaving a 12px gap under the board. */
+  .sidebar-opponent:not(:has(#opponentOptions > *:not([hidden]))) { display: none; }
+  /* "Moteur & coach": once open, its title line is dropped (the arrow on the
+     first row closes it), rows are tightened, and the horizontal eval bar is
+     hidden (the vertical one next to the board already shows it) so the whole
+     panel fits on screen without scrolling. */
+  .side-section-engine[open] > summary { display: none; }
+  .side-section-engine[open] { padding-top: 10px; }
+  .side-section-engine[open] .side-close-btn { display: inline-flex; }
+  .side-section-engine > *:not(summary) { padding-bottom: 0; }
+  .side-section-engine[open] { padding-bottom: 10px; }
+  .side-section-engine .engine-toggle-row { margin-bottom: 4px; }
+  .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+  .engine-readout .engine-status { margin-bottom: 0; }
+  .engine-readout .eval-bar { display: none; }
+  .engine-readout .engine-output {
+    background: none; border: none; padding: 0; min-height: 0; margin: 0; font-size: 12.5px;
+  }
+  .movelist-wrap > .eyebrow { display: none; }
+  .movelist {
+    display: flex; flex-wrap: nowrap; align-items: center; gap: 12px;
+    position: relative; overflow-x: auto; overflow-y: hidden; max-height: none;
+    white-space: nowrap; line-height: 1.6; padding: 6px 4px; min-height: 34px; margin: 0;
+    background: none; scrollbar-width: none;
+  }
+  .movelist::-webkit-scrollbar { display: none; }
+  .movelist .mv-pair { flex: none; }
+  .movelist:empty::before {
+    content: "Coups joués"; font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass-soft);
+  }
 }
 
 /* ---------- COLLAPSIBLE SIDE SECTIONS ---------- */
