@@ -760,6 +760,14 @@ body.layout-locked .move-grip {
   background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
   padding: 14px 16px; margin-bottom: 16px;
 }
+/* Once a game starts, #vsComputerSetup hides (its Force/Chrono/Jouer content
+   isn't relevant mid-game) and #clockRow only shows for a timed game — with
+   an untimed game, both are hidden, but this panel's own background/border/
+   padding kept rendering as an empty box regardless, right under the nav
+   buttons. Collapse the panel itself once nothing inside it is visible. */
+.opponent-panel:not(:has(> #opponentOptions > *:not([hidden]))) {
+  display: none;
+}
 .opponent-options { display: flex; flex-direction: column; gap: 7px; }
 .opponent-options[hidden] { display: none; }
 .opponent-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--ink-dim); }
