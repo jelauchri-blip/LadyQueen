@@ -344,8 +344,7 @@ export function initAnalysisView() {
       els.engineToggle.checked = true;
     }
     ensureEngine();
-    const modeLabel = challengeMode ? "Mode Défi" : "Mode Coach";
-    els.engineStatus.textContent = `${modeLabel} — ${getBotName()} joue les ${computerSide === "w" ? "Blancs" : "Noirs"} (≈ ${computerElo} Elo).`;
+    els.engineStatus.textContent = `${getBotName()} joue les ${computerSide === "w" ? "Blancs" : "Noirs"} (≈ ${computerElo} Elo).`;
     maybeTriggerComputerMove();
     updateBoardPromotion();
   };
