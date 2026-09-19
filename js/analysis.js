@@ -266,6 +266,7 @@ export function initAnalysisView() {
   els.fullgameResults = document.getElementById("fullgameResults");
   els.helpBtn = document.getElementById("helpMoveBtn");
   els.moveExplanation = document.getElementById("moveExplanation");
+  document.body.classList.toggle("no-voice", !isVoiceSupported());
   els.helpSpeakBtn = document.getElementById("helpSpeakBtn");
   els.openEditorBtn = document.getElementById("openEditorBtn");
   els.editorMount = document.getElementById("editorMount");
@@ -575,6 +576,7 @@ export function initAnalysisView() {
       refreshBulb();
       openVariationOffer(signal);
     }
+    els.moveExplanation.classList.remove("live-coach");
     if (vsComputerGameOver && currentPly === plyFens.length - 1) {
       els.moveExplanation.hidden = false;
       els.moveExplanation.textContent = "La partie est terminée — revenez en arrière dans l'historique pour demander de l'aide sur un coup passé.";
@@ -1030,6 +1032,9 @@ async function pickWeakMove(fenBefore, elo) {
 
 // Explains a single move immediately after it's played (used by the "Coach en direct" toggle).
 async function runLiveCoach(fenBefore, moveResult, plyIndex) {
+  // Marked so the phone layout can drop the written comment when the voice
+  // reads it (the "Aide" explanation, which isn't marked, stays).
+  els.moveExplanation.classList.add("live-coach");
   els.moveExplanation.hidden = false;
   els.moveExplanation.textContent = "Le coach réfléchit…";
   try {

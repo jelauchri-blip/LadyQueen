@@ -533,6 +533,7 @@ body.layout-locked .move-grip {
 .lesson-nav-item.done .chk { background: var(--success); border-color: var(--success); }
 .lesson-nav-item.active { background: var(--bg-panel); color: var(--ink); }
 .lesson-nav-item:hover { color: var(--ink); }
+.lesson-select { display: none; }
 
 .lesson-content { background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 24px; }
 .lesson-content h2 { font-size: 22px; margin-bottom: 10px; }
@@ -599,6 +600,17 @@ body.layout-locked .move-grip {
   .puzzle-explanation { margin-top: 10px; }
   /* Lessons: the column used to be as wide as the board plus padding (454 px
      on a 432 px screen), cutting text, chips and board off on the right. */
+  /* Lesson list = a dropdown; the three buttons under the lesson are half
+     their usual size. */
+  .lesson-nav .lesson-nav-item { display: none; }
+  .lesson-select {
+    display: block; width: 100%; padding: 8px 10px; font-family: var(--font-body); font-size: 14px;
+    background: var(--bg-panel); color: var(--ink); border: 1px solid var(--border-soft); border-radius: 8px;
+  }
+  .lesson-content h2 { font-size: 19px; margin-bottom: 6px; }
+  .lesson-text p { font-size: 14px; line-height: 1.45; margin-bottom: 8px; }
+  .lesson-footer { margin-top: 10px; padding-top: 8px; gap: 6px; }
+  .lesson-footer button { padding: 3px 10px; font-size: 11.5px; min-height: 0; line-height: 1.3; }
   .lesson-layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .lesson-content { padding: 12px; min-width: 0; container-type: inline-size; }
   .lesson-body { grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -1126,9 +1138,12 @@ body.layout-locked .move-grip {
   .side-section-engine[open] > summary { display: none; }
   .side-section-engine[open] { padding-top: 10px; }
   .side-section-engine[open] .side-close-btn { display: inline-flex; }
-  .side-section-engine > *:not(summary) { padding-bottom: 0; }
-  .side-section-engine[open] { padding-bottom: 10px; }
-  .side-section-engine .engine-toggle-row { margin-bottom: 4px; }
+  /* [open] added: the generic ".side-section > *:not(summary)" 16px rule
+     further down has the same weight and comes later, so it was winning. */
+  .side-section-engine[open] > *:not(summary) { padding-bottom: 0; }
+  .side-section-engine[open] .help-row:not(:has(.coach-btn:not([hidden]))) { display: none; }
+  .side-section-engine[open] { padding-bottom: 8px; }
+  .side-section-engine .engine-toggle-row { margin-bottom: 8px; }
   /* Phone, a game loaded in Analyse (library, pasted): the Force / Jouer /
      menu window steps aside so the board comes up; the slim ▾ bar reopens it. */
   body.top-collapsible .top-panel-toggle {
@@ -1147,6 +1162,9 @@ body.layout-locked .move-grip {
      fits on screen. */
   body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-main-row,
   body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-toggle-row { display: none; }
+  /* Live coach: the voice reads the comment, so the written box under the
+     panel (same words) is dropped — unless this device has no voice. */
+  body:not(.no-voice) .move-explanation.live-coach { display: none; }
   /* Nav row: slimmer buttons and pills so both pills always fit beside the
      centered ⏮◀▶⏭ group (a clipped pill beats a shifting button). */
   .board-actions-row { gap: 4px; }
@@ -1161,7 +1179,7 @@ body.layout-locked .move-grip {
   body.board-promoted-mobile .clock-box { flex-direction: row; justify-content: space-between; align-items: baseline; padding: 4px 10px; }
   body.board-promoted-mobile .clock-box .clock-time { font-size: 16px; }
   body.board-promoted-mobile .sidebar-opponent { padding-top: 4px; padding-bottom: 4px; }
-  .engine-voice-row { margin-bottom: 4px; }
+  .engine-voice-row { margin-bottom: 8px; }
   #engineVoiceBtn { padding: 4px 10px; }
   .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
   .engine-readout .engine-status { margin-bottom: 0; }

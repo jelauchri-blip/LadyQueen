@@ -146,6 +146,20 @@ export function initLessonsView(navEl, contentEl) {
   function renderNav() {
     const p = loadProgress();
     navEl.innerHTML = "";
+    // Phone: one dropdown instead of the wrapped list of chips (CSS shows
+    // one or the other).
+    const select = document.createElement("select");
+    select.className = "lesson-select";
+    select.setAttribute("aria-label", "Choisir une leçon");
+    LESSONS.forEach((lesson, i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = `${p.includes(lesson.id) ? "✓ " : ""}${i + 1}. ${lesson.title}`;
+      if (i === current) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.addEventListener("change", () => { current = parseInt(select.value, 10); render(); });
+    navEl.appendChild(select);
     LESSONS.forEach((lesson, i) => {
       const btn = document.createElement("button");
       btn.className = "lesson-nav-item" + (i === current ? " active" : "") + (p.includes(lesson.id) ? " done" : "");
