@@ -581,8 +581,28 @@ body.layout-locked .move-grip {
 }
 
 @media (max-width: 760px) {
-  .puzzle-layout { grid-template-columns: 1fr; }
+  .puzzle-layout { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .puzzle-side-col { max-width: none; }
+  /* Compact puzzle page, so board + instruction + buttons fit one screen:
+     chips on their own row, then "Difficulté [niveau]" with the Lichess
+     button beside it on the same row. */
+  .puzzle-header { margin-bottom: 8px; gap: 6px 8px; justify-content: flex-start; }
+  .puzzle-filters { flex: 0 0 100%; }
+  .filter-chip { padding: 6px 11px; }
+  .puzzle-elo-filter { gap: 6px; }
+  .puzzle-elo-filter .lbl-long { display: none; }
+  .puzzle-elo-filter select { padding: 6px 8px; }
+  #lichessLoadBtn { font-size: 12px; padding: 6px 10px; white-space: nowrap; }
+  .puzzle-board-col { gap: 6px; }
+  .theme-pill { margin-bottom: 6px; }
+  .puzzle-instruction { margin-bottom: 10px; }
+  .puzzle-explanation { margin-top: 10px; }
+  /* Lessons: the column used to be as wide as the board plus padding (454 px
+     on a 432 px screen), cutting text, chips and board off on the right. */
+  .lesson-layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .lesson-content { padding: 12px; min-width: 0; container-type: inline-size; }
+  .lesson-body { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lesson-content .board { --sq: calc((100cqw - 24px) / 8); }
 }
 
 /* ---------- ANALYSE ---------- */
