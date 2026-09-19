@@ -150,7 +150,7 @@ async function runAnalysis() {
     renderElo(moveReports);
     renderErrorCoach(moveReports);
     analyzedSig = plies.map((p) => p.san).join(" ");
-    if (ctx.onAnalysisDone) ctx.onAnalysisDone(true);
+    if (ctx.onAnalysisDone) ctx.onAnalysisDone(true, { elo: { w: estimateElo(moveReports, "w"), b: estimateElo(moveReports, "b") } });
     if (wantVoice) {
       wantVoice = false;
       voiceProgress = "";
@@ -535,6 +535,14 @@ function acplToElo(acpl) {
     }
   }
   return ACPL_ELO_TABLE[ACPL_ELO_TABLE.length - 1][1];
+}
+
+// Estimated level of one side over the whole game, or null when it has too
+// few moves for the figure to mean anything.
+export function estimateElo(reports, side) {
+  const moves = reports.filter((r) => r.color === side);
+  if (moves.length < ELO_MIN_MOVES) return null;
+  return acplToElo(Math.round(moves.reduce((sum, r) => sum + r.cpLoss, 0) / moves.length));
 }
 
 function renderElo(reports) {

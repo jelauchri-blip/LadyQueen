@@ -649,9 +649,12 @@ body.layout-locked .move-grip {
    drag keeps this row in sync too. */
 /* grid (not flex+space-between) so nav-controls sits at a fixed center point:
    the material-count pills' width varies with the score text (or goes empty),
-   which with space-between shifted the middle group sideways every move. */
+   which with space-between shifted the middle group sideways every move.
+   minmax(0, 1fr), not 1fr: a plain 1fr can't shrink below its content, so a
+   pill wider than its column stole space from the other side and pushed the
+   nav buttons off-center (mis-taps when moving quickly through a game). */
 .board-actions-row {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 6px;
   width: 100%; max-width: calc(8 * var(--board-sq-override, var(--analyse-sq)) + 24px);
 }
 .board-actions-row .material-count:first-child { justify-self: start; }
@@ -1114,6 +1117,30 @@ body.layout-locked .move-grip {
     color: var(--brass-soft); cursor: pointer;
   }
   body.top-collapsed .sidebar-opponent { display: none; }
+  /* End of a game against the computer: the settings panel returns under the
+     board, in place of the moves line, until the next game starts. */
+  body:has(#gameOverActions:not([hidden])) .movelist-wrap { display: none; }
+  /* ...and its 🔊 sits on the "Partie terminée" line, so the extra row goes. */
+  body:has(#gameOverActions:not([hidden])) .engine-voice-row { display: none; }
+  /* Only the "Partie terminée / Revoir" block and the level estimate matter
+     at that point: the engine and live-coach switches step aside so all of it
+     fits on screen. */
+  body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-main-row,
+  body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-toggle-row { display: none; }
+  /* Nav row: slimmer buttons and pills so both pills always fit beside the
+     centered ⏮◀▶⏭ group (a clipped pill beats a shifting button). */
+  .board-actions-row { gap: 4px; }
+  .nav-controls { gap: 4px; padding: 4px 6px; }
+  .nav-btn { padding: 5px 8px; }
+  .material-count { font-size: 10px; padding: 3px 6px; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: clip; }
+  /* Défi game under way: no "Moteur & coach" (it returns at the end, with
+     Revoir), and the clock — the only thing left in the settings window — is
+     one slim line of two boxes, below the board. */
+  body.challenge-playing .side-section-engine { display: none; }
+  body.board-promoted-mobile .clock-row { margin-top: 0; }
+  body.board-promoted-mobile .clock-box { flex-direction: row; justify-content: space-between; align-items: baseline; padding: 4px 10px; }
+  body.board-promoted-mobile .clock-box .clock-time { font-size: 16px; }
+  body.board-promoted-mobile .sidebar-opponent { padding-top: 4px; padding-bottom: 4px; }
   .engine-voice-row { margin-bottom: 4px; }
   #engineVoiceBtn { padding: 4px 10px; }
   .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }

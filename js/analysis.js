@@ -509,11 +509,20 @@ export function initAnalysisView() {
     onCoachState: (playing) => {
       if (els.gameVoiceBtn) els.gameVoiceBtn.textContent = playing ? "⏹" : "🔊";
     },
-    onAnalysisDone: (ok) => {
+    onAnalysisDone: (ok, info) => {
       if (els.reviewBtn) { els.reviewBtn.disabled = false; els.reviewBtn.textContent = "Revoir"; }
       if (els.correctionBtn && ok) els.correctionBtn.disabled = false;
       if (els.gameVoiceBtn && ok) els.gameVoiceBtn.disabled = false;
-      if (els.gameOverActions && !els.gameOverActions.hidden) els.engineStatus.textContent = "Partie terminée.";
+      if (els.gameOverActions && !els.gameOverActions.hidden) {
+        els.engineStatus.textContent = "Partie terminée.";
+        // Level of BOTH players over the whole game, under the buttons.
+        if (ok && info && info.elo) {
+          const fmt = (v) => (v === null ? "—" : `≈ ${v}`);
+          els.engineOutput.innerHTML = info.elo.w === null && info.elo.b === null
+            ? "Partie trop courte pour estimer le niveau."
+            : `Niveau estimé sur la partie<br>Blancs ${fmt(info.elo.w)} · Noirs ${fmt(info.elo.b)}`;
+        }
+      }
     },
   });
 
@@ -871,6 +880,9 @@ function deactivateComputerMode() {
 // layout; moved back the moment any condition stops holding. Left out of
 // Défi mode on purpose — that mode already hides the eval bar and other
 // engine "tells", and the settings panel there also still shows the clock.
+// The board also stays up when the game ends: the settings panel (Force,
+// Défi/Coach, Jouer…) then comes back BELOW it, just long enough to change a
+// setting and start again, and goes away once the next game starts.
 const MOBILE_BOARD_PROMOTE_MQ = window.matchMedia("(max-width: 760px)");
 function updateBoardPromotion() {
   const boardCol = document.querySelector(".analyse-board-col");
@@ -878,7 +890,13 @@ function updateBoardPromotion() {
   const opponentEl = document.getElementById("opponentSection");
   const analyseLayout = document.querySelector(".analyse-layout");
   if (!boardCol || !sidebarEl || !opponentEl || !analyseLayout) return;
-  const shouldPromote = MOBILE_BOARD_PROMOTE_MQ.matches && vsComputerMode && !challengeMode && !vsComputerGameOver;
+  // Coach: the board stays up through the end of the game. Défi: it is up
+  // only while playing (the clock, if any, sits in a slim strip below it); at
+  // the end the settings window returns ABOVE the board, as before.
+  const shouldPromote = MOBILE_BOARD_PROMOTE_MQ.matches && vsComputerMode && (!challengeMode || !vsComputerGameOver);
+  // Défi game under way: "Moteur & coach" (status, engine settings) steps aside
+  // until the game ends, when its "Revoir" buttons are needed.
+  document.body.classList.toggle("challenge-playing", vsComputerMode && challengeMode && !vsComputerGameOver);
   const isPromoted = boardCol.parentElement === sidebarEl;
   if (shouldPromote && !isPromoted) {
     sidebarEl.insertBefore(boardCol, opponentEl);
@@ -908,6 +926,7 @@ function refreshGameOverActions() {
     els.correctionBtn.disabled = true;
     els.gameVoiceBtn.disabled = true;
     els.gameVoiceBtn.textContent = "🔊";
+    els.engineOutput.textContent = "";
     // Panel holding the buttons opens by itself (it's closed by default).
     const engineSection = document.querySelector(".side-section-engine");
     if (engineSection) engineSection.open = true;
