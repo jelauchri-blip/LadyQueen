@@ -20,22 +20,67 @@ let ctx = null; // { getChess, evaluateFen, isEngineEnabled, enableEngine, setBu
 let els = {};
 let running = false;
 
+// "🔊 Écouter la partie" (Moteur & coach): reads the coach commentary for the
+// game on the board, running the analysis first when it hasn't been done for
+// this exact game yet.
+let analyzedSig = null;   // moves of the game the results on screen belong to
+let wantVoice = false;    // start reading as soon as the running analysis ends
+let coachPlaying = false;
+let voiceProgress = "";
+
+function gameSig() {
+  const plies = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
+  return plies.slice(0, 80).map((p) => p.san).join(" ");
+}
+
+function refreshVoiceBtn() {
+  if (!els.voiceBtn) return;
+  els.voiceBtn.textContent = coachPlaying ? "⏹ Arrêter la voix" : voiceProgress ? voiceProgress : "🔊 Écouter la partie";
+}
+
+function setCoachPlaying(v) {
+  coachPlaying = v;
+  refreshVoiceBtn();
+  if (ctx.onCoachState) ctx.onCoachState(v);
+}
+
+function toggleCoachVoice() {
+  const stopBtn = document.getElementById("coachStopBtn");
+  if (stopBtn && !stopBtn.hidden) { stopBtn.click(); return; }
+  if (running) { wantVoice = true; return; }
+  const playBtn = document.getElementById("coachPlayBtn");
+  if (playBtn && analyzedSig !== null && analyzedSig === gameSig()) { playBtn.click(); return; }
+  wantVoice = true;
+  runAnalysis();
+}
+
 export function initFullGameAnalysis(context) {
   ctx = context;
   els.btn = document.getElementById("analyzeGameBtn");
   els.select = document.getElementById("playerSideSelect");
   els.progress = document.getElementById("fullgameProgress");
   els.results = document.getElementById("fullgameResults");
+  els.voiceBtn = document.getElementById("engineVoiceBtn");
 
   els.btn.addEventListener("click", () => {
     if (running) return;
     runAnalysis();
   });
+  if (els.voiceBtn) {
+    els.voiceBtn.hidden = !isVoiceSupported();
+    els.voiceBtn.addEventListener("click", toggleCoachVoice);
+  }
 }
 
 async function runAnalysis() {
   const verboseHistory = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
   if (verboseHistory.length === 0) {
+    if (wantVoice) {
+      wantVoice = false;
+      voiceProgress = "Aucun coup à lire";
+      refreshVoiceBtn();
+      setTimeout(() => { voiceProgress = ""; refreshVoiceBtn(); }, 2500);
+    }
     els.results.innerHTML = `<div class="phase-block"><p>Chargez ou jouez d'abord une partie (plusieurs coups) avant de lancer l'analyse complète.</p></div>`;
     return;
   }
@@ -47,7 +92,9 @@ async function runAnalysis() {
   els.btn.disabled = true;
   els.progress.hidden = false;
   els.results.innerHTML = "";
+  analyzedSig = null;
   stopSpeech();
+  setCoachPlaying(false);
   ctx.setBusy(true);
   if (!ctx.isEngineEnabled()) ctx.enableEngine();
 
@@ -59,6 +106,7 @@ async function runAnalysis() {
     for (let i = 0; i < fens.length; i++) {
       els.progress.textContent = `Analyse du coup ${i} / ${fens.length - 1} (profondeur ${getDepth()})…`;
       if (ctx.onAnalysisProgress) ctx.onAnalysisProgress(i, fens.length - 1);
+      if (wantVoice) { voiceProgress = `Analyse ${i}/${fens.length - 1}…`; refreshVoiceBtn(); }
       const result = await ctx.evaluateFen(fens[i], getDepth());
       const turn = fens[i].split(" ")[1]; // 'w' | 'b' — side to move in this position
       evals.push(toWhiteCentipawns(result.score, turn));
@@ -101,12 +149,22 @@ async function runAnalysis() {
     renderMoveList(moveReports);
     renderElo(moveReports);
     renderErrorCoach(moveReports);
+    analyzedSig = plies.map((p) => p.san).join(" ");
     if (ctx.onAnalysisDone) ctx.onAnalysisDone(true);
+    if (wantVoice) {
+      wantVoice = false;
+      voiceProgress = "";
+      const playBtn = document.getElementById("coachPlayBtn");
+      if (playBtn) playBtn.click();
+    }
   } catch (e) {
     els.results.innerHTML = `<div class="phase-block"><p>L'analyse a été interrompue (moteur indisponible). Réessayez avec le moteur activé et une connexion internet stable.</p></div>`;
     if (ctx.onAnalysisDone) ctx.onAnalysisDone(false);
   } finally {
     running = false;
+    wantVoice = false;
+    voiceProgress = "";
+    refreshVoiceBtn();
     els.btn.disabled = false;
     els.progress.hidden = true;
     ctx.setBusy(false);
@@ -288,7 +346,7 @@ function wireCoachControls(reports) {
       return;
     }
     playing = true;
-    if (ctx.onCoachState) ctx.onCoachState(true);
+    setCoachPlaying(true);
     playBtn.hidden = true;
     pauseBtn.hidden = false;
     stopBtn.hidden = false;
@@ -309,7 +367,7 @@ function wireCoachControls(reports) {
       },
       onComplete: () => {
         playing = false;
-        if (ctx.onCoachState) ctx.onCoachState(false);
+        setCoachPlaying(false);
         playBtn.hidden = false;
         playBtn.textContent = "🔊 Coach vocal";
         pauseBtn.hidden = true;
@@ -328,7 +386,7 @@ function wireCoachControls(reports) {
   stopBtn.addEventListener("click", () => {
     stopSpeech();
     playing = false;
-    if (ctx.onCoachState) ctx.onCoachState(false);
+    setCoachPlaying(false);
     playBtn.hidden = false;
     playBtn.textContent = "🔊 Coach vocal";
     pauseBtn.hidden = true;

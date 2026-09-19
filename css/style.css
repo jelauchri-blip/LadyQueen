@@ -757,6 +757,12 @@ body.layout-locked .move-grip {
   transform: translate(var(--side-move-x, 0px), var(--side-move-y, 0px));
 }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+/* "🔊 Écouter la partie": coach vocal for whatever game is on the board
+   (library, pasted PGN, game just played). Phone keeps the panel compact and
+   has the 🔊 on the end-of-game line instead. */
+.engine-voice-row { margin-bottom: 8px; }
+#engineVoiceBtn { font-size: 12px; padding: 5px 12px; }
+#engineVoiceBtn[hidden] { display: none; }
 
 /* ---------- OPPONENT / VS COMPUTER ---------- */
 .opponent-panel {
@@ -1100,6 +1106,7 @@ body.layout-locked .move-grip {
   .side-section-engine > *:not(summary) { padding-bottom: 0; }
   .side-section-engine[open] { padding-bottom: 10px; }
   .side-section-engine .engine-toggle-row { margin-bottom: 4px; }
+  .engine-voice-row { display: none; }
   .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
   .engine-readout .engine-status { margin-bottom: 0; }
   .engine-readout .eval-bar { display: none; }

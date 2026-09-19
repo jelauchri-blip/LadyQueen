@@ -324,6 +324,9 @@
               <span class="slider"></span>
             </label>
           </div>
+          <div class="engine-voice-row">
+            <button type="button" class="btn-ghost coach-btn" id="engineVoiceBtn" hidden title="Écouter le coach vocal sur toute la partie affichée (lance l'analyse si besoin)">🔊 Écouter la partie</button>
+          </div>
           <div class="engine-readout">
             <div id="engineStatus" class="engine-status">Moteur désactivé</div>
             <div id="gameOverActions" class="game-over-actions" hidden>
@@ -384,8 +387,10 @@
         <p class="backup-desc">Progression des leçons, puzzles résolus, bibliothèque de parties et préférences — tout reste stocké uniquement sur cet appareil. Exporte un fichier de sauvegarde avant de changer de téléphone ou de vider ton navigateur.</p>
         <div class="backup-actions">
           <button class="btn-ghost" id="exportDataBtn">⬇ Exporter mes données</button>
-          <button class="btn-ghost" id="importDataBtn">⬆ Importer une sauvegarde</button>
+          <button class="btn-ghost" id="addGamesBtn" title="Ajoute les parties du fichier à celles de cet appareil, sans rien remplacer">➕ Ajouter les parties d'un fichier</button>
+          <button class="btn-ghost" id="importDataBtn" title="Remplace toutes les données de cet appareil par celles du fichier">⬆ Tout restaurer (remplace)</button>
           <input type="file" id="importDataInput" accept="application/json" hidden>
+          <input type="file" id="addGamesInput" accept="application/json" hidden>
         </div>
         <p class="backup-status" id="backupStatus"></p>
       </div>

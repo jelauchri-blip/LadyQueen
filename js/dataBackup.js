@@ -38,6 +38,44 @@ export function exportData() {
   URL.revokeObjectURL(url);
 }
 
+// Adds the library games found in a backup file to this device's library,
+// leaving everything else (progress, preferences, layout) and the games
+// already here untouched. A game already present (same id, or same moves) is
+// skipped, so importing the same file twice adds nothing.
+// Resolves to { added, skipped }.
+export function importGamesOnly(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(reader.result);
+        const data = payload.data || payload;
+        const incoming = typeof data.echiquier_library === "string" ? JSON.parse(data.echiquier_library) : [];
+        if (!Array.isArray(incoming)) throw new Error("bibliothèque invalide");
+        let current = [];
+        try { current = JSON.parse(localStorage.getItem("echiquier_library") || "[]"); } catch (e) { current = []; }
+        const ids = new Set(current.map((g) => g.id));
+        const pgns = new Set(current.map((g) => (g.pgn || "").trim()));
+        let added = 0, skipped = 0;
+        for (const g of incoming) {
+          if (!g || typeof g.pgn !== "string" || !g.pgn.trim()) continue;
+          if (ids.has(g.id) || pgns.has(g.pgn.trim())) { skipped++; continue; }
+          current.push(g);
+          ids.add(g.id);
+          pgns.add(g.pgn.trim());
+          added++;
+        }
+        if (added) localStorage.setItem("echiquier_library", JSON.stringify(current));
+        resolve({ added, skipped });
+      } catch (e) {
+        reject(e);
+      }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
+
 // Reads a File (from an <input type="file">) and restores its contents into
 // localStorage. Returns a Promise resolving to the number of keys restored.
 export function importData(file) {

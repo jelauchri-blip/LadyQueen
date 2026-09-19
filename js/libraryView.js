@@ -1,5 +1,5 @@
 import { listGames, deleteGame } from "./gameLibrary.js";
-import { exportData, importData } from "./dataBackup.js";
+import { exportData, importData, importGamesOnly } from "./dataBackup.js";
 
 let els = {};
 let onLoadGame = null;
@@ -17,7 +17,28 @@ export function initLibraryView({ loadPgnIntoAnalysis }) {
     els.backupStatus.textContent = "✓ Fichier de sauvegarde téléchargé.";
   });
 
-  els.importBtn.addEventListener("click", () => els.importInput.click());
+  els.addGamesBtn = document.getElementById("addGamesBtn");
+  els.addGamesInput = document.getElementById("addGamesInput");
+  els.addGamesBtn.addEventListener("click", () => els.addGamesInput.click());
+  els.addGamesInput.addEventListener("change", async () => {
+    const file = els.addGamesInput.files[0];
+    if (!file) return;
+    try {
+      const { added, skipped } = await importGamesOnly(file);
+      els.backupStatus.textContent = added
+        ? `✓ ${added} partie(s) ajoutée(s)${skipped ? ` (${skipped} déjà présente(s))` : ""}.`
+        : skipped ? "Ces parties sont déjà dans ta bibliothèque." : "Aucune partie trouvée dans ce fichier.";
+      render();
+    } catch (e) {
+      els.backupStatus.textContent = "✗ Fichier de sauvegarde invalide.";
+    }
+    els.addGamesInput.value = "";
+  });
+
+  // "Tout restaurer" replaces everything on this device: ask first.
+  els.importBtn.addEventListener("click", () => {
+    if (confirm("Tout restaurer remplace TOUTES les données de cet appareil (parties, leçons, puzzles, préférences) par celles du fichier. Continuer ?")) els.importInput.click();
+  });
   els.importInput.addEventListener("change", async () => {
     const file = els.importInput.files[0];
     if (!file) return;

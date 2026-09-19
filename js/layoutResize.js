@@ -148,9 +148,20 @@ export function initLayoutResize() {
       // rest of the handler, or the whole handle would silently do nothing.
       try { handle.setPointerCapture(e.pointerId); } catch (err) {}
       handle.classList.add("dragging");
-      onMove(e.clientX, e.clientY);
-      markDirty();
-      const onPointerMove = (ev) => { onMove(ev.clientX, ev.clientY); markDirty(); };
+      // Nothing moves until the pointer has really travelled a few pixels: a
+      // plain click, or the two clicks of a double-click (which locks the
+      // layout), used to jump the size to the cursor position, which slid the
+      // handle from under the pointer so the second click missed it.
+      const startX = e.clientX, startY = e.clientY;
+      let moved = false;
+      const onPointerMove = (ev) => {
+        if (!moved) {
+          if (Math.hypot(ev.clientX - startX, ev.clientY - startY) < 4) return;
+          moved = true;
+        }
+        onMove(ev.clientX, ev.clientY);
+        markDirty();
+      };
       const onPointerUp = (ev) => {
         handle.classList.remove("dragging");
         try { handle.releasePointerCapture(ev.pointerId); } catch (err) {}
