@@ -553,8 +553,9 @@ export function initAnalysisView() {
   const topPanelToggle = document.getElementById("topPanelToggle");
   if (topPanelToggle) topPanelToggle.onclick = () => { topPanelOpen = !topPanelOpen; refreshTopPanel(); };
   // Switching to/from the Analyse tab isn't reported to this module: watch it.
-  const analyseViewEl = document.getElementById("view-analyse");
-  if (analyseViewEl) new MutationObserver(refreshTopPanel).observe(analyseViewEl, { attributes: true, attributeFilter: ["class"] });
+  const tabObserver = new MutationObserver(refreshTopPanel);
+  document.querySelectorAll(".view").forEach((v) => tabObserver.observe(v, { attributes: true, attributeFilter: ["class"] }));
+  refreshTopPanel();
   els.correctionBtn.onclick = () => {
     const panel = document.getElementById("fullgameResults").closest("details");
     if (panel) panel.open = true;
@@ -936,19 +937,22 @@ MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 
 // Phone: with a game loaded in Analyse (library, pasted, played by hand) the
 // Force / Jouer / menu window steps aside so the board comes up; a slim ▾ bar
-// reopens it. Against the computer that window is already gone (see above).
-// Every visit to Analyse starts collapsed again.
+// reopens it. Same in every tab but the home page (where that window is the
+// menu): Force / Jouer only matter when starting a game, so they stay out of
+// the way of puzzles, lessons, the library and the analysis board. Against the
+// computer the window handles itself (see above). Every visit to a tab starts
+// collapsed again.
 let topPanelOpen = false;
-let analyseWasActive = false;
+let activeTabWas = "";
 function refreshTopPanel() {
   const toggle = document.getElementById("topPanelToggle");
-  const view = document.getElementById("view-analyse");
-  if (!toggle || !view) return;
-  const analyseActive = view.classList.contains("active");
-  if (analyseActive && !analyseWasActive) topPanelOpen = false;
-  analyseWasActive = analyseActive;
-  if (plyMoves.length === 0) topPanelOpen = false;
-  const eligible = MOBILE_BOARD_PROMOTE_MQ.matches && analyseActive && !vsComputerMode && plyMoves.length > 0;
+  if (!toggle) return;
+  const activeTab = (document.querySelector(".view.active") || {}).id || "";
+  if (activeTab !== activeTabWas) topPanelOpen = false;
+  activeTabWas = activeTab;
+  const eligible = MOBILE_BOARD_PROMOTE_MQ.matches
+    && activeTab !== "view-accueil"
+    && !(activeTab === "view-analyse" && vsComputerMode);
   document.body.classList.toggle("top-collapsible", eligible);
   document.body.classList.toggle("top-collapsed", eligible && !topPanelOpen);
   toggle.textContent = topPanelOpen ? "▴" : "▾";
