@@ -1,5 +1,5 @@
 import { listGames, deleteGame } from "./gameLibrary.js";
-import { exportData, importData, importGamesOnly } from "./dataBackup.js";
+import { exportData, importData, importGamesOnly, exportGamesText, importGamesText } from "./dataBackup.js";
 
 let els = {};
 let onLoadGame = null;
@@ -33,6 +33,44 @@ export function initLibraryView({ loadPgnIntoAnalysis }) {
       els.backupStatus.textContent = "✗ Fichier de sauvegarde invalide.";
     }
     els.addGamesInput.value = "";
+  });
+
+  function reportAdded({ added, skipped }) {
+    els.backupStatus.textContent = added
+      ? `✓ ${added} partie(s) ajoutée(s)${skipped ? ` (${skipped} déjà présente(s))` : ""}.`
+      : skipped ? "Ces parties sont déjà dans ta bibliothèque." : "Aucune partie trouvée dans ce texte.";
+  }
+
+  // Copy / paste route: all games as one piece of text.
+  const pasteBox = document.getElementById("pasteGamesBox");
+  const pasteArea = document.getElementById("pasteGamesArea");
+  document.getElementById("copyGamesBtn").addEventListener("click", async () => {
+    const text = exportGamesText();
+    if (!text) { els.backupStatus.textContent = "Aucune partie à copier : la bibliothèque est vide."; return; }
+    try {
+      await navigator.clipboard.writeText(text);
+      els.backupStatus.textContent = "✓ Parties copiées. Colle-les maintenant dans un message.";
+    } catch (e) {
+      // Clipboard refused: show the text ready to be copied by hand.
+      pasteBox.hidden = false;
+      pasteArea.value = text;
+      pasteArea.focus();
+      pasteArea.select();
+      els.backupStatus.textContent = "Copie le texte ci-dessous (appui long → Tout sélectionner → Copier).";
+    }
+  });
+  document.getElementById("pasteGamesBtn").addEventListener("click", () => {
+    pasteBox.hidden = !pasteBox.hidden;
+    if (!pasteBox.hidden) pasteArea.focus();
+  });
+  document.getElementById("pasteGamesAddBtn").addEventListener("click", () => {
+    try {
+      reportAdded(importGamesText(pasteArea.value));
+      pasteArea.value = "";
+      render();
+    } catch (e) {
+      els.backupStatus.textContent = "✗ Texte non reconnu : colle le message copié depuis « Copier mes parties ».";
+    }
   });
 
   // "Tout restaurer" replaces everything on this device: ask first.

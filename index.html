@@ -387,10 +387,16 @@
         <p class="backup-desc">Progression des leçons, puzzles résolus, bibliothèque de parties et préférences — tout reste stocké uniquement sur cet appareil. Exporte un fichier de sauvegarde avant de changer de téléphone ou de vider ton navigateur.</p>
         <div class="backup-actions">
           <button class="btn-ghost" id="exportDataBtn">⬇ Exporter mes données</button>
+          <button class="btn-ghost" id="copyGamesBtn" title="Copie toutes tes parties sous forme de texte, à coller dans un message (WhatsApp, mail…)">📋 Copier mes parties</button>
+          <button class="btn-ghost" id="pasteGamesBtn" title="Colle ici le texte copié depuis un autre appareil pour ajouter ses parties">📥 Coller des parties</button>
           <button class="btn-ghost" id="addGamesBtn" title="Ajoute les parties du fichier à celles de cet appareil, sans rien remplacer">➕ Ajouter les parties d'un fichier</button>
           <button class="btn-ghost" id="importDataBtn" title="Remplace toutes les données de cet appareil par celles du fichier">⬆ Tout restaurer (remplace)</button>
           <input type="file" id="importDataInput" accept="application/json" hidden>
-          <input type="file" id="addGamesInput" accept="application/json" hidden>
+          <input type="file" id="addGamesInput" hidden>
+        </div>
+        <div class="paste-games" id="pasteGamesBox" hidden>
+          <textarea id="pasteGamesArea" rows="4" spellcheck="false" placeholder="Colle ici le texte copié (« LadyQueen-parties: … »)"></textarea>
+          <button class="btn-ghost" id="pasteGamesAddBtn">Ajouter</button>
         </div>
         <p class="backup-status" id="backupStatus"></p>
       </div>

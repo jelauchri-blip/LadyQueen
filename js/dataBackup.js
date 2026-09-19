@@ -51,22 +51,7 @@ export function importGamesOnly(file) {
         const payload = JSON.parse(reader.result);
         const data = payload.data || payload;
         const incoming = typeof data.echiquier_library === "string" ? JSON.parse(data.echiquier_library) : [];
-        if (!Array.isArray(incoming)) throw new Error("bibliothèque invalide");
-        let current = [];
-        try { current = JSON.parse(localStorage.getItem("echiquier_library") || "[]"); } catch (e) { current = []; }
-        const ids = new Set(current.map((g) => g.id));
-        const pgns = new Set(current.map((g) => (g.pgn || "").trim()));
-        let added = 0, skipped = 0;
-        for (const g of incoming) {
-          if (!g || typeof g.pgn !== "string" || !g.pgn.trim()) continue;
-          if (ids.has(g.id) || pgns.has(g.pgn.trim())) { skipped++; continue; }
-          current.push(g);
-          ids.add(g.id);
-          pgns.add(g.pgn.trim());
-          added++;
-        }
-        if (added) localStorage.setItem("echiquier_library", JSON.stringify(current));
-        resolve({ added, skipped });
+        resolve(mergeGames(incoming));
       } catch (e) {
         reject(e);
       }
@@ -74,6 +59,46 @@ export function importGamesOnly(file) {
     reader.onerror = () => reject(reader.error);
     reader.readAsText(file);
   });
+}
+
+function mergeGames(incoming) {
+  if (!Array.isArray(incoming)) throw new Error("bibliothèque invalide");
+  let current = [];
+  try { current = JSON.parse(localStorage.getItem("echiquier_library") || "[]"); } catch (e) { current = []; }
+  const ids = new Set(current.map((g) => g.id));
+  const pgns = new Set(current.map((g) => (g.pgn || "").trim()));
+  let added = 0, skipped = 0;
+  for (const g of incoming) {
+    if (!g || typeof g.pgn !== "string" || !g.pgn.trim()) continue;
+    if (ids.has(g.id) || pgns.has(g.pgn.trim())) { skipped++; continue; }
+    current.push(g);
+    ids.add(g.id);
+    pgns.add(g.pgn.trim());
+    added++;
+  }
+  if (added) localStorage.setItem("echiquier_library", JSON.stringify(current));
+  return { added, skipped };
+}
+
+// Copy/paste route, for when a file is a hassle (e.g. WhatsApp won't save it):
+// the whole library as one line of text, and the reverse.
+const TEXT_MARK = "LadyQueen-parties:";
+
+export function exportGamesText() {
+  let games = [];
+  try { games = JSON.parse(localStorage.getItem("echiquier_library") || "[]"); } catch (e) { games = []; }
+  if (!Array.isArray(games) || games.length === 0) return "";
+  return TEXT_MARK + JSON.stringify(games);
+}
+
+// Accepts the text made by exportGamesText, even with extra words around it
+// (a message that says "voilà mes parties" before it, say). Throws when no
+// list of games can be found.
+export function importGamesText(text) {
+  const start = text.indexOf("[");
+  const end = text.lastIndexOf("]");
+  if (start < 0 || end <= start) throw new Error("texte non reconnu");
+  return mergeGames(JSON.parse(text.slice(start, end + 1)));
 }
 
 // Reads a File (from an <input type="file">) and restores its contents into
