@@ -541,6 +541,11 @@ export function initAnalysisView() {
     if (stop && !stop.hidden) stop.click();
     else if (play) play.click();
   };
+  const topPanelToggle = document.getElementById("topPanelToggle");
+  if (topPanelToggle) topPanelToggle.onclick = () => { topPanelOpen = !topPanelOpen; refreshTopPanel(); };
+  // Switching to/from the Analyse tab isn't reported to this module: watch it.
+  const analyseViewEl = document.getElementById("view-analyse");
+  if (analyseViewEl) new MutationObserver(refreshTopPanel).observe(analyseViewEl, { attributes: true, attributeFilter: ["class"] });
   els.correctionBtn.onclick = () => {
     const panel = document.getElementById("fullgameResults").closest("details");
     if (panel) panel.open = true;
@@ -887,6 +892,7 @@ function updateBoardPromotion() {
   // "Revoir / Correction" buttons appear or go away.
   refreshBulb();
   refreshGameOverActions();
+  refreshTopPanel();
 }
 
 function refreshGameOverActions() {
@@ -908,6 +914,27 @@ function refreshGameOverActions() {
   }
 }
 MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
+
+// Phone: with a game loaded in Analyse (library, pasted, played by hand) the
+// Force / Jouer / menu window steps aside so the board comes up; a slim ▾ bar
+// reopens it. Against the computer that window is already gone (see above).
+// Every visit to Analyse starts collapsed again.
+let topPanelOpen = false;
+let analyseWasActive = false;
+function refreshTopPanel() {
+  const toggle = document.getElementById("topPanelToggle");
+  const view = document.getElementById("view-analyse");
+  if (!toggle || !view) return;
+  const analyseActive = view.classList.contains("active");
+  if (analyseActive && !analyseWasActive) topPanelOpen = false;
+  analyseWasActive = analyseActive;
+  if (plyMoves.length === 0) topPanelOpen = false;
+  const eligible = MOBILE_BOARD_PROMOTE_MQ.matches && analyseActive && !vsComputerMode && plyMoves.length > 0;
+  document.body.classList.toggle("top-collapsible", eligible);
+  document.body.classList.toggle("top-collapsed", eligible && !topPanelOpen);
+  toggle.textContent = topPanelOpen ? "▴" : "▾";
+}
+MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", refreshTopPanel);
 
 async function maybeTriggerComputerMove() {
   if (!vsComputerMode || vsComputerGameOver) return;
@@ -1066,6 +1093,7 @@ function updateMoveList() {
   els.moveList.scrollLeft = cur
     ? cur.offsetLeft - els.moveList.clientWidth / 2 + cur.offsetWidth / 2
     : 0;
+  refreshTopPanel();
 }
 
 function ensureEngine(urlIndex = 0) {

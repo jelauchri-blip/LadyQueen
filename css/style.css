@@ -758,8 +758,8 @@ body.layout-locked .move-grip {
 }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
 /* "🔊 Écouter la partie": coach vocal for whatever game is on the board
-   (library, pasted PGN, game just played). Phone keeps the panel compact and
-   has the 🔊 on the end-of-game line instead. */
+   (library, pasted PGN, game just played). Compact on phone (below). */
+.top-panel-toggle { display: none; }
 .engine-voice-row { margin-bottom: 8px; }
 #engineVoiceBtn { font-size: 12px; padding: 5px 12px; }
 #engineVoiceBtn[hidden] { display: none; }
@@ -1106,7 +1106,16 @@ body.layout-locked .move-grip {
   .side-section-engine > *:not(summary) { padding-bottom: 0; }
   .side-section-engine[open] { padding-bottom: 10px; }
   .side-section-engine .engine-toggle-row { margin-bottom: 4px; }
-  .engine-voice-row { display: none; }
+  /* Phone, a game loaded in Analyse (library, pasted): the Force / Jouer /
+     menu window steps aside so the board comes up; the slim ▾ bar reopens it. */
+  body.top-collapsible .top-panel-toggle {
+    display: block; width: 100%; padding: 1px 0 3px; font-size: 15px; line-height: 1;
+    background: none; border: none; border-bottom: 1px solid var(--border-soft);
+    color: var(--brass-soft); cursor: pointer;
+  }
+  body.top-collapsed .sidebar-opponent { display: none; }
+  .engine-voice-row { margin-bottom: 4px; }
+  #engineVoiceBtn { padding: 4px 10px; }
   .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
   .engine-readout .engine-status { margin-bottom: 0; }
   .engine-readout .eval-bar { display: none; }
