@@ -1154,7 +1154,7 @@ body.layout-locked .move-grip {
   body.top-collapsed .sidebar-opponent { display: none; }
   /* End of a game against the computer: the settings panel returns under the
      board, in place of the moves line, until the next game starts. */
-  body:has(#gameOverActions:not([hidden])) .movelist-wrap { display: none; }
+  body:not(.top-collapsed):has(#gameOverActions:not([hidden])) .movelist-wrap { display: none; }
   /* ...and its 🔊 sits on the "Partie terminée" line, so the extra row goes. */
   body:has(#gameOverActions:not([hidden])) .engine-voice-row { display: none; }
   /* Only the "Partie terminée / Revoir" block and the level estimate matter
@@ -1167,7 +1167,7 @@ body.layout-locked .move-grip {
   body:not(.no-voice) .move-explanation.live-coach { display: none; }
   /* Nav row: slimmer buttons and pills so both pills always fit beside the
      centered ⏮◀▶⏭ group (a clipped pill beats a shifting button). */
-  .board-actions-row { gap: 4px; }
+  .board-actions-row { gap: 4px; padding: 0 4px; box-sizing: border-box; }
   .nav-controls { gap: 4px; padding: 4px 6px; }
   .nav-btn { padding: 5px 8px; }
   .material-count { font-size: 10px; padding: 3px 6px; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: clip; }

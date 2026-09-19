@@ -538,7 +538,13 @@ export function initAnalysisView() {
     hideResultBanner();
     els.reviewBtn.disabled = true;
     els.reviewBtn.textContent = "Analyse…";
-    els.engineStatus.textContent = "Analyse de la partie…";
+    // The button itself shows the "Analyse 44/80" count; an empty status keeps
+    // the buttons on one line on a phone.
+    els.engineStatus.textContent = "";
+    // Reviewing: the settings window steps aside (▾ brings it back).
+    reviewStarted = true;
+    topPanelOpen = false;
+    refreshTopPanel();
     document.getElementById("analyzeGameBtn").click();
   };
   // 🔊 on the same line: runs the "Coach vocal" of the analysis panel (which
@@ -922,6 +928,7 @@ function refreshGameOverActions() {
   const show = vsComputerMode && vsComputerGameOver;
   const justEnded = show && box.hidden;
   box.hidden = !show;
+  if (justEnded || !show) reviewStarted = false;
   if (justEnded) {
     els.engineStatus.textContent = "Partie terminée.";
     els.reviewBtn.disabled = false;
@@ -946,6 +953,9 @@ MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 // collapsed again.
 let topPanelOpen = false;
 let activeTabWas = "";
+// True once "Revoir" was tapped after a game against the computer: the game
+// is being reviewed, so the settings window can be hidden like elsewhere.
+let reviewStarted = false;
 function refreshTopPanel() {
   const toggle = document.getElementById("topPanelToggle");
   if (!toggle) return;
@@ -954,7 +964,7 @@ function refreshTopPanel() {
   activeTabWas = activeTab;
   const eligible = MOBILE_BOARD_PROMOTE_MQ.matches
     && activeTab !== "view-accueil"
-    && !(activeTab === "view-analyse" && vsComputerMode);
+    && !(activeTab === "view-analyse" && vsComputerMode && !(vsComputerGameOver && reviewStarted));
   document.body.classList.toggle("top-collapsible", eligible);
   document.body.classList.toggle("top-collapsed", eligible && !topPanelOpen);
   toggle.textContent = topPanelOpen ? "▴" : "▾";
