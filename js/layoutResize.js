@@ -362,7 +362,18 @@ export function initLayoutResize() {
       });
     }
     const sideCol = document.querySelector(".analyse-side-col");
-    clampMoveOffset(sideCol, "--side-move-x", "--side-move-y", () => {
+    // Phone / narrow window: the panels stack UNDER the board (a single grid
+    // column), so there is no board beside them to keep clear of — and the
+    // board's right edge would read as a wall that shoved the panels off the
+    // screen. Nothing to clamp there; any offset left over from a wider
+    // layout is dropped.
+    const layoutEl = document.querySelector(".analyse-layout");
+    const stacked = layoutEl && getComputedStyle(layoutEl).gridTemplateColumns.trim().split(/\s+/).length < 2;
+    if (stacked) {
+      const rootStyle = document.documentElement.style;
+      if (rootStyle.getPropertyValue("--side-move-x")) rootStyle.setProperty("--side-move-x", "0px");
+      if (rootStyle.getPropertyValue("--side-move-y")) rootStyle.setProperty("--side-move-y", "0px");
+    } else clampMoveOffset(sideCol, "--side-move-x", "--side-move-y", () => {
       const handle = document.getElementById("sideMovelistResizeHandle");
       const movelist = document.querySelector(".movelist-wrap");
       const layout = document.querySelector(".analyse-layout");
