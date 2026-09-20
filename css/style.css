@@ -1078,11 +1078,8 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
 .fullgame-panel {
   margin: 18px 0; padding-top: 16px; border-top: 1px solid var(--border-soft);
 }
-.fullgame-controls { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-#playerSideSelect {
-  background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--ink);
-  font-family: var(--font-body); font-size: 12px; padding: 6px 9px; border-radius: 6px;
-}
+.fullgame-controls { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.fullgame-controls .btn-primary { flex: 1; }
 .fullgame-controls .btn-primary { padding: 7px 14px; font-size: 12.5px; }
 .fullgame-progress {
   font-family: var(--font-mono); font-size: 11px; color: var(--brass-soft); margin-bottom: 8px;
@@ -1134,6 +1131,12 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
      hidden (the vertical one next to the board already shows it) so the whole
      panel fits on screen without scrolling. */
   .side-section-engine[open] > summary { display: none; }
+  /* "Analyse complète": same idea — no title once open, the arrow beside
+     "Analyser coup par coup" closes it. */
+  #fullGameSection[open] > summary { display: none; }
+  #fullGameSection[open] .side-close-btn { display: inline-flex; }
+  #fullGameSection[open] { padding-top: 10px; }
+  #fullGameSection[open] .fullgame-panel { margin-top: 0; padding-top: 0; border-top: none; }
   .side-section-engine[open] { padding-top: 10px; }
   .side-section-engine[open] .side-close-btn { display: inline-flex; }
   /* [open] added: the generic ".side-section > *:not(summary)" 16px rule
@@ -1261,3 +1264,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 }
 .alt-line-bar[hidden] { display: none; }
 .alt-line-bar .btn-ghost { font-size: 12px; padding: 4px 10px; }
+
+/* "Comment lire les coups" bubble */
+.legend-info-btn { margin-left: 6px; vertical-align: middle; }
+.legend-bubble {
+  position: fixed; left: 50%; top: 22%; transform: translateX(-50%); z-index: 60;
+  width: min(92vw, 360px); padding: 14px 16px 12px; border-radius: 12px;
+  background: var(--bg-panel-raised); border: 1px solid var(--brass); box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+  font-size: 13.5px; line-height: 1.5; color: var(--ink);
+}
+.legend-bubble[hidden] { display: none; }
+.legend-title { font-family: var(--font-display); font-size: 15px; margin: 0 0 8px; color: var(--brass-soft); }
+.legend-bubble ul { margin: 0; padding-left: 18px; color: var(--ink-dim); }
+.legend-bubble li { margin-bottom: 5px; }
+.legend-bubble b { color: var(--ink); }
+.legend-close { position: absolute; top: 4px; right: 8px; background: none; border: none; color: var(--ink-dim); font-size: 20px; cursor: pointer; line-height: 1; }

@@ -533,6 +533,21 @@ export function initAnalysisView() {
     getCurrentPly: () => (mainLine ? Math.min(currentPly, mainLine.branchPly) : currentPly),
   });
 
+  // Phone: once "Analyse complète" is open its title is hidden; this arrow closes it.
+  const fullGameCloseBtn = document.getElementById("fullGameCloseBtn");
+  if (fullGameCloseBtn) fullGameCloseBtn.onclick = (e) => { e.currentTarget.closest("details").open = false; };
+  // Legend bubble "Comment lire les coups" (any .legend-info-btn opens it).
+  const legendBubble = document.getElementById("legendBubble");
+  if (legendBubble) {
+    const closeLegend = () => { legendBubble.hidden = true; };
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest && e.target.closest(".legend-info-btn");
+      if (btn) { legendBubble.hidden = !legendBubble.hidden; return; }
+      if (!legendBubble.hidden && !legendBubble.contains(e.target)) closeLegend();
+    });
+    document.getElementById("legendCloseBtn").onclick = closeLegend;
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLegend(); });
+  }
   const altLineBackBtn = document.getElementById("altLineBackBtn");
   if (altLineBackBtn) altLineBackBtn.onclick = () => backToMainLine();
   const topPanelToggle = document.getElementById("topPanelToggle");
@@ -967,9 +982,6 @@ function refreshGameOverActions() {
   if (over && !gameOverSeen) {
     els.engineStatus.textContent = "Partie terminée.";
     els.engineOutput.textContent = "";
-    // "Analyse complète" then estimates the level of the human player.
-    const sideSelect = document.getElementById("playerSideSelect");
-    if (sideSelect && computerSide) sideSelect.value = computerSide === "w" ? "b" : "w";
   }
   if (over !== gameOverSeen) reviewStarted = false;
   gameOverSeen = over;

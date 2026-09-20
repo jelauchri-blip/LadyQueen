@@ -347,12 +347,8 @@
           <summary>Analyse complète de la partie</summary>
           <div class="fullgame-panel">
             <div class="fullgame-controls">
-              <select id="playerSideSelect">
-                <option value="w">Estimer le niveau des Blancs</option>
-                <option value="b">Estimer le niveau des Noirs</option>
-                <option value="both">Estimer les deux camps</option>
-              </select>
               <button class="btn-primary" id="analyzeGameBtn">Analyser coup par coup</button>
+              <button type="button" class="side-close-btn" id="fullGameCloseBtn" aria-label="Refermer l'analyse complète">▾</button>
             </div>
             <div id="fullgameProgress" class="fullgame-progress" hidden></div>
             <div id="fullgameResults" class="fullgame-results"></div>
@@ -368,7 +364,7 @@
         <div class="resize-handle resize-handle-analyse handle-side-movelist" id="sideMovelistResizeHandle" title="Glisser pour redimensionner"></div>
 
         <div class="movelist-wrap">
-          <p class="eyebrow">Coups joués</p>
+          <p class="eyebrow">Coups joués <button type="button" class="info-icon-btn legend-info-btn" aria-label="Comment lire les coups" title="Comment lire les coups">i</button></p>
           <div id="variationStrip" class="variation-strip" hidden></div>
           <ol id="moveList" class="movelist"></ol>
         </div>
@@ -405,6 +401,18 @@
     </section>
 
   </main>
+
+  <div id="legendBubble" class="legend-bubble" hidden role="dialog" aria-label="Comment lire les coups">
+    <button type="button" class="legend-close" id="legendCloseBtn" aria-label="Fermer">×</button>
+    <p class="legend-title">Comment lire les coups</p>
+    <ul>
+      <li><b>R D T F C P</b> : roi, dame, tour, fou, cavalier, pion. Dans la liste des coups, un pion n'a pas de lettre (« e4 »).</li>
+      <li><b>x</b> : prend (« Fxc5 » : le fou prend en c5).</li>
+      <li><b>+</b> : échec. <b>#</b> : échec et mat.</li>
+      <li>Note d'un coup : <b>!!</b> excellent · <b>?!</b> imprécision · <b>?</b> erreur · <b>??</b> gaffe.</li>
+    </ul>
+  </div>
+
 
   </div>
 

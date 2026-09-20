@@ -60,7 +60,6 @@ function setCoachState(state) {
 export function initFullGameAnalysis(context) {
   ctx = context;
   els.btn = document.getElementById("analyzeGameBtn");
-  els.select = document.getElementById("playerSideSelect");
   els.progress = document.getElementById("fullgameProgress");
   els.results = document.getElementById("fullgameResults");
 
@@ -310,9 +309,6 @@ function renderMoveList(reports) {
   wrap.className = "phase-block";
   const titleRow = document.createElement("div");
   titleRow.className = "coach-title-row";
-  const title = document.createElement("h4");
-  title.textContent = "Coup par coup";
-  titleRow.appendChild(title);
   // Filled by renderElo(): the level estimate sits on this same line.
   const eloSlot = document.createElement("span");
   eloSlot.className = "coach-elo-slot";
@@ -449,6 +445,30 @@ function explainBestMove(fenBefore, uci, bestSan, cpLoss, plyIndex) {
   }
 }
 
+// A move written for a beginner: piece letter, square it leaves, arrow, square
+// it reaches, then what happens — "F f8 → c5", "P d2 → c3 (prise)",
+// "C d6 → f7 (prise, échec)". Castling is spelt out.
+const PIECE_LETTER = { p: "P", n: "C", b: "F", r: "T", q: "D", k: "R" };
+function describeMove(fenBefore, uci) {
+  if (!uci || uci.length < 4) return null;
+  try {
+    const c = new Chess(fenBefore);
+    const r = c.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.slice(4) || undefined });
+    if (!r) return null;
+    const notes = [];
+    if (r.flags.includes("k") || r.flags.includes("q")) {
+      const isMate = r.san.endsWith("#"), isCheck = r.san.endsWith("+");
+      return (r.flags.includes("k") ? "Petit roque" : "Grand roque") + (isMate ? " (échec et mat)" : isCheck ? " (échec)" : "");
+    }
+    if (r.flags.includes("e")) notes.push("prise en passant");
+    else if (r.captured) notes.push("prise");
+    if (r.promotion) notes.push("promotion en " + { q: "dame", r: "tour", b: "fou", n: "cavalier" }[r.promotion]);
+    if (r.san.endsWith("#")) notes.push("échec et mat");
+    else if (r.san.endsWith("+")) notes.push("échec");
+    return `${PIECE_LETTER[r.piece]} ${r.from} → ${r.to}${notes.length ? ` (${notes.join(", ")})` : ""}`;
+  } catch (e) { return null; }
+}
+
 function renderErrorCoach(reports) {
   const mistakes = reports.filter((r) => r.classification.key === "mistake" || r.classification.key === "blunder");
 
@@ -474,31 +494,42 @@ function renderErrorCoach(reports) {
   wrap.appendChild(body);
   els.results.appendChild(wrap);
 
-  function render() {
+  // moveBoard is false for the card shown when the analysis ends: the board
+  // stays where the user is until he asks (◀ ▶, 👁 Voir).
+  function render(moveBoard = true) {
     stopSpeech();
     const m = mistakes[index];
     const sideLabel = m.color === "w" ? "les Blancs" : "les Noirs";
-    const numLabel = m.color === "w" ? `${m.moveNumber}.` : `${m.moveNumber}…`;
     const bestSanEn = bestMoveSan(m.fenBefore, m.bestMoveUci);
     const bestSan = bestSanEn ? sanFr(bestSanEn) : null;
+    const playedText = describeMove(m.fenBefore, m.playedUci) || sanFr(m.san);
+    const bestText = describeMove(m.fenBefore, m.bestMoveUci) || bestSan;
 
     body.innerHTML = `
-      <div class="coach-error-counter">Erreur ${index + 1} / ${mistakes.length}</div>
+      <div class="coach-error-counter">Erreur ${index + 1} / ${mistakes.length} <button type="button" class="info-icon-btn legend-info-btn" aria-label="Comment lire les coups" title="Comment lire les coups">i</button></div>
       <div class="coach-error-move">
         <span class="mv-symbol sym-${m.classification.key}">${m.classification.symbol}</span>
-        ${numLabel} <span class="mv-san">${sanFr(m.san)}</span> — ${sideLabel}
+        Coup ${m.moveNumber} — ${sideLabel} : <span class="mv-san">${playedText}</span>
       </div>
-      ${bestSan ? `<p class="coach-error-best">→ <span class="best-move">${bestSan}</span></p>` : ""}
+      ${bestText ? `<p class="coach-error-best">Mieux : <span class="best-move">${bestText}</span></p>` : ""}
       ${bestSan ? `<p class="coach-error-why" id="errWhyText" hidden></p>` : ""}
       <div class="coach-error-actions">
         <button class="btn-ghost" id="errPrevBtn" title="Erreur précédente" aria-label="Erreur précédente" ${index === 0 ? "disabled" : ""}>◀</button>
         ${isVoiceSupported() ? '<button class="btn-ghost" id="errSpeakBtn" title="Écouter l\'explication" aria-label="Écouter l\'explication">🔊</button>' : ""}
         ${bestSan ? `<button class="btn-ghost" id="errWhyBtn" title="Pourquoi ${bestSan} est meilleur ?" aria-label="Pourquoi ce coup est meilleur">💡</button>` : ""}
+        <button class="btn-ghost" id="errShowBtn" title="Voir sur le plateau" aria-label="Voir sur le plateau">👁</button>
         <button class="btn-primary" id="errResumeBtn">↩ Reprendre ici</button>
         <button class="btn-ghost" id="errIgnoreBtn" ${index === mistakes.length - 1 ? "" : 'title="Ignorer, aller à l\'erreur suivante" aria-label="Ignorer, aller à l\'erreur suivante"'}>${index === mistakes.length - 1 ? "Terminer" : "▶"}</button>
       </div>
     `;
 
+    const showOnBoard = () => {
+      if (m.bestMoveUci && ctx.goToPly) {
+        ctx.goToPly(m.ply);
+        if (ctx.showHint) ctx.showHint(m.bestMoveUci.slice(0, 2), m.bestMoveUci.slice(2, 4));
+      }
+    };
+    body.querySelector("#errShowBtn").onclick = showOnBoard;
     body.querySelector("#errPrevBtn").onclick = () => { index = Math.max(0, index - 1); render(); };
     body.querySelector("#errIgnoreBtn").onclick = () => {
       if (index < mistakes.length - 1) { index++; render(); }
@@ -530,13 +561,10 @@ function renderErrorCoach(reports) {
 
     // Put the board on the position BEFORE this move and light up the
     // suggested move's start and end squares.
-    if (m.bestMoveUci && ctx.goToPly) {
-      ctx.goToPly(m.ply);
-      if (ctx.showHint) ctx.showHint(m.bestMoveUci.slice(0, 2), m.bestMoveUci.slice(2, 4));
-    }
+    if (moveBoard) showOnBoard();
   }
 
-  render();
+  render(false);
 }
 
 const ACPL_ELO_TABLE = [
@@ -566,10 +594,9 @@ export function estimateElo(reports, side) {
 }
 
 function renderElo(reports) {
-  const side = els.select.value;
-  const sides = side === "both" ? ["w", "b"] : [side];
+  const sides = ["w", "b"];
 
-  // Goes on the "Coup par coup" title line (slot made by renderMoveList).
+  // Level of both sides, in the slot made by renderMoveList.
   const slot = document.getElementById("coachEloSlot");
   if (!slot) return;
   slot.innerHTML = "";
