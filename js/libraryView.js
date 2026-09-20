@@ -8,6 +8,13 @@ export function initLibraryView({ loadPgnIntoAnalysis }) {
   onLoadGame = loadPgnIntoAnalysis;
   els.list = document.getElementById("libraryList");
   wireCommonActions();
+  // Re-fit when the screen turns, the tab opens, or the backup block changes
+  // height (a status line, the paste box…).
+  window.addEventListener("resize", fitListHeight);
+  const libView = document.getElementById("view-bibliotheque");
+  if (libView) new MutationObserver(fitListHeight).observe(libView, { attributes: true, attributeFilter: ["class"] });
+  const backupBlock = document.querySelector(".backup-panel");
+  if (backupBlock && window.ResizeObserver) new ResizeObserver(fitListHeight).observe(backupBlock);
   els.exportBtn = document.getElementById("exportDataBtn");
   els.importBtn = document.getElementById("importDataBtn");
   els.importInput = document.getElementById("importDataInput");
@@ -98,6 +105,23 @@ export function refreshLibraryView() {
   if (els.list) render();
 }
 
+// Phone: the list grows with the number of games until the backup buttons
+// below it reach the bottom of the screen; from there on the list scrolls
+// inside its own box, so nothing is ever pushed off-screen.
+const PHONE_MQ = window.matchMedia("(max-width: 760px)");
+function fitListHeight() {
+  const view = document.getElementById("view-bibliotheque");
+  const backup = document.querySelector(".backup-panel");
+  if (!els.list || !view || !backup) return;
+  if (!PHONE_MQ.matches) { els.list.style.maxHeight = ""; return; }
+  if (!view.classList.contains("active")) return;
+  els.list.style.maxHeight = "none"; // measure the natural layout first
+  const cs = getComputedStyle(backup);
+  const below = backup.offsetHeight + parseFloat(cs.marginTop) + 12;
+  const top = els.list.getBoundingClientRect().top + window.scrollY;
+  els.list.style.maxHeight = Math.max(140, window.innerHeight - top - below) + "px";
+}
+
 // Phone: the rows are just selectable lines, and ONE pair of buttons
 // ("Ouvrir et analyser", 🗑) acts on the selected game — so the controls never
 // scroll away however many games there are. PC keeps buttons on every card.
@@ -158,4 +182,5 @@ function render() {
     });
     els.list.appendChild(card);
   }
+  fitListHeight();
 }
