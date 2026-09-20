@@ -1,13 +1,30 @@
 // Publicité Google AdMob — uniquement dans l'appli Android (Capacitor).
 // Sur le site web (navigateur) rien n'est chargé et aucune pub ne s'affiche.
 //
-// IDENTIFIANTS : tant que USE_TEST_ADS est vrai, ce sont les annonces de TEST de
-// Google qui s'affichent (elles portent la mention « Test Ad »). Avant de
-// publier : renseigner BANNER_ID avec l'ID du bloc d'annonces LadyQueen (créé
-// dans AdMob) et passer USE_TEST_ADS à false. L'ID de l'appli AdMob se règle
+// IDENTIFIANTS : REAL_BANNER_ID est le bloc d'annonces « Bannière bas » de LadyQueen
+// (AdMob). Tant que USE_TEST_ADS est vrai, on utilise le bloc de TEST de Google
+// (mention « Test Ad ») et un petit message de diagnostic s'affiche en bas :
+// à garder pour tous les essais, car cliquer sur de vraies annonces de sa propre
+// appli est interdit par AdMob (et un bloc neuf met des heures à diffuser). On
+// ne passe à false que pour la version publiée. L'ID de l'appli AdMob se règle
 // dans android/app/src/main/AndroidManifest.xml (meta-data APPLICATION_ID).
 const USE_TEST_ADS = true;
-const BANNER_ID = "ca-app-pub-3940256099942544/9214589741"; // bannière adaptative — ID de test Google
+const REAL_BANNER_ID = "ca-app-pub-4987258009555198/9157890974";
+const TEST_BANNER_ID = "ca-app-pub-3940256099942544/9214589741"; // bannière de test Google
+const BANNER_ID = USE_TEST_ADS ? TEST_BANNER_ID : REAL_BANNER_ID;
+
+// Test builds only: a line at the bottom of the screen says what the ads are doing.
+function debugMsg(text) {
+  if (!USE_TEST_ADS) return;
+  let el = document.getElementById("adDebug");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "adDebug";
+    el.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99998;padding:2px 6px;font:11px/1.3 monospace;color:#fff;background:rgba(160,30,30,.85);pointer-events:none;";
+    document.body.appendChild(el);
+  }
+  el.textContent = "PUB (test) : " + text;
+}
 
 function isNativeApp() {
   return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
@@ -36,10 +53,16 @@ async function showBanner(AdMob) {
   });
 }
 
+let bannerAnswered = false;
+let retries = 0;
+const RETRY_DELAYS = [20, 40, 80, 160, 300]; // seconds
+const MAX_RETRIES = RETRY_DELAYS.length;
+
 export async function initAds() {
   if (!isNativeApp()) return;
   const AdMob = window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob;
-  if (!AdMob) return;
+  if (!AdMob) { debugMsg("module AdMob introuvable"); return; }
+  debugMsg("demarrage…");
   try {
     // RGPD consent (Google UMP): asked at first launch where the law requires it.
     let privacyOptionsRequired = false;
@@ -69,12 +92,30 @@ export async function initAds() {
     }
 
     AdMob.addListener("bannerAdSizeChanged", (size) => reserveBannerSpace(size && size.height));
-    AdMob.addListener("bannerAdFailedToLoad", () => reserveBannerSpace(0));
+    AdMob.addListener("bannerAdLoaded", () => { bannerAnswered = true; debugMsg("banniere chargee"); });
+    AdMob.addListener("bannerAdFailedToLoad", (err) => {
+      bannerAnswered = true;
+      reserveBannerSpace(0);
+      debugMsg("banniere refusee, code " + (err && err.code) + " " + (err && err.message ? err.message : "") + (retries < MAX_RETRIES ? " — nouvel essai dans " + RETRY_DELAYS[retries] + " s" : ""));
+      // An occasional refusal ("Unable to obtain a JavascriptEngine") is a hiccup of the phone's
+      // WebView: ask again a few times, with growing pauses, instead of giving up.
+      if (retries < MAX_RETRIES) {
+        const wait = RETRY_DELAYS[retries++] * 1000;
+        setTimeout(async () => {
+          try { await AdMob.removeBanner(); } catch (e) { /* nothing to remove */ }
+          try { bannerAnswered = false; await showBanner(AdMob); } catch (e) { debugMsg("erreur : " + (e && (e.message || e))); }
+        }, wait);
+      }
+    });
 
     await AdMob.initialize({});
+    debugMsg("initialise, demande de banniere…");
     await new Promise((r) => setTimeout(r, 800));
     await showBanner(AdMob);
+    debugMsg("banniere demandee, attente de la reponse…");
+    setTimeout(() => { if (!bannerAnswered) debugMsg("aucune reponse d'AdMob apres 15 s"); }, 15000);
   } catch (e) {
     reserveBannerSpace(0); // AdMob unavailable: the page uses the whole screen
+    debugMsg("erreur : " + (e && (e.message || e)));
   }
 }

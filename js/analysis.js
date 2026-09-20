@@ -414,7 +414,30 @@ export function initAnalysisView() {
       ? "En dessous de 1320 : simulation approximative (coups faibles/aléatoires), pas de réglage officiel du moteur à ce niveau."
       : "Force calibrée officiellement par le moteur (UCI_Elo).";
   }
-  els.opponentEloSelect.onchange = updateEloHint;
+  // The settings of the last game (strength, Défi/Coach, chrono) are kept for the next ones.
+  function rememberSelect(select, key, onChange) {
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved && [...select.options].some((o) => o.value === saved)) select.value = saved;
+    } catch (e) { /* storage unavailable: the default stays */ }
+    select.addEventListener("change", () => {
+      if (onChange) onChange();
+      try { localStorage.setItem(key, select.value); } catch (e) { /* not saved */ }
+    });
+  }
+  rememberSelect(els.opponentEloSelect, "echiquier_opponent_elo", updateEloHint);
+  rememberSelect(els.timeControlSelect, "echiquier_vs_time");
+  rememberSelect(els.incrementSelect, "echiquier_vs_increment");
+  const BEHAVIOR_KEY = "echiquier_vs_behavior";
+  const behaviorRadios = [...document.querySelectorAll('input[name="vsComputerBehavior"]')];
+  try {
+    const saved = localStorage.getItem(BEHAVIOR_KEY);
+    const match = behaviorRadios.find((r) => r.value === saved);
+    if (match) match.checked = true;
+  } catch (e) { /* the default stays */ }
+  behaviorRadios.forEach((r) => r.addEventListener("change", () => {
+    try { localStorage.setItem(BEHAVIOR_KEY, r.value); } catch (e) { /* not saved */ }
+  }));
   updateEloHint();
 
   // Small "(i)"-style icon + bubble pattern, shared by the Elo hint and the

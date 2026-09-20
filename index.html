@@ -4,6 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="theme-color" content="#1B1F1D">
+<script>
+/* Android app (Capacitor): a launch screen with the big LadyQueen logo covers the page while it loads. */
+(function () {
+  try {
+    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+      document.documentElement.classList.add("is-native-app");
+      var hide = function () {
+        var el = document.getElementById("nativeSplash");
+        if (!el || el.classList.contains("gone")) return;
+        el.classList.add("gone");
+        setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
+      };
+      window.addEventListener("load", function () { setTimeout(hide, 1100); });
+      setTimeout(hide, 4000); // safety net
+    }
+  } catch (e) {}
+})();
+</script>
+<style>
+.native-splash { display: none; }
+.is-native-app .native-splash {
+  display: flex; align-items: center; justify-content: center;
+  position: fixed; inset: 0; z-index: 99999; background: #1B1F1D;
+  transition: opacity 0.45s ease;
+}
+.native-splash.gone { opacity: 0; pointer-events: none; }
+.native-splash img { width: min(70vw, 340px); height: auto; }
+</style>
 <title>Échiquier — Académie | Cours d'échecs gratuit en français, puzzles et analyse</title>
 <meta name="description" content="Apprends les échecs gratuitement en français : 12 leçons interactives, puzzles tactiques vérifiés, analyse de partie par moteur d'échecs, et une partie contre l'ordinateur au niveau réglable. Application installable, utilisable hors-ligne.">
 <link rel="canonical" href="https://flourishing-semolina-177de0.netlify.app/">
@@ -41,6 +69,7 @@
 </script>
 </head>
 <body>
+<div class="native-splash" id="nativeSplash" aria-hidden="true"><img src="icons/splash-logo.png" alt=""></div>
 
 <div id="app">
 
