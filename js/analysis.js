@@ -1201,6 +1201,12 @@ let lastBestMove = null;
 let lastScore = null;
 let lastPv = [];
 let pendingResolve = null;
+// Position the engine is searching right now. Its live "info" lines may only
+// be shown while that is still the position on the board — the coach's own
+// evaluations (of the position BEFORE the move just played) used to be drawn
+// as if they were the current one: "Meilleur coup : e4" under a board where
+// e4 had already been played.
+let searchFen = null;
 
 function handleEngineMessage(e) {
   const line = typeof e.data === "string" ? e.data : "";
@@ -1231,12 +1237,12 @@ function handleEngineMessage(e) {
       lastPv = pvMatch[1].trim().split(" ");
       lastBestMove = lastPv[0];
     }
-    if (!busy) renderEval();
+    if (!busy && searchFen === chess.fen()) renderEval();
   }
   if (line.startsWith("bestmove")) {
     const parts = line.split(" ");
     if (parts[1] && parts[1] !== "(none)") lastBestMove = parts[1];
-    if (!busy) renderEval(true);
+    if (!busy && searchFen === chess.fen()) renderEval(true);
     if (pendingResolve) {
       const resolve = pendingResolve;
       pendingResolve = null;
@@ -1308,6 +1314,14 @@ function requestEval() {
   }
   clearTimeout(evalTimeout);
   const fenAtRequest = chess.fen();
+  // The position changed: the evaluation on screen belongs to the previous
+  // one, so it goes now instead of lingering until the new result arrives
+  // (the review buttons' level estimate is left alone).
+  const reviewingFinishedGame = els.gameOverActions && !els.gameOverActions.hidden;
+  if (!reviewingFinishedGame && els.engineOutput.textContent) {
+    els.engineOutput.textContent = "";
+    els.engineStatus.textContent = "Analyse en cours…";
+  }
   evalTimeout = setTimeout(async () => {
     if (!engine) return;
     try {
@@ -1337,6 +1351,7 @@ export function evaluateFen(fen, depth = 12) {
       lastScore = null;
       lastBestMove = null;
       lastPv = [];
+      searchFen = fen;
       let settled = false;
       const finish = (value) => {
         if (settled) return;
