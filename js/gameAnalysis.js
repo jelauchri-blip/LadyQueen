@@ -2,6 +2,7 @@ import { Chess } from "./chess.js";
 import { speakOne, playSequence, pauseSequence, resumeSequence, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { getDepth } from "./engineSettings.js";
 import { sanFr, sanSpoken } from "./notation.js";
+import { gameSignature, getSavedAnalysis, saveAnalysis } from "./gameLibrary.js";
 
 // A move counts as "there was a better one" from an inaccuracy up (≥ 25
 // centipawns lost) — below that the difference is too small to act on.
@@ -19,6 +20,9 @@ export const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 let ctx = null; // { getChess, evaluateFen, isEngineEnabled, enableEngine, setBusy }
 let els = {};
 let running = false;
+// Engine results already worked out during this session, by game signature —
+// and, for games of the library, kept with the game itself (gameLibrary.js).
+const sessionAnalyses = new Map();
 
 // Coach voice state: "idle" (nothing read), "playing", or "paused". A click on
 // the voice button while it reads = pause; the board can then be moved freely
@@ -80,6 +84,14 @@ async function runAnalysis() {
   els.btn.disabled = true;
   els.progress.hidden = false;
   els.results.innerHTML = "";
+  // The voice button is there from the start, greyed out until the analysis is done.
+  const pending = document.createElement("div");
+  pending.className = "phase-block";
+  pending.innerHTML = isVoiceSupported()
+    ? '<button class="btn-ghost coach-btn" disabled>🔊 Coach vocal</button> <span class="analysis-pending-text">Analyse…</span>'
+    : '<span class="analysis-pending-text">Analyse…</span>';
+  els.results.appendChild(pending);
+  const pendingText = pending.querySelector(".analysis-pending-text");
   stopSpeech();
   setCoachState("idle");
   ctx.setBusy(true);
@@ -88,16 +100,33 @@ async function runAnalysis() {
   try {
     // Evaluate every position in the sequence once: start position + after each ply.
     const fens = [plies[0].before, ...plies.map((p) => p.after)];
-    const evals = [];
-    const bestMoves = [];
-    for (let i = 0; i < fens.length; i++) {
-      els.progress.textContent = `Analyse du coup ${i} / ${fens.length - 1} (profondeur ${getDepth()})…`;
-      if (ctx.onAnalysisProgress) ctx.onAnalysisProgress(i, fens.length - 1);
-      const result = await ctx.evaluateFen(fens[i], getDepth());
-      const turn = fens[i].split(" ")[1]; // 'w' | 'b' — side to move in this position
-      evals.push(toWhiteCentipawns(result.score, turn));
-      bestMoves.push(result.bestMove || null);
+    let evals = [];
+    let bestMoves = [];
+    const sig = gameSignature(plies[0].before, plies.map((p) => p.san));
+    const depth = getDepth();
+    const known = sessionAnalyses.get(sig);
+    const saved = known && known.depth >= depth ? known : getSavedAnalysis(sig, depth);
+    if (saved && saved.evals.length === fens.length) {
+      // Already analysed: nothing to compute.
+      evals = saved.evals;
+      bestMoves = saved.bestMoves;
+      pendingText.textContent = "Analyse déjà faite";
+      if (ctx.onAnalysisProgress) ctx.onAnalysisProgress(fens.length - 1, fens.length - 1);
+    } else {
+      for (let i = 0; i < fens.length; i++) {
+        els.progress.textContent = `Analyse du coup ${i} / ${fens.length - 1} (profondeur ${depth})…`;
+        pendingText.textContent = `Analyse ${i} / ${fens.length - 1}…`;
+        if (ctx.onAnalysisProgress) ctx.onAnalysisProgress(i, fens.length - 1);
+        const result = await ctx.evaluateFen(fens[i], depth);
+        const turn = fens[i].split(" ")[1]; // 'w' | 'b' — side to move in this position
+        evals.push(toWhiteCentipawns(result.score, turn));
+        bestMoves.push(result.bestMove || null);
+      }
+      const analysis = { depth, evals, bestMoves };
+      sessionAnalyses.set(sig, analysis);
+      saveAnalysis(sig, analysis); // kept with the game when it is in the library
     }
+    pending.remove();
 
     const moveReports = [];
     const devTracker = { w: new Set(), b: new Set() }; // piece types moved more than once tracking
