@@ -34,8 +34,13 @@ function showTab(name) {
     initialized.bibliotheque = true;
     initLibraryView({
       loadPgnIntoAnalysis: (pgn) => {
-        loadPgnString(pgn);
+        if (!loadPgnString(pgn)) return;
         showTab("analyse");
+        // "Ouvrir et analyser": the analysis starts as soon as the game is open
+        // (instant when it was already analysed — its results are kept with the game).
+        const panel = document.getElementById("fullGameSection");
+        if (panel) panel.open = true;
+        document.getElementById("analyzeGameBtn").click();
       },
     });
   }

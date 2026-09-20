@@ -20,6 +20,9 @@ export const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 let ctx = null; // { getChess, evaluateFen, isEngineEnabled, enableEngine, setBusy }
 let els = {};
 let running = false;
+// Signature of the game the analysis on screen belongs to (null = none).
+let analyzedSig = null;
+
 // Engine results already worked out during this session, by game signature —
 // and, for games of the library, kept with the game itself (gameLibrary.js).
 const sessionAnalyses = new Map();
@@ -57,6 +60,29 @@ function setCoachState(state) {
   if (ctx.onCoachState) ctx.onCoachState(state);
 }
 
+function currentGameSig() {
+  if (!ctx) return null;
+  const plies = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
+  if (plies.length === 0) return null;
+  return gameSignature(plies[0].before, plies.slice(0, 80).map((p) => p.san));
+}
+
+// Once the game on the board is analysed, the "Analyser coup par coup" row goes
+// away (the results, with their own ↻ and ▾, take its place); it comes back
+// when the game changes.
+export function refreshAnalysisButton() {
+  if (!els.btn) return;
+  const done = !running && analyzedSig !== null && analyzedSig === currentGameSig();
+  const panel = document.querySelector(".fullgame-panel");
+  if (panel) panel.classList.toggle("fullgame-done", done);
+}
+
+// A new game / position replaces the analysis on screen.
+export function resetAnalysis() {
+  analyzedSig = null;
+  refreshAnalysisButton();
+}
+
 export function initFullGameAnalysis(context) {
   ctx = context;
   els.btn = document.getElementById("analyzeGameBtn");
@@ -67,9 +93,14 @@ export function initFullGameAnalysis(context) {
     if (running) return;
     runAnalysis();
   });
+  // ↻ and ▾ live in the results (they replace the button row once it is gone).
+  els.results.addEventListener("click", (e) => {
+    if (e.target.closest(".fullgame-redo-btn")) { if (!running) runAnalysis({ force: true }); }
+    else if (e.target.closest(".fullgame-close-btn")) e.target.closest("details").open = false;
+  });
 }
 
-async function runAnalysis() {
+async function runAnalysis(options = {}) {
   const verboseHistory = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
   if (verboseHistory.length === 0) {
     els.results.innerHTML = `<div class="phase-block"><p>Chargez ou jouez d'abord une partie (plusieurs coups) avant de lancer l'analyse complète.</p></div>`;
@@ -87,7 +118,7 @@ async function runAnalysis() {
   const pending = document.createElement("div");
   pending.className = "phase-block";
   pending.innerHTML = isVoiceSupported()
-    ? '<button class="btn-ghost coach-btn" disabled>🔊 Coach vocal</button> <span class="analysis-pending-text">Analyse…</span>'
+    ? '<button class="btn-ghost coach-btn" disabled>🔊<span class="coach-label"> Coach vocal</span></button> <span class="analysis-pending-text">Analyse…</span>'
     : '<span class="analysis-pending-text">Analyse…</span>';
   els.results.appendChild(pending);
   const pendingText = pending.querySelector(".analysis-pending-text");
@@ -103,8 +134,8 @@ async function runAnalysis() {
     let bestMoves = [];
     const sig = gameSignature(plies[0].before, plies.map((p) => p.san));
     const depth = getDepth();
-    const known = sessionAnalyses.get(sig);
-    const saved = known && known.depth >= depth ? known : getSavedAnalysis(sig, depth);
+    const known = options.force ? null : sessionAnalyses.get(sig);
+    const saved = options.force ? null : (known && known.depth >= depth ? known : getSavedAnalysis(sig, depth));
     if (saved && saved.evals.length === fens.length) {
       // Already analysed: nothing to compute.
       evals = saved.evals;
@@ -163,6 +194,7 @@ async function runAnalysis() {
     renderMoveList(moveReports);
     renderElo(moveReports);
     renderErrorCoach(moveReports);
+    analyzedSig = sig;
     if (ctx.onAnalysisDone) ctx.onAnalysisDone(true, { elo: { w: estimateElo(moveReports, "w"), b: estimateElo(moveReports, "b") } });
   } catch (e) {
     els.results.innerHTML = `<div class="phase-block"><p>L'analyse a été interrompue (moteur indisponible). Réessayez avec le moteur activé et une connexion internet stable.</p></div>`;
@@ -170,6 +202,7 @@ async function runAnalysis() {
   } finally {
     running = false;
     els.btn.disabled = false;
+    refreshAnalysisButton();
     els.progress.hidden = true;
     ctx.setBusy(false);
     syncResultsHeight();
@@ -304,6 +337,8 @@ export function buildExplanation(mv, classification, cpLoss, tags, beforeSigned,
 
 // --- Rendering ---------------------------------------------------------------
 
+const COACH_PLAY_HTML = '🔊<span class="coach-label"> Coach vocal</span>';
+
 function renderMoveList(reports) {
   const wrap = document.createElement("div");
   wrap.className = "phase-block";
@@ -319,12 +354,17 @@ function renderMoveList(reports) {
     const coachBar = document.createElement("div");
     coachBar.className = "coach-bar";
     coachBar.innerHTML = `
-      <button class="btn-ghost coach-btn" id="coachPlayBtn">🔊 Coach vocal</button>
+      <button class="btn-ghost coach-btn" id="coachPlayBtn" title="Coach vocal">🔊<span class="coach-label"> Coach vocal</span></button>
       <button class="btn-ghost coach-btn" id="coachPauseBtn" hidden>⏸ Pause</button>
       <button class="btn-ghost coach-btn" id="coachStopBtn" hidden>⏹ Arrêter</button>
     `;
     titleRow.appendChild(coachBar);
   }
+  const tools = document.createElement("span");
+  tools.className = "fullgame-tools";
+  tools.innerHTML = '<button type="button" class="btn-ghost fullgame-redo-btn" title="Refaire l\'analyse depuis le début" aria-label="Refaire l\'analyse">↻</button>'
+    + '<button type="button" class="side-close-btn fullgame-close-btn" aria-label="Refermer l\'analyse complète">▾</button>';
+  titleRow.appendChild(tools);
   wrap.appendChild(titleRow);
   els.results.appendChild(wrap);
 
@@ -357,7 +397,7 @@ function wireCoachControls(reports) {
       playing = false;
       setCoachState("idle");
       playBtn.hidden = false;
-      playBtn.textContent = "🔊 Coach vocal";
+      playBtn.innerHTML = COACH_PLAY_HTML;
       pauseBtn.hidden = true;
       stopBtn.hidden = true;
     },
@@ -396,7 +436,7 @@ function wireCoachControls(reports) {
     setCoachState("paused");
     pauseBtn.hidden = true;
     playBtn.hidden = false;
-    playBtn.textContent = "▶ Reprendre";
+    playBtn.innerHTML = '▶<span class="coach-label"> Reprendre</span>';
   });
 
   stopBtn.addEventListener("click", () => {
@@ -404,7 +444,7 @@ function wireCoachControls(reports) {
     playing = false;
     setCoachState("idle");
     playBtn.hidden = false;
-    playBtn.textContent = "🔊 Coach vocal";
+    playBtn.innerHTML = COACH_PLAY_HTML;
     pauseBtn.hidden = true;
     stopBtn.hidden = true;
   });
@@ -474,9 +514,6 @@ function renderErrorCoach(reports) {
 
   const wrap = document.createElement("div");
   wrap.className = "phase-block coach-error-block";
-  const title = document.createElement("h4");
-  title.textContent = "Correction guidée";
-  wrap.appendChild(title);
 
   if (mistakes.length === 0) {
     const perfectible = reports.filter(hasBetterMove).length;

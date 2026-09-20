@@ -1279,3 +1279,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 .legend-bubble li { margin-bottom: 5px; }
 .legend-bubble b { color: var(--ink); }
 .legend-close { position: absolute; top: 4px; right: 8px; background: none; border: none; color: var(--ink-dim); font-size: 20px; cursor: pointer; line-height: 1; }
+
+/* Analyse complète, game analysed: the button row goes away; ↻ and ▾ sit at the
+   end of the level row. On phone the voice button keeps only its icon. */
+.fullgame-panel.fullgame-done .fullgame-controls { display: none; }
+.fullgame-tools { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.fullgame-redo-btn { padding: 4px 8px; font-size: 14px; line-height: 1; }
+@media (max-width: 760px) {
+  .coach-btn .coach-label { display: none; }
+  .coach-bar .coach-btn { padding: 4px 8px; }
+}

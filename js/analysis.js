@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated } from "./gameAnalysis.js";
+import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated, refreshAnalysisButton, resetAnalysis } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -76,6 +76,7 @@ function startHistoryAt(fen) {
   currentPly = 0;
   liveMoveCountByPieceType = { w: {}, b: {} };
   if (els.fullgameResults) els.fullgameResults.innerHTML = "";
+  resetAnalysis();
 }
 
 function rebuildHistoryFromChessObject(chessWithHistory) {
@@ -92,6 +93,7 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
   }
   currentPly = plyFens.length - 1;
   if (els.fullgameResults) els.fullgameResults.innerHTML = "";
+  resetAnalysis();
 }
 
 export function goToPly(n, opts = {}) {
@@ -1164,6 +1166,7 @@ function buildPgnFromHistory() {
 
 function updateMoveList() {
   syncGameKindUi();
+  refreshAnalysisButton();
   els.moveList.innerHTML = "";
   for (let i = 0; i < plyMoves.length; i += 2) {
     const li = document.createElement("li");
