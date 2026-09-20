@@ -794,6 +794,9 @@ body.layout-locked .move-grip {
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
 /* "🔊 Écouter la partie": coach vocal for whatever game is on the board
    (library, pasted PGN, game just played). Compact on phone (below). */
+/* Game against the computer under way: no full-game review (finished games only). */
+body.game-live #fullGameSection,
+body.game-live .engine-voice-row { display: none; }
 .top-panel-toggle { display: none; }
 .engine-voice-row { margin-bottom: 8px; }
 #engineVoiceBtn { font-size: 12px; padding: 5px 12px; }
@@ -880,13 +883,6 @@ body.layout-locked .move-grip {
 /* "Partie terminée.  [Revoir] ......... [Correction]" — the two buttons join
    the status text's row (display:contents makes them flex items of the
    readout on phone; on desktop's block layout they simply follow inline). */
-.game-over-actions { display: contents; }
-.game-over-actions[hidden] { display: none; }
-.game-over-btn { padding: 4px 10px; font-size: 12px; }
-#correctionBtn { margin-left: auto; }
-.game-over-btn:disabled { opacity: 0.45; cursor: default; }
-.game-over-btn[hidden] { display: none; }
-#gameVoiceBtn { padding: 4px 6px; }
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-panel-raised); border: 1px solid var(--border-soft); border-radius: 999px; transition: 0.15s; }
@@ -1158,14 +1154,7 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
   body.top-collapsed .sidebar-opponent { display: none; }
   /* End of a game against the computer: the settings panel returns under the
      board, in place of the moves line, until the next game starts. */
-  body:not(.top-collapsed):has(#gameOverActions:not([hidden])) .movelist-wrap { display: none; }
-  /* ...and its 🔊 sits on the "Partie terminée" line, so the extra row goes. */
-  body:has(#gameOverActions:not([hidden])) .engine-voice-row { display: none; }
-  /* Only the "Partie terminée / Revoir" block and the level estimate matter
-     at that point: the engine and live-coach switches step aside so all of it
-     fits on screen. */
-  body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-main-row,
-  body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-toggle-row { display: none; }
+  body.game-over-mobile:not(.top-collapsed) .movelist-wrap { display: none; }
   /* Nav row: slimmer buttons and pills so both pills always fit beside the
      centered ⏮◀▶⏭ group (a clipped pill beats a shifting button). */
   .board-actions-row { gap: 4px; padding: 0 4px; box-sizing: border-box; }

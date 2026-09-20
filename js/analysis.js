@@ -512,78 +512,25 @@ export function initAnalysisView() {
     setBusy: (v) => { busy = v; },
     goToPly,
     showHint: (from, to) => board.setHintMove({ from, to }),
-    // The real progress text lives inside the closed "Analyse complète"
-    // panel — a long game takes minutes, so show the count on the button
-    // the user just tapped instead of leaving it looking frozen.
-    onAnalysisProgress: (i, total) => {
-      if (els.gameOverActions && !els.gameOverActions.hidden && els.reviewBtn.disabled) {
-        els.reviewBtn.textContent = `Analyse ${i}/${total}`;
+    // Reviewing a game just finished against the computer through "Analyse
+    // complète": the settings window steps aside (▾ brings it back).
+    onAnalysisProgress: () => {
+      if (vsComputerMode && vsComputerGameOver && !reviewStarted) {
+        reviewStarted = true;
+        hideResultBanner(); // the "X gagne." banner would hide the board being reviewed
+        topPanelOpen = false;
+        refreshTopPanel();
       }
     },
     getCurrentPly: () => currentPly,
-    onCoachState: (state) => {
-      if (els.gameVoiceBtn) els.gameVoiceBtn.textContent = state === "playing" ? "⏸" : state === "paused" ? "▶" : "🔊";
-    },
-    onAnalysisDone: (ok, info) => {
-      if (els.reviewBtn) { els.reviewBtn.disabled = false; els.reviewBtn.textContent = "Revoir"; }
-      if (els.correctionBtn && ok) els.correctionBtn.disabled = false;
-      if (els.gameVoiceBtn && ok) els.gameVoiceBtn.disabled = false;
-      if (els.gameOverActions && !els.gameOverActions.hidden) {
-        els.engineStatus.textContent = "Partie terminée.";
-        // Level of BOTH players over the whole game, under the buttons.
-        if (ok && info && info.elo) {
-          const fmt = (v) => (v === null ? "—" : `≈ ${v}`);
-          els.engineOutput.innerHTML = info.elo.w === null && info.elo.b === null
-            ? "Partie trop courte pour estimer le niveau."
-            : `Niveau estimé sur la partie<br>Blancs ${fmt(info.elo.w)} · Noirs ${fmt(info.elo.b)}`;
-        }
-      }
-    },
   });
 
-  // End of a game against the computer: "Partie terminée. [Revoir] [Correction]"
-  // on the engine status line — lets the game be studied without saving it.
-  els.gameOverActions = document.getElementById("gameOverActions");
-  els.reviewBtn = document.getElementById("reviewBtn");
-  els.correctionBtn = document.getElementById("correctionBtn");
-  els.reviewBtn.onclick = () => {
-    const sideSelect = document.getElementById("playerSideSelect");
-    if (sideSelect && computerSide) sideSelect.value = computerSide === "w" ? "b" : "w"; // estimate the human's level
-    hideResultBanner();
-    els.reviewBtn.disabled = true;
-    els.reviewBtn.textContent = "Analyse…";
-    // The button itself shows the "Analyse 44/80" count; an empty status keeps
-    // the buttons on one line on a phone.
-    els.engineStatus.textContent = "";
-    // Reviewing: the settings window steps aside (▾ brings it back).
-    reviewStarted = true;
-    topPanelOpen = false;
-    refreshTopPanel();
-    document.getElementById("analyzeGameBtn").click();
-  };
-  // 🔊 on the same line: runs the "Coach vocal" of the analysis panel (which
-  // is closed and out of sight here) — again to stop it.
-  els.gameVoiceBtn = document.getElementById("gameVoiceBtn");
-  els.gameVoiceBtn.hidden = !isVoiceSupported();
-  els.gameVoiceBtn.onclick = () => {
-    const pause = document.getElementById("coachPauseBtn");
-    const play = document.getElementById("coachPlayBtn");
-    if (pause && !pause.hidden) pause.click(); // reading → pause
-    else if (play) play.click();               // idle → read, paused → resume
-  };
   const topPanelToggle = document.getElementById("topPanelToggle");
   if (topPanelToggle) topPanelToggle.onclick = () => { topPanelOpen = !topPanelOpen; refreshTopPanel(); };
   // Switching to/from the Analyse tab isn't reported to this module: watch it.
   const tabObserver = new MutationObserver(refreshTopPanel);
   document.querySelectorAll(".view").forEach((v) => tabObserver.observe(v, { attributes: true, attributeFilter: ["class"] }));
   refreshTopPanel();
-  els.correctionBtn.onclick = () => {
-    const panel = document.getElementById("fullgameResults").closest("details");
-    if (panel) panel.open = true;
-    const card = document.querySelector(".coach-error-block");
-    if (card) card.scrollIntoView({ block: "center", behavior: "smooth" });
-  };
-
   let lastHelpSpeech = "";
   els.helpBtn.onclick = async () => {
     // Stepping through a suggested line: help is about the real position, so
@@ -938,25 +885,26 @@ function updateBoardPromotion() {
   refreshTopPanel();
 }
 
+let gameOverSeen = false;
 function refreshGameOverActions() {
-  const box = els.gameOverActions;
-  if (!box) return;
-  const show = vsComputerMode && vsComputerGameOver;
-  const justEnded = show && box.hidden;
-  box.hidden = !show;
-  if (justEnded || !show) reviewStarted = false;
-  if (justEnded) {
+  // "Analyse complète de la partie" (and the "Écouter la partie" shortcut) are
+  // for reviewing FINISHED games only, saved or not: while a game against the
+  // computer is being played they are out of reach (CSS on body.game-live).
+  const live = vsComputerMode && !vsComputerGameOver;
+  document.body.classList.toggle("game-live", live);
+  const fullGame = document.getElementById("fullGameSection");
+  if (live && fullGame && fullGame.open) fullGame.open = false; // else the other panels stay hidden by the accordion
+  const over = vsComputerMode && vsComputerGameOver;
+  document.body.classList.toggle("game-over-mobile", over);
+  if (over && !gameOverSeen) {
     els.engineStatus.textContent = "Partie terminée.";
-    els.reviewBtn.disabled = false;
-    els.reviewBtn.textContent = "Revoir";
-    els.correctionBtn.disabled = true;
-    els.gameVoiceBtn.disabled = true;
-    els.gameVoiceBtn.textContent = "🔊";
     els.engineOutput.textContent = "";
-    // Panel holding the buttons opens by itself (it's closed by default).
-    const engineSection = document.querySelector(".side-section-engine");
-    if (engineSection) engineSection.open = true;
+    // "Analyse complète" then estimates the level of the human player.
+    const sideSelect = document.getElementById("playerSideSelect");
+    if (sideSelect && computerSide) sideSelect.value = computerSide === "w" ? "b" : "w";
   }
+  if (over !== gameOverSeen) reviewStarted = false;
+  gameOverSeen = over;
 }
 MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 
@@ -1333,9 +1281,8 @@ function requestEval() {
   const fenAtRequest = chess.fen();
   // The position changed: the evaluation on screen belongs to the previous
   // one, so it goes now instead of lingering until the new result arrives
-  // (the review buttons' level estimate is left alone).
-  const reviewingFinishedGame = els.gameOverActions && !els.gameOverActions.hidden;
-  if (!reviewingFinishedGame && els.engineOutput.textContent) {
+  //.
+  if (els.engineOutput.textContent) {
     els.engineOutput.textContent = "";
     els.engineStatus.textContent = "Analyse en cours…";
   }
