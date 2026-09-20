@@ -25,20 +25,32 @@ let running = false;
 // this exact game yet.
 let analyzedSig = null;   // moves of the game the results on screen belong to
 let wantVoice = false;    // start reading as soon as the running analysis ends
-let coachPlaying = false;
+// Coach voice state: "idle" (nothing read), "playing", or "paused". A click on
+// the voice button while it reads = pause; the board can then be moved freely
+// (◀ ▶ ...), and "Reprendre" carries on from the move now on the board.
+let coachState = "idle";
+let coachNavigated = false; // the board was moved by the user during the pause
 let voiceProgress = "";
 
 // The voice moves the board itself (onItemStart below): those moves are marked,
-// so a position change made by the USER while it talks can be told apart —
-// that one stops the voice (see stopCoachIfPlaying) instead of letting it go
-// on and drag the board back to where its commentary had got to.
+// so a position change made by the USER while it talks can be told apart. A
+// user move of the board while the voice reads simply pauses it (see
+// coachUserNavigated); loading another game etc. stops it (stopCoachIfPlaying).
 let coachDriving = false;
 export function isCoachDriving() { return coachDriving; }
 export function stopCoachIfPlaying() {
-  if (!coachPlaying) return;
+  if (coachState === "idle") return;
   const stopBtn = document.getElementById("coachStopBtn");
   if (stopBtn && !stopBtn.hidden) stopBtn.click();
-  else { stopSpeech(); setCoachPlaying(false); }
+  else { stopSpeech(); setCoachState("idle"); }
+}
+export function coachUserNavigated() {
+  if (coachState === "idle") return;
+  if (coachState === "playing") {
+    const pauseBtn = document.getElementById("coachPauseBtn");
+    if (pauseBtn && !pauseBtn.hidden) pauseBtn.click();
+  }
+  coachNavigated = true;
 }
 
 function gameSig() {
@@ -48,20 +60,24 @@ function gameSig() {
 
 function refreshVoiceBtn() {
   if (!els.voiceBtn) return;
-  els.voiceBtn.textContent = coachPlaying ? "⏹ Arrêter la voix" : voiceProgress ? voiceProgress : "🔊 Écouter la partie";
+  els.voiceBtn.textContent = coachState === "playing" ? "⏸ Pause"
+    : coachState === "paused" ? "▶ Reprendre"
+    : voiceProgress ? voiceProgress : "🔊 Écouter la partie";
 }
 
-function setCoachPlaying(v) {
-  coachPlaying = v;
+function setCoachState(state) {
+  coachState = state;
+  if (state !== "paused") coachNavigated = false;
   refreshVoiceBtn();
-  if (ctx.onCoachState) ctx.onCoachState(v);
+  if (ctx.onCoachState) ctx.onCoachState(state);
 }
 
 function toggleCoachVoice() {
-  const stopBtn = document.getElementById("coachStopBtn");
-  if (stopBtn && !stopBtn.hidden) { stopBtn.click(); return; }
-  if (running) { wantVoice = true; return; }
+  const pauseBtn = document.getElementById("coachPauseBtn");
   const playBtn = document.getElementById("coachPlayBtn");
+  if (coachState === "playing") { if (pauseBtn) pauseBtn.click(); return; }
+  if (coachState === "paused") { if (playBtn) playBtn.click(); return; }
+  if (running) { wantVoice = true; return; }
   if (playBtn && analyzedSig !== null && analyzedSig === gameSig()) { playBtn.click(); return; }
   wantVoice = true;
   runAnalysis();
@@ -107,7 +123,7 @@ async function runAnalysis() {
   els.results.innerHTML = "";
   analyzedSig = null;
   stopSpeech();
-  setCoachPlaying(false);
+  setCoachState("idle");
   ctx.setBusy(true);
   if (!ctx.isEngineEnabled()) ctx.enableEngine();
 
@@ -347,51 +363,65 @@ function wireCoachControls(reports) {
   const playBtn = document.getElementById("coachPlayBtn");
   const pauseBtn = document.getElementById("coachPauseBtn");
   const stopBtn = document.getElementById("coachStopBtn");
-  let playing = false;
+  let playing = false; // a reading is under way (playing OR paused)
+
+  const items = reports.map((report) => {
+    const numWord = report.color === "w" ? `Coup ${report.moveNumber}, les Blancs jouent` : `Coup ${report.moveNumber}, les Noirs jouent`;
+    let text = `${numWord} ${sanSpoken(report.san)}. ${report.explanation}`;
+    if (hasBetterMove(report)) text += " Il y avait un meilleur coup ici. Touche l'ampoule pour le voir.";
+    return { text };
+  });
+  const callbacks = {
+    // The board follows the move being commented: on the position BEFORE
+    // it when a better move existed (so the ampoule can show that move),
+    // otherwise on the position after it.
+    onItemStart: (i) => {
+      const report = reports[i];
+      if (!report || !ctx.goToPly) return;
+      coachDriving = true;
+      try { ctx.goToPly(hasBetterMove(report) ? report.ply : report.ply + 1); } finally { coachDriving = false; }
+    },
+    onComplete: () => {
+      playing = false;
+      setCoachState("idle");
+      playBtn.hidden = false;
+      playBtn.textContent = "🔊 Coach vocal";
+      pauseBtn.hidden = true;
+      stopBtn.hidden = true;
+    },
+  };
+  // First move not yet shown on the board: where a reading carries on after
+  // the user has moved the board during the pause.
+  const indexFromBoard = () => {
+    const at = ctx.getCurrentPly ? ctx.getCurrentPly() : 0;
+    const i = reports.findIndex((r) => r.ply >= at);
+    return i < 0 ? reports.length - 1 : i;
+  };
 
   playBtn.addEventListener("click", () => {
     if (playing) {
-      // resume from pause
-      resumeSequence();
+      // Resume after a pause: from where the reading stopped, or — if the
+      // board was moved meanwhile — from the move now on the board.
       playBtn.hidden = true;
       pauseBtn.hidden = false;
       stopBtn.hidden = false;
+      const restart = coachNavigated;
+      setCoachState("playing");
+      if (restart) playSequence(items, callbacks, indexFromBoard());
+      else resumeSequence();
       return;
     }
     playing = true;
-    setCoachPlaying(true);
+    setCoachState("playing");
     playBtn.hidden = true;
     pauseBtn.hidden = false;
     stopBtn.hidden = false;
-    const items = reports.map((report) => {
-      const numWord = report.color === "w" ? `Coup ${report.moveNumber}, les Blancs jouent` : `Coup ${report.moveNumber}, les Noirs jouent`;
-      let text = `${numWord} ${sanSpoken(report.san)}. ${report.explanation}`;
-      if (hasBetterMove(report)) text += " Il y avait un meilleur coup ici. Touche l'ampoule pour le voir.";
-      return { text };
-    });
-    playSequence(items, {
-      // The board follows the move being commented: on the position BEFORE
-      // it when a better move existed (so the ampoule can show that move),
-      // otherwise on the position after it.
-      onItemStart: (i) => {
-        const report = reports[i];
-        if (!report || !ctx.goToPly) return;
-        coachDriving = true;
-        try { ctx.goToPly(hasBetterMove(report) ? report.ply : report.ply + 1); } finally { coachDriving = false; }
-      },
-      onComplete: () => {
-        playing = false;
-        setCoachPlaying(false);
-        playBtn.hidden = false;
-        playBtn.textContent = "🔊 Coach vocal";
-        pauseBtn.hidden = true;
-        stopBtn.hidden = true;
-      },
-    });
+    playSequence(items, callbacks);
   });
 
   pauseBtn.addEventListener("click", () => {
     pauseSequence();
+    setCoachState("paused");
     pauseBtn.hidden = true;
     playBtn.hidden = false;
     playBtn.textContent = "▶ Reprendre";
@@ -400,7 +430,7 @@ function wireCoachControls(reports) {
   stopBtn.addEventListener("click", () => {
     stopSpeech();
     playing = false;
-    setCoachPlaying(false);
+    setCoachState("idle");
     playBtn.hidden = false;
     playBtn.textContent = "🔊 Coach vocal";
     pauseBtn.hidden = true;

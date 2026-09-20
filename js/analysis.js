@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying } from "./gameAnalysis.js";
+import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -90,9 +90,10 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
 
 export function goToPly(n) {
   // A jump made by the user (◀ ▶, a move in the list, a correction card…)
-  // while the coach voice is reading the game: the voice stops, so it can't
-  // carry on and pull the board back to its own position later.
-  if (!isCoachDriving()) stopCoachIfPlaying();
+  // while the coach voice is reading: the voice pauses, so it can't pull the
+  // board back to its own position; "Reprendre" then carries on from the move
+  // now on the board.
+  if (!isCoachDriving()) coachUserNavigated();
   clearVariation();
   // Reviewing a finished game: the "X gagne." banner sits over the board and
   // gets in the way — it goes away as soon as the user starts navigating.
@@ -518,8 +519,9 @@ export function initAnalysisView() {
         els.reviewBtn.textContent = `Analyse ${i}/${total}`;
       }
     },
-    onCoachState: (playing) => {
-      if (els.gameVoiceBtn) els.gameVoiceBtn.textContent = playing ? "⏹" : "🔊";
+    getCurrentPly: () => currentPly,
+    onCoachState: (state) => {
+      if (els.gameVoiceBtn) els.gameVoiceBtn.textContent = state === "playing" ? "⏸" : state === "paused" ? "▶" : "🔊";
     },
     onAnalysisDone: (ok, info) => {
       if (els.reviewBtn) { els.reviewBtn.disabled = false; els.reviewBtn.textContent = "Revoir"; }
@@ -563,10 +565,10 @@ export function initAnalysisView() {
   els.gameVoiceBtn = document.getElementById("gameVoiceBtn");
   els.gameVoiceBtn.hidden = !isVoiceSupported();
   els.gameVoiceBtn.onclick = () => {
-    const stop = document.getElementById("coachStopBtn");
+    const pause = document.getElementById("coachPauseBtn");
     const play = document.getElementById("coachPlayBtn");
-    if (stop && !stop.hidden) stop.click();
-    else if (play) play.click();
+    if (pause && !pause.hidden) pause.click(); // reading → pause
+    else if (play) play.click();               // idle → read, paused → resume
   };
   const topPanelToggle = document.getElementById("topPanelToggle");
   if (topPanelToggle) topPanelToggle.onclick = () => { topPanelOpen = !topPanelOpen; refreshTopPanel(); };

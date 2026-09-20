@@ -37,7 +37,13 @@ export function isPaused() {
   return paused;
 }
 
+// Each reading gets a number: the "end"/"error" event of an utterance that was
+// cut short (stop, pause, restart) fires late, and must not push a NEWER
+// reading forward by one item.
+let seqId = 0;
+
 export function stop() {
+  seqId++;
   queue = [];
   queueIndex = 0;
   paused = false;
@@ -64,10 +70,10 @@ export function speakOne(text, onEnd) {
 
 // Play a sequence of { text, onStart } items back to back.
 // callbacks: { onItemStart(index), onComplete() }
-export function playSequence(items, callbacks = {}) {
+export function playSequence(items, callbacks = {}, startIndex = 0) {
   stop();
   queue = items;
-  queueIndex = 0;
+  queueIndex = Math.max(0, Math.min(items.length, startIndex));
   queueCallbacks = callbacks;
   paused = false;
   playNext();
@@ -81,7 +87,10 @@ function playNext() {
   }
   const item = queue[queueIndex];
   if (queueCallbacks.onItemStart) queueCallbacks.onItemStart(queueIndex);
+  const id = seqId;
   speakOne(item.text, () => {
+    // Cut short by stop / pause / a new reading: don't move on.
+    if (id !== seqId || paused) return;
     queueIndex++;
     playNext();
   });

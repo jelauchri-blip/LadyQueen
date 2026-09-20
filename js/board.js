@@ -221,7 +221,21 @@ export function createBoard(mountEl, chess, opts = {}) {
       clone.style.transform = `translate(${dx}px, ${dy}px)`;
     });
 
-    setTimeout(() => { clone.remove(); onDone(); }, duration + 20);
+    const timer = setTimeout(() => { clone.remove(); onDone(); }, duration + 20);
+    return { clone, timer };
+  }
+
+  // Slide started by setChess (navigation), kept so a NEWER navigation can
+  // cancel it. Without that, quick clicks left the earlier slide's final redraw
+  // to run last and put an older move's highlight on the board.
+  let navSlide = null;
+  function cancelNavSlide() {
+    if (!navSlide) return false;
+    clearTimeout(navSlide.timer);
+    navSlide.clone.remove();
+    navSlide = null;
+    state.animating = false;
+    return true;
   }
 
   function attemptMove(from, to) {
@@ -268,14 +282,18 @@ export function createBoard(mountEl, chess, opts = {}) {
     // not the one that moved, and the fake slide shows a capture of a piece
     // the user never saw arrive (see goToPly in analysis.js).
     setChess(newChess, lastMove, opts) {
-      const animate = !(opts && opts.animate === false);
+      // A slide still in flight means the drawn board is NOT the position just
+      // before this move: cancel it and redraw directly, no new slide.
+      const interrupted = cancelNavSlide();
+      const animate = !(opts && opts.animate === false) && !interrupted;
       // The previous position's hint goes now; a hint set right AFTER this call
       // (correction card: goToPly then showHint) must survive the slide's
       // final redraw instead of being wiped by it.
       state.hintMove = null;
       if (animate && lastMove && lastMove.from && lastMove.to && !state.animating) {
         state.animating = true;
-        animatePieceSlide(lastMove.from, lastMove.to, () => {
+        navSlide = animatePieceSlide(lastMove.from, lastMove.to, () => {
+          navSlide = null;
           state.animating = false;
           state.chess = newChess;
           clearSelection();
