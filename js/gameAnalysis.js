@@ -565,6 +565,10 @@ function renderErrorCoach(reports) {
     const playedText = describeMove(m.fenBefore, m.playedUci) || sanFr(m.san);
     const bestText = describeMove(m.fenBefore, m.bestMoveUci) || bestSan;
 
+    // The legend explains "E n / total" with the very numbers on this card.
+    const legendItem = document.getElementById("legendErrorItem");
+    if (legendItem) legendItem.innerHTML = `<b>E ${index + 1} / ${mistakes.length}</b> : erreur n° ${index + 1} sur ${mistakes.length} repérées dans cette partie.`;
+
     body.innerHTML = `
       <div class="coach-error-head">
         <span class="coach-error-counter" title="Erreur ${index + 1} sur ${mistakes.length}">E<span class="err-word">rreur</span> ${index + 1} / ${mistakes.length}</span>
