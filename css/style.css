@@ -995,6 +995,7 @@ body.game-finished .side-section-engine { display: none; }
 .movelist .mv-pair { cursor: default; }
 .movelist .mv-pair span.mv-clickable { cursor: pointer; padding: 1px 4px; border-radius: 3px; }
 .movelist .mv-pair span.mv-clickable:hover { background: rgba(201,162,39,0.15); color: var(--ink); }
+.movelist .mv-pair span.mv-clickable.mv-alt { color: var(--brass-soft); font-style: italic; }
 .movelist .mv-pair span.mv-clickable.current { background: var(--brass); color: #201A08; font-weight: 700; }
 
 /* ---------- POSITION EDITOR ---------- */
@@ -1252,3 +1253,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* Alternative line: the bar under the navigation buttons. */
+.alt-line-bar {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  font-size: 12.5px; color: var(--brass-soft);
+}
+.alt-line-bar[hidden] { display: none; }
+.alt-line-bar .btn-ghost { font-size: 12px; padding: 4px 10px; }

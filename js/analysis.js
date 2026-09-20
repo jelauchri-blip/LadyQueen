@@ -58,6 +58,10 @@ let vsComputerGameOver = false;
 // signal = résultat de analyseSignal() pour la position `fen` ; `consumed`
 // passe à true quand l'utilisateur touche l'ampoule (elle redevient neutre).
 let signal = null;
+// Alternative line (a "partie alternative"): when a move that is NOT the one of
+// the game being reviewed is played, the original game is kept here and the
+// board carries on with the new moves; "↩ Revenir à la partie" brings it back.
+let mainLine = null; // { fens, moves, branchPly } | null
 // variation = suite de coups proposée qu'on peut parcourir sur le plateau :
 // { fen, line, step, started, kind, label }. `started` false = simple offre
 // "Voir les coups", true = on parcourt la suite.
@@ -66,6 +70,7 @@ let variation = null;
 function startHistoryAt(fen) {
   stopCoachIfPlaying();
   clearVariation();
+  clearAltLine();
   plyFens = [fen];
   plyMoves = [];
   currentPly = 0;
@@ -76,6 +81,7 @@ function startHistoryAt(fen) {
 function rebuildHistoryFromChessObject(chessWithHistory) {
   stopCoachIfPlaying();
   clearVariation();
+  clearAltLine();
   const hist = chessWithHistory.history({ verbose: true });
   plyFens = [hist.length ? hist[0].before : chessWithHistory.fen()];
   plyMoves = [];
@@ -88,7 +94,7 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
   if (els.fullgameResults) els.fullgameResults.innerHTML = "";
 }
 
-export function goToPly(n) {
+export function goToPly(n, opts = {}) {
   // A jump made by the user (◀ ▶, a move in the list, a correction card…)
   // while the coach voice is reading: the voice pauses, so it can't pull the
   // board back to its own position; "Reprendre" then carries on from the move
@@ -105,7 +111,7 @@ export function goToPly(n) {
   // Slide the piece only for a single step forward: from any other starting
   // point (a jump to an error card, ⏮ ⏭, a click in the list, one step back)
   // the drawn board isn't the position just before that move.
-  board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null, { animate: currentPly === previousPly + 1 });
+  board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null, { animate: opts.animate !== undefined ? opts.animate : currentPly === previousPly + 1 });
   updateMoveList();
   updateNavButtons();
   els.moveExplanation.hidden = true;
@@ -120,7 +126,9 @@ export function goToPly(n) {
   // is otherwise allowed). Now that lock only applies to the actual final
   // position itself, where there's nothing to explore anyway (already mate).
   const atLatest = currentPly === plyFens.length - 1;
-  if (vsComputerGameOver && atLatest) {
+  if (mainLine) {
+    board.setInteractive(true); // exploring an alternative line: always free
+  } else if (vsComputerGameOver && atLatest) {
     board.setInteractive(false);
   } else if (vsComputerMode && challengeMode) {
     board.setInteractive(atLatest);
@@ -505,12 +513,12 @@ export function initAnalysisView() {
 
   initFullGameAnalysis({
     getChess: () => chess,
-    getPlies: () => plyMoves,
+    getPlies: () => (mainLine ? mainLine.moves : plyMoves),
     evaluateFen,
     isEngineEnabled: () => engineEnabled,
     enableEngine: () => { engineEnabled = true; els.engineToggle.checked = true; ensureEngine(); },
     setBusy: (v) => { busy = v; },
-    goToPly,
+    goToPly: goToMainPly,
     showHint: (from, to) => board.setHintMove({ from, to }),
     // Reviewing a game just finished against the computer through "Analyse
     // complète": the settings window steps aside (▾ brings it back).
@@ -522,9 +530,11 @@ export function initAnalysisView() {
         refreshTopPanel();
       }
     },
-    getCurrentPly: () => currentPly,
+    getCurrentPly: () => (mainLine ? Math.min(currentPly, mainLine.branchPly) : currentPly),
   });
 
+  const altLineBackBtn = document.getElementById("altLineBackBtn");
+  if (altLineBackBtn) altLineBackBtn.onclick = () => backToMainLine();
   const topPanelToggle = document.getElementById("topPanelToggle");
   if (topPanelToggle) topPanelToggle.onclick = () => { topPanelOpen = !topPanelOpen; refreshTopPanel(); };
   // Switching to/from the Analyse tab isn't reported to this module: watch it.
@@ -730,20 +740,57 @@ function hideResultBanner() {
   if (els.gameResultBanner) els.gameResultBanner.hidden = true;
 }
 
+// --- Alternative line -------------------------------------------------------
+function altLineText() {
+  const n = Math.floor(mainLine.branchPly / 2) + 1;
+  return `Variante depuis le coup ${n}${mainLine.branchPly % 2 === 0 ? "." : "…"}`;
+}
+
+function refreshAltLineBar() {
+  const bar = document.getElementById("altLineBar");
+  if (!bar) return;
+  bar.hidden = !mainLine;
+  if (mainLine) document.getElementById("altLineText").textContent = altLineText();
+}
+
+function clearAltLine() {
+  mainLine = null;
+  refreshAltLineBar();
+}
+
+// Puts the original game back (at `ply`, by default where the line was left).
+function backToMainLine(ply) {
+  if (!mainLine) return;
+  const at = ply === undefined ? mainLine.branchPly : ply;
+  plyFens = mainLine.fens;
+  plyMoves = mainLine.moves;
+  clearAltLine();
+  goToPly(at, { animate: false });
+}
+
+// "Analyse complète" and its correction cards are about the ORIGINAL game: they
+// bring it back before moving the board.
+function goToMainPly(n) {
+  if (mainLine) backToMainLine(n);
+  else goToPly(n);
+}
+
 // Shared bookkeeping for any move (human or computer): updates history, UI, live coach.
 function recordMove(fenBefore, moveResult, opts = {}) {
-  // Branching off a game that had already ended (rewound to an earlier ply
-  // in Coach mode, then played a different move here): that old ending no
-  // longer applies to this new line, so un-freeze the game instead of
-  // leaving vsComputerGameOver stuck true — which would otherwise silently
-  // re-lock the board again the moment this new position was navigated back
-  // to, and stop the computer from ever replying to the new line at all
-  // (maybeTriggerComputerMove bails out whenever vsComputerGameOver is true).
-  if (vsComputerMode && vsComputerGameOver) {
-    vsComputerGameOver = false;
-    hideResultBanner();
-    if (els.resignBtn) els.resignBtn.hidden = false;
-    if (els.vsComputerSetup) els.vsComputerSetup.hidden = true;
+  // Reviewing a game (loaded, saved, or finished): a move played from an
+  // earlier position either IS the game's own next move — then we simply
+  // follow the game — or it starts an alternative line, the original being kept.
+  const liveGame = vsComputerMode && !vsComputerGameOver;
+  if (!liveGame && currentPly < plyFens.length - 1) {
+    const next = plyMoves[currentPly];
+    if (next && next.from === moveResult.from && next.to === moveResult.to && (next.promotion || "") === (moveResult.promotion || "")) {
+      goToPly(currentPly + 1, { animate: false }); // the board has already shown it
+      return;
+    }
+    // A finished game against the computer is explored as a free analysis:
+    // the computer does not answer in an alternative line.
+    if (vsComputerMode) deactivateComputerMode();
+    if (!mainLine) mainLine = { fens: plyFens.slice(), moves: plyMoves.slice(), branchPly: currentPly };
   }
   stopCoachIfPlaying(); // a move played on the board ends the reading
   plyFens = plyFens.slice(0, currentPly + 1);
@@ -751,6 +798,7 @@ function recordMove(fenBefore, moveResult, opts = {}) {
   plyMoves.push(moveResult);
   plyFens.push(moveResult.after);
   currentPly = plyFens.length - 1;
+  refreshAltLineBar();
   updateMoveList();
   updateNavButtons();
   els.moveExplanation.hidden = true;
@@ -1111,14 +1159,14 @@ function updateMoveList() {
     const whiteMove = plyMoves[i];
     const blackMove = plyMoves[i + 1];
     const whiteSpan = document.createElement("span");
-    whiteSpan.className = "mv-clickable" + (currentPly === i + 1 ? " current" : "");
+    whiteSpan.className = "mv-clickable" + (currentPly === i + 1 ? " current" : "") + (mainLine && i >= mainLine.branchPly ? " mv-alt" : "");
     whiteSpan.textContent = sanFr(whiteMove.san);
     whiteSpan.addEventListener("click", () => goToPly(i + 1));
     li.appendChild(whiteSpan);
     if (blackMove) {
       li.appendChild(document.createTextNode("  "));
       const blackSpan = document.createElement("span");
-      blackSpan.className = "mv-clickable" + (currentPly === i + 2 ? " current" : "");
+      blackSpan.className = "mv-clickable" + (currentPly === i + 2 ? " current" : "") + (mainLine && i + 1 >= mainLine.branchPly ? " mv-alt" : "");
       blackSpan.textContent = sanFr(blackMove.san);
       blackSpan.addEventListener("click", () => goToPly(i + 2));
       li.appendChild(blackSpan);
