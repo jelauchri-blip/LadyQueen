@@ -1058,8 +1058,9 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
 .coach-btn { font-size: 10px; padding: 3px 7px; white-space: nowrap; }
 /* ---------- ERROR COACH ---------- */
 .coach-error-block { border: 1px solid var(--brass); }
-.coach-error-counter { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brass-soft); margin-bottom: 8px; }
-.coach-error-move { font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.coach-error-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 10px; }
+.coach-error-counter { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brass-soft); white-space: nowrap; }
+.coach-error-move { font-size: 16px; display: flex; align-items: center; gap: 6px; }
 .coach-error-move .mv-san { font-weight: 700; color: var(--ink); }
 .coach-error-explain { font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); margin: 0 0 8px; }
 .coach-error-best { font-size: 13.5px; color: var(--ink-dim); margin: 0 0 14px; }
@@ -1291,4 +1292,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 @media (max-width: 760px) {
   .coach-btn .coach-label { display: none; }
   .coach-bar .coach-btn { padding: 4px 8px; }
+  .coach-error-counter .err-word { display: none; } /* "E 1 / 12" */
+  /* Level row: one line even while the voice reads (play/pause + stop + i + redo + fold). */
+  .coach-title-row { flex-wrap: nowrap; }
+  .coach-title-row .info-icon-btn { flex: none; }
+  .coach-reading .fullgame-redo-btn { display: none; }
 }

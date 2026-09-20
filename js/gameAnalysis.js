@@ -23,6 +23,13 @@ let running = false;
 // Signature of the game the analysis on screen belongs to (null = none).
 let analyzedSig = null;
 
+// Green "correction" move of each error/blunder of the analysed game, by the
+// ply of the position BEFORE the bad move: shown whenever the board lands there.
+const correctionHints = new Map();
+export function correctionHintAt(ply) {
+  return correctionHints.get(ply) || null;
+}
+
 // Engine results already worked out during this session, by game signature —
 // and, for games of the library, kept with the game itself (gameLibrary.js).
 const sessionAnalyses = new Map();
@@ -56,6 +63,7 @@ export function coachUserNavigated() {
 
 function setCoachState(state) {
   coachState = state;
+  if (els.results) els.results.classList.toggle("coach-reading", state !== "idle");
   if (state !== "paused") coachNavigated = false;
   if (ctx.onCoachState) ctx.onCoachState(state);
 }
@@ -80,6 +88,7 @@ export function refreshAnalysisButton() {
 // A new game / position replaces the analysis on screen.
 export function resetAnalysis() {
   analyzedSig = null;
+  correctionHints.clear();
   refreshAnalysisButton();
 }
 
@@ -355,11 +364,19 @@ function renderMoveList(reports) {
     coachBar.className = "coach-bar";
     coachBar.innerHTML = `
       <button class="btn-ghost coach-btn" id="coachPlayBtn" title="Coach vocal">🔊<span class="coach-label"> Coach vocal</span></button>
-      <button class="btn-ghost coach-btn" id="coachPauseBtn" hidden>⏸ Pause</button>
-      <button class="btn-ghost coach-btn" id="coachStopBtn" hidden>⏹ Arrêter</button>
+      <button class="btn-ghost coach-btn" id="coachPauseBtn" title="Pause" aria-label="Pause" hidden>⏸<span class="coach-label"> Pause</span></button>
+      <button class="btn-ghost coach-btn" id="coachStopBtn" title="Arrêter" aria-label="Arrêter" hidden>⏹<span class="coach-label"> Arrêter</span></button>
     `;
     titleRow.appendChild(coachBar);
   }
+  // "How to read the moves" legend, in the free space right of the levels.
+  const legendBtn = document.createElement("button");
+  legendBtn.type = "button";
+  legendBtn.className = "info-icon-btn legend-info-btn";
+  legendBtn.title = "Comment lire les coups";
+  legendBtn.setAttribute("aria-label", "Comment lire les coups");
+  legendBtn.textContent = "i";
+  titleRow.appendChild(legendBtn);
   const tools = document.createElement("span");
   tools.className = "fullgame-tools";
   tools.innerHTML = '<button type="button" class="btn-ghost fullgame-redo-btn" title="Refaire l\'analyse depuis le début" aria-label="Refaire l\'analyse">↻</button>'
@@ -526,6 +543,12 @@ function renderErrorCoach(reports) {
     return;
   }
 
+  correctionHints.clear();
+  for (const r of mistakes) {
+    if (r.bestMoveUci) correctionHints.set(r.ply, { from: r.bestMoveUci.slice(0, 2), to: r.bestMoveUci.slice(2, 4) });
+  }
+  if (ctx.refreshHint) ctx.refreshHint(); // the board may already be on one of these positions
+
   let index = 0;
   const body = document.createElement("div");
   wrap.appendChild(body);
@@ -543,10 +566,12 @@ function renderErrorCoach(reports) {
     const bestText = describeMove(m.fenBefore, m.bestMoveUci) || bestSan;
 
     body.innerHTML = `
-      <div class="coach-error-counter">Erreur ${index + 1} / ${mistakes.length} <button type="button" class="info-icon-btn legend-info-btn" aria-label="Comment lire les coups" title="Comment lire les coups">i</button></div>
-      <div class="coach-error-move">
-        <span class="mv-symbol sym-${m.classification.key}">${m.classification.symbol}</span>
-        Coup ${m.moveNumber} — ${sideLabel} : <span class="mv-san">${playedText}</span>
+      <div class="coach-error-head">
+        <span class="coach-error-counter" title="Erreur ${index + 1} sur ${mistakes.length}">E<span class="err-word">rreur</span> ${index + 1} / ${mistakes.length}</span>
+        <span class="coach-error-move">
+          <span class="mv-symbol sym-${m.classification.key}">${m.classification.symbol}</span>
+          Coup ${m.moveNumber} — ${sideLabel} : <span class="mv-san">${playedText}</span>
+        </span>
       </div>
       ${bestText ? `<p class="coach-error-best">Mieux : <span class="best-move">${bestText}</span></p>` : ""}
       ${bestSan ? `<p class="coach-error-why" id="errWhyText" hidden></p>` : ""}

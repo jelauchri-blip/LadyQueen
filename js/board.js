@@ -290,6 +290,9 @@ export function createBoard(mountEl, chess, opts = {}) {
       // (correction card: goToPly then showHint) must survive the slide's
       // final redraw instead of being wiped by it.
       state.hintMove = null;
+      // opts.hint: the suggested move of THIS position (green squares); it
+      // appears together with the position, after the slide when there is one.
+      const hint = (opts && opts.hint) || null;
       if (animate && lastMove && lastMove.from && lastMove.to && !state.animating) {
         state.animating = true;
         navSlide = animatePieceSlide(lastMove.from, lastMove.to, () => {
@@ -298,13 +301,14 @@ export function createBoard(mountEl, chess, opts = {}) {
           state.chess = newChess;
           clearSelection();
           state.lastMove = lastMove;
+          state.hintMove = hint;
           render();
         });
       } else {
         state.chess = newChess;
         clearSelection();
         state.lastMove = lastMove || null;
-        state.hintMove = null;
+        state.hintMove = hint;
         render();
       }
     },

@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated, refreshAnalysisButton, resetAnalysis } from "./gameAnalysis.js";
+import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated, refreshAnalysisButton, resetAnalysis, correctionHintAt } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -96,6 +96,13 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
   resetAnalysis();
 }
 
+// The green move of the analysis' correction, when the board is on the position
+// where an error was made (never inside an alternative line, past its start).
+function correctionHint() {
+  if (mainLine && currentPly > mainLine.branchPly) return null;
+  return correctionHintAt(currentPly);
+}
+
 export function goToPly(n, opts = {}) {
   // A jump made by the user (◀ ▶, a move in the list, a correction card…)
   // while the coach voice is reading: the voice pauses, so it can't pull the
@@ -113,7 +120,7 @@ export function goToPly(n, opts = {}) {
   // Slide the piece only for a single step forward: from any other starting
   // point (a jump to an error card, ⏮ ⏭, a click in the list, one step back)
   // the drawn board isn't the position just before that move.
-  board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null, { animate: opts.animate !== undefined ? opts.animate : currentPly === previousPly + 1 });
+  board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null, { animate: opts.animate !== undefined ? opts.animate : currentPly === previousPly + 1, hint: correctionHint() });
   updateMoveList();
   updateNavButtons();
   els.moveExplanation.hidden = true;
@@ -522,6 +529,7 @@ export function initAnalysisView() {
     setBusy: (v) => { busy = v; },
     goToPly: goToMainPly,
     showHint: (from, to) => board.setHintMove({ from, to }),
+    refreshHint: () => { const h = correctionHint(); if (h) board.setHintMove(h); },
     // Reviewing a game just finished against the computer through "Analyse
     // complète": the settings window steps aside (▾ brings it back).
     onAnalysisProgress: () => {
