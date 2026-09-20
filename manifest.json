@@ -1,7 +1,9 @@
 {
-  "name": "Échiquier — Académie",
-  "short_name": "Échiquier",
-  "description": "Application pédagogique d'échecs : règles, tactique et analyse de positions.",
+  "id": "./",
+  "name": "LadyQueen — Échecs",
+  "short_name": "LadyQueen",
+  "description": "Apprends les échecs, joue contre l'ordinateur et analyse tes parties avec un coach vocal.",
+  "categories": ["games", "education"],
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

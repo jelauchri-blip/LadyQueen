@@ -7,8 +7,10 @@ import { getPieceStyle, setPieceStyle } from "./pieceStyle.js";
 import { isSoundEnabled, setSoundEnabled } from "./sounds.js";
 import { initLibraryView } from "./libraryView.js";
 import { initLayoutResize } from "./layoutResize.js";
+import { initAds } from "./ads.js";
 
 initLayoutResize();
+initAds(); // AdMob banner: Android app only, does nothing on the website
 
 const tabButtons = document.querySelectorAll(".tab-btn");
 const views = document.querySelectorAll(".view");
@@ -19,6 +21,7 @@ function showTab(name) {
   tabButtons.forEach(b => b.classList.toggle("active", b.dataset.tab === name));
   views.forEach(v => v.classList.toggle("active", v.id === "view-" + name));
   document.body.classList.toggle("wide-view", name === "analyse");
+  document.body.dataset.tab = name; // CSS: what is shown depends on the tab (see board-promoted-mobile)
   document.getElementById("views").scrollTop = 0;
   if (mobileTabSelect.value !== name) mobileTabSelect.value = name;
 
@@ -240,7 +243,8 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 
 // ---- Service worker registration ----
-if ("serviceWorker" in navigator) {
+// (Not in the Android app: its files are bundled, updates come with the app.)
+if ("serviceWorker" in navigator && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   });

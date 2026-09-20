@@ -49,6 +49,8 @@ html, body {
    dvh support; the dvh rule right after overrides it where available so
    mobile browser chrome doesn't clip the bottom. */
 html, body { height: 100%; overflow-y: hidden; }
+/* Android app: the AdMob banner covers the bottom strip; the page keeps it free. */
+body.has-ad-banner { padding-bottom: var(--ad-banner-h, 0px); box-sizing: border-box; }
 body {
   height: 100vh;
   height: 100dvh;
@@ -1170,6 +1172,10 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
      Revoir), and the clock — the only thing left in the settings window — is
      one slim line of two boxes, below the board. */
   body.challenge-playing .side-section-engine { display: none; }
+  /* A game under way puts its board up in the top window; on the other tabs
+     (Initiation, Puzzle, Bibliothèque) that board would sit on top of their
+     content — it only shows on Accueil and Analyse. */
+  body.board-promoted-mobile[data-tab]:not([data-tab="accueil"]):not([data-tab="analyse"]) .sidebar .analyse-board-col { display: none; }
   body.board-promoted-mobile .clock-row { margin-top: 0; }
   body.board-promoted-mobile .clock-box { flex-direction: row; justify-content: space-between; align-items: baseline; padding: 4px 10px; }
   body.board-promoted-mobile .clock-box .clock-time { font-size: 16px; }
