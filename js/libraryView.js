@@ -7,6 +7,7 @@ let onLoadGame = null;
 export function initLibraryView({ loadPgnIntoAnalysis }) {
   onLoadGame = loadPgnIntoAnalysis;
   els.list = document.getElementById("libraryList");
+  wireCommonActions();
   els.exportBtn = document.getElementById("exportDataBtn");
   els.importBtn = document.getElementById("importDataBtn");
   els.importInput = document.getElementById("importDataInput");
@@ -97,16 +98,43 @@ export function refreshLibraryView() {
   if (els.list) render();
 }
 
+// Phone: the rows are just selectable lines, and ONE pair of buttons
+// ("Ouvrir et analyser", 🗑) acts on the selected game — so the controls never
+// scroll away however many games there are. PC keeps buttons on every card.
+let selectedId = null;
+
+function wireCommonActions() {
+  els.actions = document.getElementById("libraryActions");
+  document.getElementById("libOpenSelectedBtn").addEventListener("click", () => {
+    const g = listGames().find((x) => x.id === selectedId);
+    if (g && onLoadGame) onLoadGame(g.pgn);
+  });
+  document.getElementById("libDeleteSelectedBtn").addEventListener("click", () => {
+    const g = listGames().find((x) => x.id === selectedId);
+    if (g && confirm(`Supprimer « ${g.label} » ?`)) {
+      deleteGame(g.id);
+      selectedId = null;
+      render();
+    }
+  });
+}
+
 function render() {
   const games = listGames();
+  if (els.actions) els.actions.hidden = games.length === 0;
   if (games.length === 0) {
     els.list.innerHTML = `<div class="phase-block"><p>Aucune partie enregistrée pour l'instant. Dans l'onglet Analyse, joue ou charge une partie puis clique sur « 💾 Enregistrer » pour la retrouver ici.</p></div>`;
     return;
   }
+  if (!games.some((g) => g.id === selectedId)) selectedId = games[0].id;
   els.list.innerHTML = "";
   for (const g of games) {
     const card = document.createElement("div");
-    card.className = "library-card";
+    card.className = "library-card" + (g.id === selectedId ? " selected" : "");
+    card.addEventListener("click", () => {
+      selectedId = g.id;
+      els.list.querySelectorAll(".library-card").forEach((c) => c.classList.toggle("selected", c === card));
+    });
     const date = new Date(g.savedAt);
     const dateStr = date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
     card.innerHTML = `

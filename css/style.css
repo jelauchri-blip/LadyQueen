@@ -1230,6 +1230,21 @@ body.layout-locked .move-grip {
 .library-card-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-dim); }
 .library-card-actions { display: flex; gap: 8px; align-items: center; }
 .lib-delete-btn { padding: 9px 12px; }
+/* The shared "Ouvrir et analyser" / 🗑 pair is for the phone only. */
+.library-actions { display: none; }
+@media (max-width: 760px) {
+  .library-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+  .library-actions[hidden] { display: none; }
+  .library-actions .btn-primary { flex: 1; }
+  /* One tight line per game (name · date · moves); a long library scrolls
+     inside its own box instead of pushing the controls off the screen. */
+  .library-list { gap: 6px; max-height: 46vh; overflow-y: auto; }
+  .library-card { padding: 9px 12px; flex-wrap: nowrap; cursor: pointer; }
+  .library-card-info { flex-direction: row; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+  .library-card-label { font-size: 15px; }
+  .library-card-actions { display: none; }
+  .library-card.selected { border-color: var(--brass); background: var(--bg-panel-raised); }
+}
 
 .backup-panel {
   margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-soft);
