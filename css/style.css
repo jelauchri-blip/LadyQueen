@@ -1049,6 +1049,10 @@ body.layout-locked .move-grip {
   background: var(--bg-panel); border-left: 3px solid var(--brass); border-radius: 6px;
   padding: 9px 11px; font-size: 12.5px; line-height: 1.4; color: var(--ink-dim); margin-bottom: 10px;
 }
+/* Live coach: the voice reads the comment, so the written box (same words) is
+   dropped — on phone and PC alike — unless this device has no voice. The "Aide"
+   explanation isn't marked live-coach and stays. */
+body:not(.no-voice) .move-explanation.live-coach { display: none; }
 .move-explanation .best-move { color: var(--brass-soft); font-family: var(--font-mono); font-weight: 600; }
 
 /* ---------- VOICE COACH ---------- */
@@ -1162,9 +1166,6 @@ body.layout-locked .move-grip {
      fits on screen. */
   body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-main-row,
   body:has(#gameOverActions:not([hidden])) .side-section-engine .engine-toggle-row { display: none; }
-  /* Live coach: the voice reads the comment, so the written box under the
-     panel (same words) is dropped — unless this device has no voice. */
-  body:not(.no-voice) .move-explanation.live-coach { display: none; }
   /* Nav row: slimmer buttons and pills so both pills always fit beside the
      centered ⏮◀▶⏭ group (a clipped pill beats a shifting button). */
   .board-actions-row { gap: 4px; padding: 0 4px; box-sizing: border-box; }
