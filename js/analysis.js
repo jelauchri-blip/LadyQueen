@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE } from "./gameAnalysis.js";
+import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -64,6 +64,7 @@ let signal = null;
 let variation = null;
 
 function startHistoryAt(fen) {
+  stopCoachIfPlaying();
   clearVariation();
   plyFens = [fen];
   plyMoves = [];
@@ -73,6 +74,7 @@ function startHistoryAt(fen) {
 }
 
 function rebuildHistoryFromChessObject(chessWithHistory) {
+  stopCoachIfPlaying();
   clearVariation();
   const hist = chessWithHistory.history({ verbose: true });
   plyFens = [hist.length ? hist[0].before : chessWithHistory.fen()];
@@ -87,6 +89,10 @@ function rebuildHistoryFromChessObject(chessWithHistory) {
 }
 
 export function goToPly(n) {
+  // A jump made by the user (◀ ▶, a move in the list, a correction card…)
+  // while the coach voice is reading the game: the voice stops, so it can't
+  // carry on and pull the board back to its own position later.
+  if (!isCoachDriving()) stopCoachIfPlaying();
   clearVariation();
   // Reviewing a finished game: the "X gagne." banner sits over the board and
   // gets in the way — it goes away as soon as the user starts navigating.
@@ -784,6 +790,7 @@ function recordMove(fenBefore, moveResult, opts = {}) {
     if (els.resignBtn) els.resignBtn.hidden = false;
     if (els.vsComputerSetup) els.vsComputerSetup.hidden = true;
   }
+  stopCoachIfPlaying(); // a move played on the board ends the reading
   plyFens = plyFens.slice(0, currentPly + 1);
   plyMoves = plyMoves.slice(0, currentPly);
   plyMoves.push(moveResult);

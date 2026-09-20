@@ -28,6 +28,19 @@ let wantVoice = false;    // start reading as soon as the running analysis ends
 let coachPlaying = false;
 let voiceProgress = "";
 
+// The voice moves the board itself (onItemStart below): those moves are marked,
+// so a position change made by the USER while it talks can be told apart —
+// that one stops the voice (see stopCoachIfPlaying) instead of letting it go
+// on and drag the board back to where its commentary had got to.
+let coachDriving = false;
+export function isCoachDriving() { return coachDriving; }
+export function stopCoachIfPlaying() {
+  if (!coachPlaying) return;
+  const stopBtn = document.getElementById("coachStopBtn");
+  if (stopBtn && !stopBtn.hidden) stopBtn.click();
+  else { stopSpeech(); setCoachPlaying(false); }
+}
+
 function gameSig() {
   const plies = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
   return plies.slice(0, 80).map((p) => p.san).join(" ");
@@ -363,7 +376,8 @@ function wireCoachControls(reports) {
       onItemStart: (i) => {
         const report = reports[i];
         if (!report || !ctx.goToPly) return;
-        ctx.goToPly(hasBetterMove(report) ? report.ply : report.ply + 1);
+        coachDriving = true;
+        try { ctx.goToPly(hasBetterMove(report) ? report.ply : report.ply + 1); } finally { coachDriving = false; }
       },
       onComplete: () => {
         playing = false;
