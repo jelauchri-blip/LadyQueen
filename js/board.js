@@ -262,15 +262,24 @@ export function createBoard(mountEl, chess, opts = {}) {
       state.hintMove = null;
       render();
     },
-    setChess(newChess, lastMove) {
-      if (lastMove && lastMove.from && lastMove.to && !state.animating) {
+    // opts.animate === false: redraw straight away, no sliding piece. The slide
+    // only makes sense when the board goes ONE move forward from what is
+    // currently drawn; after any bigger jump the piece at lastMove.from is
+    // not the one that moved, and the fake slide shows a capture of a piece
+    // the user never saw arrive (see goToPly in analysis.js).
+    setChess(newChess, lastMove, opts) {
+      const animate = !(opts && opts.animate === false);
+      // The previous position's hint goes now; a hint set right AFTER this call
+      // (correction card: goToPly then showHint) must survive the slide's
+      // final redraw instead of being wiped by it.
+      state.hintMove = null;
+      if (animate && lastMove && lastMove.from && lastMove.to && !state.animating) {
         state.animating = true;
         animatePieceSlide(lastMove.from, lastMove.to, () => {
           state.animating = false;
           state.chess = newChess;
           clearSelection();
           state.lastMove = lastMove;
-          state.hintMove = null;
           render();
         });
       } else {

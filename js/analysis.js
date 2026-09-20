@@ -97,10 +97,14 @@ export function goToPly(n) {
   // Reviewing a finished game: the "X gagne." banner sits over the board and
   // gets in the way — it goes away as soon as the user starts navigating.
   if (vsComputerGameOver) hideResultBanner();
+  const previousPly = currentPly;
   currentPly = Math.max(0, Math.min(plyFens.length - 1, n));
   chess.load(plyFens[currentPly]);
   const lastMove = currentPly > 0 ? plyMoves[currentPly - 1] : null;
-  board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null);
+  // Slide the piece only for a single step forward: from any other starting
+  // point (a jump to an error card, ⏮ ⏭, a click in the list, one step back)
+  // the drawn board isn't the position just before that move.
+  board.setChess(chess, lastMove ? { from: lastMove.from, to: lastMove.to } : null, { animate: currentPly === previousPly + 1 });
   updateMoveList();
   updateNavButtons();
   els.moveExplanation.hidden = true;
@@ -177,6 +181,7 @@ function openVariationOffer(sig) {
 
 function setVariationStep(n) {
   if (!variation || !variation.started) return;
+  const previousStep = variation.step;
   variation.step = Math.max(0, Math.min(variation.line.length, n));
   const c = new Chess(variation.fen);
   for (let i = 0; i < variation.step; i++) {
@@ -184,7 +189,7 @@ function setVariationStep(n) {
     c.move({ from: m.from, to: m.to, promotion: m.uci.slice(4) || undefined });
   }
   const last = variation.step > 0 ? variation.line[variation.step - 1] : null;
-  board.setChess(c, last ? { from: last.from, to: last.to } : null);
+  board.setChess(c, last ? { from: last.from, to: last.to } : null, { animate: variation.step === previousStep + 1 });
   board.setInteractive(false);
   // Light up the move to play next from this position.
   const next = variation.line[variation.step];
