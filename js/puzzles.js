@@ -16,6 +16,11 @@ let firstMoveSan = null; // the move the user actually played, to spot other val
 let recentIds = [];
 let activeThemeFilter = "all";
 let activeEloFilter = "all";
+// "Indice" is progressive: 1st press = text + the piece to move lit up, 2nd
+// press (same position) = its destination square too.
+let hintLevel = 0;
+let hintFen = null;
+let puzzleSolved = false;
 
 const els = {};
 
@@ -107,6 +112,9 @@ function loadPuzzle(puzzle) {
   currentPuzzle = puzzle;
   solverStep = 0;
   firstMoveSan = null;
+  hintLevel = 0;
+  hintFen = null;
+  puzzleSolved = false;
   const chess = new Chess(puzzle.fen);
   els.theme.textContent = `${puzzle.themeLabel} · ≈ ${puzzle.elo} Elo`;
   els.instruction.textContent = puzzle.instruction;
@@ -231,11 +239,14 @@ function handleMove(result, chessInst) {
       }, 500);
       return;
     }
+    // Lichess accepts any move that checkmates, even if it is not the stored one.
+    if (chessInst.isCheckmate()) return onSolved();
     return onWrong(chessInst, p.fen);
   }
 }
 
 function onSolved() {
+  puzzleSolved = true;
   els.status.textContent = "✓ Résolu !";
   els.status.className = "puzzle-status correct";
   els.explanation.hidden = false;
@@ -264,9 +275,33 @@ function onWrong(chessInst, fen) {
   }, 700);
 }
 
+// A move that solves the puzzle from the position now on the board, or null
+// (not the user's turn, or nothing found). Worked out from the position itself,
+// so a puzzle with several valid solutions still gets a correct suggestion.
+function hintMoveNow() {
+  const p = currentPuzzle;
+  if (!p || !board) return null;
+  const chess = board.chess;
+  if (chess.turn() !== new Chess(p.fen).turn()) return null; // the opponent is replying
+  if (p.theme === "lichess") {
+    const u = p.uciSolution && p.uciSolution[solverStep];
+    return u ? { from: u.slice(0, 2), to: u.slice(2, 4) } : null;
+  }
+  const after = (m) => { const c = new Chess(chess.fen()); c.move(m.san); return c; };
+  let pick = null;
+  for (const m of chess.moves({ verbose: true })) {
+    let ok = false;
+    if (p.theme === "mat1") ok = after(m).isCheckmate();
+    else if (p.theme === "mat2") ok = solverStep === 0 ? isForcedMateInTwo(after(m)) : after(m).isCheckmate();
+    else if (p.theme === "fourchette") ok = m.to === p.forkSquare && m.piece === "n";
+    if (ok) { pick = m; break; }
+  }
+  return pick ? { from: pick.from, to: pick.to } : null;
+}
+
 function showHint() {
   const p = currentPuzzle;
-  if (!p) return;
+  if (!p || puzzleSolved) return;
   let hint = "";
   if (p.theme === "mat1") {
     const pieceLetter = p.solution[0][0];
@@ -279,6 +314,13 @@ function showHint() {
   if (p.theme === "lichess") hint = "Indice : cherchez le coup qui crée la plus grande menace immédiate (gain de matériel ou mat).";
   els.explanation.hidden = false;
   els.explanation.textContent = hint;
+
+  // Light up the squares: the piece to move first, then where it goes.
+  const fen = board.chess.fen();
+  hintLevel = fen === hintFen ? Math.min(hintLevel + 1, 2) : 1;
+  hintFen = fen;
+  const mv = hintMoveNow();
+  if (mv) board.setHintMove({ from: mv.from, to: hintLevel >= 2 ? mv.to : null });
 }
 
 function incrementSolvedCount() {
@@ -317,20 +359,39 @@ async function loadLichessPuzzle() {
 }
 
 function convertLichessPuzzle(data) {
-  const chess = new Chess();
+  const solution = data.puzzle.solution; // array of UCI moves
   const pgnMoves = data.game.pgn.split(/\s+/).filter(t => t && !/^\d+\.+$/.test(t));
   const initialPly = data.puzzle.initialPly;
-  for (let i = 0; i < initialPly && i < pgnMoves.length; i++) {
-    try { chess.move(pgnMoves[i]); } catch (e) { break; }
-  }
-  const solution = data.puzzle.solution; // array of UCI moves
-  // play the first (setup) move automatically
-  const setup = solution[0];
-  try {
-    chess.move({ from: setup.slice(0,2), to: setup.slice(2,4), promotion: setup.slice(4) || undefined });
-  } catch (e) { /* ignore */ }
+  const uci = (m) => ({ from: m.slice(0, 2), to: m.slice(2, 4), promotion: m.slice(4) || undefined });
+  const legal = (fen, m) => { try { return !!new Chess(fen).move(uci(m)); } catch (e) { return false; } };
+  const afterPgn = (n) => {
+    const c = new Chess();
+    for (let i = 0; i < n && i < pgnMoves.length; i++) {
+      try { c.move(pgnMoves[i]); } catch (e) { break; }
+    }
+    return c.fen();
+  };
 
-  const rest = solution.slice(1);
+  // Lichess' solution starts with the move of the player who solves the puzzle:
+  // the position is the one AFTER the game's last listed move (the opponent's
+  // slip), i.e. `initialPly + 1` half-moves — puzzle.fen when the answer has it.
+  // (Older data lists the opponent's move first: then it is played for the user.)
+  let fen = null;
+  let uciSolution = solution;
+  if (data.puzzle.fen && legal(data.puzzle.fen, solution[0])) fen = data.puzzle.fen;
+  else if (legal(afterPgn(initialPly + 1), solution[0])) fen = afterPgn(initialPly + 1);
+  else {
+    const before = afterPgn(initialPly);
+    if (legal(before, solution[0])) {
+      const c = new Chess(before);
+      c.move(uci(solution[0]));
+      fen = c.fen();
+      uciSolution = solution.slice(1);
+    }
+  }
+  if (!fen) throw new Error("puzzle");
+  const chess = new Chess(fen);
+
   const themes = (data.puzzle.themes || []).join(", ") || "Lichess";
   return {
     id: "lichess-" + data.puzzle.id,
@@ -339,7 +400,7 @@ function convertLichessPuzzle(data) {
     elo: data.puzzle.rating || 1200,
     fen: chess.fen(),
     toMove: chess.turn() === "w" ? "blancs" : "noirs",
-    uciSolution: rest,
+    uciSolution,
     instruction: `Puzzle du jour Lichess (thème : ${themes}, note ${data.puzzle.rating}). Trouvez la meilleure suite pour ${chess.turn() === "w" ? "les Blancs" : "les Noirs"}.`,
     explanation: `Ce puzzle provient de la base ouverte Lichess (id ${data.puzzle.id}, note ${data.puzzle.rating}).`,
   };
