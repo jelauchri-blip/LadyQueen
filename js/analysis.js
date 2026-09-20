@@ -434,6 +434,7 @@ export function initAnalysisView() {
   els.startVsComputerBtn.textContent = "▶ Jouer";
 
   els.startVsComputerBtn.onclick = async () => {
+    if (vsComputerMode && !vsComputerGameOver && !confirm("Une partie est en cours : la remplacer par une nouvelle ?")) return;
     if (!document.getElementById("view-analyse").classList.contains("active")) {
       document.querySelector('.tab-btn[data-tab="analyse"]')?.click();
     }
@@ -888,6 +889,7 @@ function deactivateComputerMode() {
   if (els.resignBtn) els.resignBtn.hidden = true;
   if (els.setupControls) els.setupControls.hidden = false;
   if (els.openEditorBtn) els.openEditorBtn.hidden = false;
+  if (els.vsComputerSetup) els.vsComputerSetup.hidden = false;
   hideResultBanner();
   if (board) board.setInteractive(true);
   updateBoardPromotion();
@@ -965,12 +967,24 @@ MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", updateBoardPromotion);
 // the way of puzzles, lessons, the library and the analysis board. Against the
 // computer the window handles itself (see above). Every visit to a tab starts
 // collapsed again.
+// The Force / Jouer window: hidden only while a game against the computer is
+// running AND the Analyse board (where it is played) is on screen. Everywhere
+// else (other tabs, no game, game over) it is there — it used to stay hidden
+// for good after leaving a game unfinished (another tab, a library game
+// opened…), and the app had to be closed and reopened to get "Jouer" back.
+function syncSetupVisibility() {
+  if (!els.vsComputerSetup) return;
+  const onAnalyse = !!document.getElementById("view-analyse")?.classList.contains("active");
+  els.vsComputerSetup.hidden = vsComputerMode && !vsComputerGameOver && onAnalyse;
+}
+
 let topPanelOpen = false;
 let activeTabWas = "";
 // True once "Revoir" was tapped after a game against the computer: the game
 // is being reviewed, so the settings window can be hidden like elsewhere.
 let reviewStarted = false;
 function refreshTopPanel() {
+  syncSetupVisibility();
   const toggle = document.getElementById("topPanelToggle");
   if (!toggle) return;
   const activeTab = (document.querySelector(".view.active") || {}).id || "";
@@ -1095,6 +1109,9 @@ export function loadPgnString(pgn) {
   } catch (e) {
     return false;
   }
+  // Loading another game (library, pasted) ends a game against the computer
+  // that was still open, instead of leaving it half-alive behind the new one.
+  if (vsComputerMode) deactivateComputerMode();
   chess = tmp;
   board.setChess(chess, null);
   rebuildHistoryFromChessObject(chess);
