@@ -1136,7 +1136,10 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
   #fullGameSection[open] > summary { display: none; }
   #fullGameSection[open] .side-close-btn { display: inline-flex; }
   #fullGameSection[open] { padding-top: 10px; }
-  #fullGameSection[open] .fullgame-panel { margin-top: 0; padding-top: 0; border-top: none; }
+  #fullGameSection[open] .fullgame-panel { margin: 0; padding-top: 0; border-top: none; }
+  /* Nothing under the results but a thin border: no empty band, no scroll. */
+  #fullGameSection[open] { padding-bottom: 8px; margin-bottom: 0; }
+  #fullGameSection[open] > *:not(summary) { padding-bottom: 0; }
   .side-section-engine[open] { padding-top: 10px; }
   .side-section-engine[open] .side-close-btn { display: inline-flex; }
   /* [open] added: the generic ".side-section > *:not(summary)" 16px rule
