@@ -885,15 +885,35 @@ function updateBoardPromotion() {
   refreshTopPanel();
 }
 
+// A game is "finished" once it has ended: a game against the computer that is
+// over, or a loaded / played game whose last position is mate, stalemate or a
+// draw. Otherwise it is "in progress" (live game, or a position being explored).
+function isFinishedGame() {
+  if (vsComputerMode) return vsComputerGameOver;
+  if (plyMoves.length === 0) return false;
+  try { return new Chess(plyFens[plyFens.length - 1]).isGameOver(); } catch (e) { return false; }
+}
+
+// "Moteur & coach" follows a game IN PROGRESS; "Analyse complète de la partie"
+// is where FINISHED games are reviewed (saved or not) and is out of reach while
+// a game against the computer is being played. CSS does the hiding
+// (body.game-live / body.game-finished); the open panel is closed here, else
+// the accordion would leave every other panel hidden.
+function syncGameKindUi() {
+  const live = vsComputerMode && !vsComputerGameOver;
+  const finished = isFinishedGame();
+  document.body.classList.toggle("game-live", live);
+  document.body.classList.toggle("game-finished", finished);
+  const fullGame = document.getElementById("fullGameSection");
+  if (live && fullGame && fullGame.open) fullGame.open = false;
+  const engineSection = document.querySelector(".side-section-engine");
+  if (finished && engineSection && engineSection.open) engineSection.open = false;
+  if (finished && els.evalBarVert) els.evalBarVert.hidden = true;
+}
+
 let gameOverSeen = false;
 function refreshGameOverActions() {
-  // "Analyse complète de la partie" (and the "Écouter la partie" shortcut) are
-  // for reviewing FINISHED games only, saved or not: while a game against the
-  // computer is being played they are out of reach (CSS on body.game-live).
-  const live = vsComputerMode && !vsComputerGameOver;
-  document.body.classList.toggle("game-live", live);
-  const fullGame = document.getElementById("fullGameSection");
-  if (live && fullGame && fullGame.open) fullGame.open = false; // else the other panels stay hidden by the accordion
+  syncGameKindUi();
   const over = vsComputerMode && vsComputerGameOver;
   document.body.classList.toggle("game-over-mobile", over);
   if (over && !gameOverSeen) {
@@ -1083,6 +1103,7 @@ function buildPgnFromHistory() {
 }
 
 function updateMoveList() {
+  syncGameKindUi();
   els.moveList.innerHTML = "";
   for (let i = 0; i < plyMoves.length; i += 2) {
     const li = document.createElement("li");
@@ -1269,7 +1290,7 @@ let evalTimeout = null;
 const LIVE_EVAL_DEPTH = 12;
 
 function requestEval() {
-  if (!engineEnabled || busy) return;
+  if (!engineEnabled || busy || isFinishedGame()) return;
   ensureEngine();
   if (chess.isGameOver()) {
     els.engineOutput.textContent = gameOverMessage(chess) || "Partie terminée.";

@@ -792,15 +792,12 @@ body.layout-locked .move-grip {
   transform: translate(var(--side-move-x, 0px), var(--side-move-y, 0px));
 }
 .engine-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
-/* "🔊 Écouter la partie": coach vocal for whatever game is on the board
-   (library, pasted PGN, game just played). Compact on phone (below). */
-/* Game against the computer under way: no full-game review (finished games only). */
-body.game-live #fullGameSection,
-body.game-live .engine-voice-row { display: none; }
+/* The phone-only bar that reopens the Force / Jouer window (shown by the rules in the phone block). */
 .top-panel-toggle { display: none; }
-.engine-voice-row { margin-bottom: 8px; }
-#engineVoiceBtn { font-size: 12px; padding: 5px 12px; }
-#engineVoiceBtn[hidden] { display: none; }
+/* Game against the computer under way: no full-game review (finished games only). */
+body.game-live #fullGameSection { display: none; }
+/* Finished game: reviewed in "Analyse complète" only; "Moteur & coach" is for a game in progress. */
+body.game-finished .side-section-engine { display: none; }
 
 /* ---------- OPPONENT / VS COMPUTER ---------- */
 .opponent-panel {
@@ -1169,8 +1166,6 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
   body.board-promoted-mobile .clock-box { flex-direction: row; justify-content: space-between; align-items: baseline; padding: 4px 10px; }
   body.board-promoted-mobile .clock-box .clock-time { font-size: 16px; }
   body.board-promoted-mobile .sidebar-opponent { padding-top: 4px; padding-bottom: 4px; }
-  .engine-voice-row { margin-bottom: 8px; }
-  #engineVoiceBtn { padding: 4px 10px; }
   .engine-readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
   .engine-readout .engine-status { margin-bottom: 0; }
   .engine-readout .eval-bar { display: none; }

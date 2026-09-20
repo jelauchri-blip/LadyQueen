@@ -20,17 +20,11 @@ let ctx = null; // { getChess, evaluateFen, isEngineEnabled, enableEngine, setBu
 let els = {};
 let running = false;
 
-// "🔊 Écouter la partie" (Moteur & coach): reads the coach commentary for the
-// game on the board, running the analysis first when it hasn't been done for
-// this exact game yet.
-let analyzedSig = null;   // moves of the game the results on screen belong to
-let wantVoice = false;    // start reading as soon as the running analysis ends
 // Coach voice state: "idle" (nothing read), "playing", or "paused". A click on
 // the voice button while it reads = pause; the board can then be moved freely
 // (◀ ▶ ...), and "Reprendre" carries on from the move now on the board.
 let coachState = "idle";
 let coachNavigated = false; // the board was moved by the user during the pause
-let voiceProgress = "";
 
 // The voice moves the board itself (onItemStart below): those moves are marked,
 // so a position change made by the USER while it talks can be told apart. A
@@ -53,34 +47,10 @@ export function coachUserNavigated() {
   coachNavigated = true;
 }
 
-function gameSig() {
-  const plies = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
-  return plies.slice(0, 80).map((p) => p.san).join(" ");
-}
-
-function refreshVoiceBtn() {
-  if (!els.voiceBtn) return;
-  els.voiceBtn.textContent = coachState === "playing" ? "⏸ Pause"
-    : coachState === "paused" ? "▶ Reprendre"
-    : voiceProgress ? voiceProgress : "🔊 Écouter la partie";
-}
-
 function setCoachState(state) {
   coachState = state;
   if (state !== "paused") coachNavigated = false;
-  refreshVoiceBtn();
   if (ctx.onCoachState) ctx.onCoachState(state);
-}
-
-function toggleCoachVoice() {
-  const pauseBtn = document.getElementById("coachPauseBtn");
-  const playBtn = document.getElementById("coachPlayBtn");
-  if (coachState === "playing") { if (pauseBtn) pauseBtn.click(); return; }
-  if (coachState === "paused") { if (playBtn) playBtn.click(); return; }
-  if (running) { wantVoice = true; return; }
-  if (playBtn && analyzedSig !== null && analyzedSig === gameSig()) { playBtn.click(); return; }
-  wantVoice = true;
-  runAnalysis();
 }
 
 export function initFullGameAnalysis(context) {
@@ -89,27 +59,16 @@ export function initFullGameAnalysis(context) {
   els.select = document.getElementById("playerSideSelect");
   els.progress = document.getElementById("fullgameProgress");
   els.results = document.getElementById("fullgameResults");
-  els.voiceBtn = document.getElementById("engineVoiceBtn");
 
   els.btn.addEventListener("click", () => {
     if (running) return;
     runAnalysis();
   });
-  if (els.voiceBtn) {
-    els.voiceBtn.hidden = !isVoiceSupported();
-    els.voiceBtn.addEventListener("click", toggleCoachVoice);
-  }
 }
 
 async function runAnalysis() {
   const verboseHistory = ctx.getPlies ? ctx.getPlies() : ctx.getChess().history({ verbose: true });
   if (verboseHistory.length === 0) {
-    if (wantVoice) {
-      wantVoice = false;
-      voiceProgress = "Aucun coup à lire";
-      refreshVoiceBtn();
-      setTimeout(() => { voiceProgress = ""; refreshVoiceBtn(); }, 2500);
-    }
     els.results.innerHTML = `<div class="phase-block"><p>Chargez ou jouez d'abord une partie (plusieurs coups) avant de lancer l'analyse complète.</p></div>`;
     return;
   }
@@ -121,7 +80,6 @@ async function runAnalysis() {
   els.btn.disabled = true;
   els.progress.hidden = false;
   els.results.innerHTML = "";
-  analyzedSig = null;
   stopSpeech();
   setCoachState("idle");
   ctx.setBusy(true);
@@ -135,7 +93,6 @@ async function runAnalysis() {
     for (let i = 0; i < fens.length; i++) {
       els.progress.textContent = `Analyse du coup ${i} / ${fens.length - 1} (profondeur ${getDepth()})…`;
       if (ctx.onAnalysisProgress) ctx.onAnalysisProgress(i, fens.length - 1);
-      if (wantVoice) { voiceProgress = `Analyse ${i}/${fens.length - 1}…`; refreshVoiceBtn(); }
       const result = await ctx.evaluateFen(fens[i], getDepth());
       const turn = fens[i].split(" ")[1]; // 'w' | 'b' — side to move in this position
       evals.push(toWhiteCentipawns(result.score, turn));
@@ -178,22 +135,12 @@ async function runAnalysis() {
     renderMoveList(moveReports);
     renderElo(moveReports);
     renderErrorCoach(moveReports);
-    analyzedSig = plies.map((p) => p.san).join(" ");
     if (ctx.onAnalysisDone) ctx.onAnalysisDone(true, { elo: { w: estimateElo(moveReports, "w"), b: estimateElo(moveReports, "b") } });
-    if (wantVoice) {
-      wantVoice = false;
-      voiceProgress = "";
-      const playBtn = document.getElementById("coachPlayBtn");
-      if (playBtn) playBtn.click();
-    }
   } catch (e) {
     els.results.innerHTML = `<div class="phase-block"><p>L'analyse a été interrompue (moteur indisponible). Réessayez avec le moteur activé et une connexion internet stable.</p></div>`;
     if (ctx.onAnalysisDone) ctx.onAnalysisDone(false);
   } finally {
     running = false;
-    wantVoice = false;
-    voiceProgress = "";
-    refreshVoiceBtn();
     els.btn.disabled = false;
     els.progress.hidden = true;
     ctx.setBusy(false);
