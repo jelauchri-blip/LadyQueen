@@ -1,6 +1,6 @@
 import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
-import { initFullGameAnalysis, pieceNameFr, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated, refreshAnalysisButton, resetAnalysis, correctionHintAt } from "./gameAnalysis.js";
+import { initFullGameAnalysis, classify, buildHeuristicTags, buildExplanation, toWhiteCentipawns, PIECE_VALUE, isCoachDriving, stopCoachIfPlaying, coachUserNavigated, refreshAnalysisButton, resetAnalysis, correctionHintAt } from "./gameAnalysis.js";
 import { initPositionEditor, renderEditableBoard } from "./positionEditor.js";
 import { speakOne, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { saveGame } from "./gameLibrary.js";
@@ -10,7 +10,8 @@ import { eloSteps, uciOptionsForElo, resetEngineStrength, weakPlayParams, ELO_CA
 import { createClock, formatClock } from "./chessClock.js";
 import { playMove, playCapture, playCheck, playGameEnd } from "./sounds.js";
 import { getPlayerName, getBotName } from "./playerNames.js";
-import { sanFr, sanSpoken } from "./notation.js";
+import { sanDisplay, sanSpoken, pieceName, toWord } from "./notation.js";
+import { getCoachLang, t, ttsLangFor, onCoachLangChange } from "./i18n.js";
 import { analyseSignal, exchangeSignal } from "./signals.js";
 
 // The local copy is tried FIRST — it removes any dependency on an external
@@ -251,7 +252,7 @@ function renderVariationStrip() {
   }
   const moves = variation.line.map((m, i) => {
     const cls = "var-mv" + (i < variation.step ? " done" : "") + (i === variation.step - 1 ? " current" : "");
-    return `<span class="${cls}" data-var="step" data-i="${i + 1}">${sanFr(m.san)}</span>`;
+    return `<span class="${cls}" data-var="step" data-i="${i + 1}">${sanDisplay(m.san, getCoachLang())}</span>`;
   }).join(" ");
   strip.innerHTML = `<span class="var-moves">${moves}</span>
     <span class="var-count">${variation.step}/${variation.line.length}</span>
@@ -563,6 +564,10 @@ export function initAnalysisView() {
   updateMoveList();
   updateNavButtons();
 
+  // Switching the coach language live-refreshes the move list (piece letters
+  // follow the chosen language) and stops any speech already under way.
+  onCoachLangChange(() => { stopSpeech(); updateMoveList(); });
+
   initFullGameAnalysis({
     getChess: () => chess,
     getPlies: () => (mainLine ? mainLine.moves : plyMoves),
@@ -634,8 +639,9 @@ export function initAnalysisView() {
     els.moveExplanation.textContent = "Réflexion en cours…";
     try {
       const result = await evaluateFen(chess.fen(), getDepth());
+      const lang = getCoachLang();
       if (!result.bestMove) {
-        els.moveExplanation.textContent = "Aucun coup possible : la partie est terminée dans cette position.";
+        els.moveExplanation.textContent = t(lang).noMoveGameOver;
       } else {
         let pieceLabel = "";
         let fromSquare = result.bestMove.slice(0, 2);
@@ -644,10 +650,10 @@ export function initAnalysisView() {
           const testChess = new Chess(chess.fen());
           const from = result.bestMove.slice(0, 2), to = result.bestMove.slice(2, 4), promo = result.bestMove.slice(4) || undefined;
           const r = testChess.move({ from, to, promotion: promo });
-          if (r) { pieceLabel = pieceNameFr(r.piece); fromSquare = r.from; destSquare = r.to; }
+          if (r) { pieceLabel = pieceName(r.piece, lang); fromSquare = r.from; destSquare = r.to; }
         } catch (e) { /* keep raw squares */ }
         els.moveExplanation.innerHTML = `${pieceLabel} <span class="best-move">→ ${destSquare}</span>`;
-        lastHelpSpeech = `${pieceLabel} vers ${destSquare}`;
+        lastHelpSpeech = `${pieceLabel} ${toWord(lang)} ${destSquare}`;
         if (isVoiceSupported()) els.helpSpeakBtn.hidden = false;
         board.setHintMove({ from: fromSquare, to: destSquare });
       }
@@ -662,7 +668,7 @@ export function initAnalysisView() {
     els.helpSpeakBtn.onclick = () => {
       if (!lastHelpSpeech) return;
       stopSpeech();
-      speakOne(lastHelpSpeech);
+      speakOne(lastHelpSpeech, undefined, ttsLangFor(getCoachLang()));
     };
   }
 
@@ -925,6 +931,11 @@ function handleFlag(loserColor) {
 let engineQueue = Promise.resolve();
 function queueEngineTask(taskFn) {
   const run = async () => {
+    // A previous queued task's hard timeout may have terminated the worker
+    // (engine = null) while THIS task was still waiting its turn — without
+    // this, whenEngineReady() would wait forever for a "readyok" that no
+    // worker is left to send, stranding every task queued after it.
+    ensureEngine();
     await whenEngineReady();
     return taskFn();
   };
@@ -1172,10 +1183,11 @@ async function runLiveCoach(fenBefore, moveResult, plyIndex) {
     const tags = buildHeuristicTags(moveResult, plyIndex, liveMoveCountByPieceType);
     const explanation = buildExplanation(moveResult, classification, cpLoss, tags, beforeSigned, afterSigned);
 
-    els.moveExplanation.innerHTML = `<span class="mv-symbol sym-${classification.key}">${classification.symbol}</span> <span class="best-move">${sanFr(moveResult.san)}</span><br>${explanation}`;
+    const lang = getCoachLang();
+    els.moveExplanation.innerHTML = `<span class="mv-symbol sym-${classification.key}">${classification.symbol}</span> <span class="best-move">${sanDisplay(moveResult.san, lang)}</span><br>${explanation}`;
     if (isVoiceSupported()) {
       stopSpeech();
-      speakOne(`${sanSpoken(moveResult.san)}. ${explanation}`);
+      speakOne(`${sanSpoken(moveResult.san, lang)}. ${explanation}`, undefined, ttsLangFor(lang));
     }
   } catch (e) {
     els.moveExplanation.textContent = "Coach indisponible pour ce coup (moteur non prêt ou hors ligne).";
@@ -1219,6 +1231,7 @@ function updateMoveList() {
   syncGameKindUi();
   refreshAnalysisButton();
   els.moveList.innerHTML = "";
+  const moveListLang = getCoachLang();
   for (let i = 0; i < plyMoves.length; i += 2) {
     const li = document.createElement("li");
     li.className = "mv-pair";
@@ -1226,14 +1239,14 @@ function updateMoveList() {
     const blackMove = plyMoves[i + 1];
     const whiteSpan = document.createElement("span");
     whiteSpan.className = "mv-clickable" + (currentPly === i + 1 ? " current" : "") + (mainLine && i >= mainLine.branchPly ? " mv-alt" : "");
-    whiteSpan.textContent = sanFr(whiteMove.san);
+    whiteSpan.textContent = sanDisplay(whiteMove.san, moveListLang);
     whiteSpan.addEventListener("click", () => goToPly(i + 1));
     li.appendChild(whiteSpan);
     if (blackMove) {
       li.appendChild(document.createTextNode("  "));
       const blackSpan = document.createElement("span");
       blackSpan.className = "mv-clickable" + (currentPly === i + 2 ? " current" : "") + (mainLine && i + 1 >= mainLine.branchPly ? " mv-alt" : "");
-      blackSpan.textContent = sanFr(blackMove.san);
+      blackSpan.textContent = sanDisplay(blackMove.san, moveListLang);
       blackSpan.addEventListener("click", () => goToPly(i + 2));
       li.appendChild(blackSpan);
     }
@@ -1377,9 +1390,11 @@ function renderEval(final) {
     els.evalBarVertFill.style.background = cpForWhite >= 0 ? "var(--brass)" : "var(--ink-faint)";
   }
 
+  const statusLang = getCoachLang();
+  const dStatus = t(statusLang);
   const evalText = lastScore.mate !== undefined
-    ? `Mat en ${Math.abs(lastScore.mate)} coup${Math.abs(lastScore.mate) > 1 ? "s" : ""} pour ${(lastScore.mate > 0) === (turn === "w") ? "les Blancs" : "les Noirs"}`
-    : `Éval. ${(Math.abs(cpForWhite) / 100).toFixed(2)} ${cpForWhite >= 0 ? "Blancs" : "Noirs"}`;
+    ? dStatus.matForLabel(Math.abs(lastScore.mate), (lastScore.mate > 0) === (turn === "w") ? dStatus.sideLabel("w", true) : dStatus.sideLabel("b", true))
+    : dStatus.evalLabel((Math.abs(cpForWhite) / 100).toFixed(2), cpForWhite >= 0 ? dStatus.sideShort("w") : dStatus.sideShort("b"));
 
   let bestSan = lastBestMove;
   try {
@@ -1387,12 +1402,12 @@ function renderEval(final) {
       const testChess = new Chess(chess.fen());
       const from = lastBestMove.slice(0, 2), to = lastBestMove.slice(2, 4), promo = lastBestMove.slice(4) || undefined;
       const r = testChess.move({ from, to, promotion: promo });
-      if (r) bestSan = sanFr(r.san);
+      if (r) bestSan = sanDisplay(r.san, statusLang);
     }
   } catch (e) { /* keep UCI form */ }
 
-  els.engineStatus.textContent = vsComputerGameOver ? "Partie terminée." : (final ? "Analyse terminée." : "Analyse en cours…");
-  els.engineOutput.innerHTML = `${evalText} · Meilleur coup : <span class="best-move">${bestSan || "…"}</span>`;
+  els.engineStatus.textContent = vsComputerGameOver ? dStatus.gameOverStatus : (final ? dStatus.analysisDoneStatus : dStatus.analysisRunningStatus);
+  els.engineOutput.innerHTML = `${evalText} · ${dStatus.bestMoveLabel} <span class="best-move">${bestSan || "…"}</span>`;
 }
 
 let evalTimeout = null;

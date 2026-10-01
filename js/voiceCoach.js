@@ -1,17 +1,26 @@
 // Coach vocal : utilise l'API native SpeechSynthesis du navigateur (gratuite, aucune
 // clé requise). Fonctionne hors-ligne selon les voix installées sur l'appareil.
 
-let frenchVoice = null;
+let allVoices = [];
 let voicesReady = false;
 
 function loadVoices() {
   const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
   if (voices.length === 0) return;
-  frenchVoice =
-    voices.find((v) => v.lang === "fr-FR") ||
-    voices.find((v) => v.lang && v.lang.startsWith("fr")) ||
-    null;
+  allVoices = voices;
   voicesReady = true;
+}
+
+// Best available voice for a BCP-47 tag like "es-ES": exact match, then same
+// base language with any region, then none (the browser still reads the
+// text with its default voice, just not necessarily in the right accent).
+function voiceFor(ttsLang) {
+  const base = ttsLang.split("-")[0];
+  return (
+    allVoices.find((v) => v.lang === ttsLang) ||
+    allVoices.find((v) => v.lang && v.lang.startsWith(base)) ||
+    null
+  );
 }
 
 export function isSupported() {
@@ -51,15 +60,16 @@ export function stop() {
 }
 
 // Speak a single piece of text. Calls onEnd() when finished (or immediately on error).
-export function speakOne(text, onEnd) {
+export function speakOne(text, onEnd, ttsLang = "fr-FR") {
   if (!isSupported()) {
     if (onEnd) onEnd();
     return;
   }
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "fr-FR";
-  if (frenchVoice) utter.voice = frenchVoice;
+  utter.lang = ttsLang;
+  const voice = voiceFor(ttsLang);
+  if (voice) utter.voice = voice;
   utter.rate = 1.0;
   utter.pitch = 1.0;
   currentUtterance = utter;
@@ -70,11 +80,13 @@ export function speakOne(text, onEnd) {
 
 // Play a sequence of { text, onStart } items back to back.
 // callbacks: { onItemStart(index), onComplete() }
-export function playSequence(items, callbacks = {}, startIndex = 0) {
+let queueTtsLang = "fr-FR";
+export function playSequence(items, callbacks = {}, startIndex = 0, ttsLang = "fr-FR") {
   stop();
   queue = items;
   queueIndex = Math.max(0, Math.min(items.length, startIndex));
   queueCallbacks = callbacks;
+  queueTtsLang = ttsLang;
   paused = false;
   playNext();
 }
@@ -93,7 +105,7 @@ function playNext() {
     if (id !== seqId || paused) return;
     queueIndex++;
     playNext();
-  });
+  }, queueTtsLang);
 }
 
 export function pauseSequence() {

@@ -1,7 +1,8 @@
 import { Chess } from "./chess.js";
 import { speakOne, playSequence, pauseSequence, resumeSequence, stop as stopSpeech, isSupported as isVoiceSupported } from "./voiceCoach.js";
 import { getDepth } from "./engineSettings.js";
-import { sanFr, sanSpoken } from "./notation.js";
+import { sanDisplay, sanSpoken, castleNote, captureNote, enPassantNote, promoNote, checkmateWord, checkWord, pieceLetter, decimalSeparator } from "./notation.js";
+import { getCoachLang, t, ttsLangFor } from "./i18n.js";
 import { gameSignature, getSavedAnalysis, saveAnalysis } from "./gameLibrary.js";
 
 // A move counts as "there was a better one" from an inaccuracy up (≥ 25
@@ -288,65 +289,62 @@ export function toWhiteCentipawns(score, turn) {
 // --- Heuristic move tagging -------------------------------------------------
 
 export function buildHeuristicTags(mv, plyIndex, moveCountByPieceType) {
+  const d = t(getCoachLang());
   const tags = [];
   const color = mv.color;
   const moveNumber = Math.floor(plyIndex / 2) + 1;
   const opening = moveNumber <= 12;
 
   if (mv.flags && (mv.flags.includes("k") || mv.flags.includes("q"))) {
-    tags.push({ kind: "pro", text: "met le Roi à l'abri (roque)" });
+    tags.push({ kind: "pro", text: d.tagRoque });
   }
   if (mv.captured) {
     const val = PIECE_VALUE[mv.captured] || 0;
-    tags.push({ kind: "pro", text: `gagne du matériel (capture, valeur ≈ ${val})` });
+    tags.push({ kind: "pro", text: d.tagCapture(val) });
   }
   if (opening && mv.piece === "p" && ["d4", "d5", "e4", "e5"].includes(mv.to)) {
-    tags.push({ kind: "pro", text: "renforce le contrôle du centre" });
+    tags.push({ kind: "pro", text: d.tagCenter });
   }
   if (opening && (mv.piece === "n" || mv.piece === "b")) {
     moveCountByPieceType[color][mv.piece] = (moveCountByPieceType[color][mv.piece] || 0) + 1;
     if (moveCountByPieceType[color][mv.piece] > 1) {
-      tags.push({ kind: "con", text: "déplace une pièce déjà développée, au détriment du rythme de développement" });
+      tags.push({ kind: "con", text: d.tagRedeveloped });
     }
   }
   if (mv.flags && mv.flags.includes("p")) {
-    tags.push({ kind: "pro", text: "promotion : gain de matériel décisif" });
+    tags.push({ kind: "pro", text: d.tagPromotion });
   }
   return tags;
 }
 
 export function classify(cpLoss) {
-  if (cpLoss < 10) return { key: "excellent", symbol: "!!", label: "Excellent" };
-  if (cpLoss < 25) return { key: "good", symbol: "", label: "Bon coup" };
-  if (cpLoss < 50) return { key: "inaccuracy", symbol: "?!", label: "Imprécision" };
-  if (cpLoss < 100) return { key: "mistake", symbol: "?", label: "Erreur" };
-  return { key: "blunder", symbol: "??", label: "Gaffe" };
+  const d = t(getCoachLang());
+  if (cpLoss < 10) return { key: "excellent", symbol: "!!", label: d.classifyLabel.excellent };
+  if (cpLoss < 25) return { key: "good", symbol: "", label: d.classifyLabel.good };
+  if (cpLoss < 50) return { key: "inaccuracy", symbol: "?!", label: d.classifyLabel.inaccuracy };
+  if (cpLoss < 100) return { key: "mistake", symbol: "?", label: d.classifyLabel.mistake };
+  return { key: "blunder", symbol: "??", label: d.classifyLabel.blunder };
 }
 
 export function buildExplanation(mv, classification, cpLoss, tags, beforeSigned, afterSigned) {
+  const d = t(getCoachLang());
   const parts = [];
-  const sideLabel = mv.color === "w" ? "Les Blancs" : "Les Noirs";
+  const sideLabel = d.sideLabel(mv.color, true);
 
-  const engineSentence = {
-    excellent: `${classification.label} : coup quasi optimal.`,
-    good: `${classification.label} : coup solide, proche de l'optimum du moteur.`,
-    inaccuracy: `${classification.label} : un coup plus précis existait.`,
-    mistake: `${classification.label} : ce coup cède un avantage significatif.`,
-    blunder: `${classification.label} : ce coup change probablement l'issue de la partie.`,
-  }[classification.key];
-  parts.push(engineSentence);
+  parts.push(d.engineSentence[classification.key](classification.label));
 
-  const pros = tags.filter((t) => t.kind === "pro").map((t) => t.text);
-  const cons = tags.filter((t) => t.kind === "con").map((t) => t.text);
-  if (pros.length) parts.push(`Avantage : ${sideLabel} ${pros.join(", ")}.`);
-  if (cons.length) parts.push(`Inconvénient : ${cons.join(", ")}.`);
+  const pros = tags.filter((tag) => tag.kind === "pro").map((tag) => tag.text);
+  const cons = tags.filter((tag) => tag.kind === "con").map((tag) => tag.text);
+  if (pros.length) parts.push(d.advantageLine(`${sideLabel} ${pros.join(", ")}`));
+  if (cons.length) parts.push(d.drawbackLine(cons.join(", ")));
 
   return parts.join(" ");
 }
 
 // --- Rendering ---------------------------------------------------------------
 
-const COACH_PLAY_HTML = '🔊<span class="coach-label"> Coach vocal</span>';
+function coachPlayHtml() { return `🔊<span class="coach-label"> ${t(getCoachLang()).coachVocalLabel}</span>`; }
+function coachResumeHtml() { return `▶<span class="coach-label"> ${t(getCoachLang()).resumeLabel}</span>`; }
 
 function renderMoveList(reports) {
   const wrap = document.createElement("div");
@@ -359,13 +357,14 @@ function renderMoveList(reports) {
   eloSlot.id = "coachEloSlot";
   titleRow.appendChild(eloSlot);
 
+  const d0 = t(getCoachLang());
   if (isVoiceSupported()) {
     const coachBar = document.createElement("div");
     coachBar.className = "coach-bar";
     coachBar.innerHTML = `
-      <button class="btn-ghost coach-btn" id="coachPlayBtn" title="Coach vocal">🔊<span class="coach-label"> Coach vocal</span></button>
-      <button class="btn-ghost coach-btn" id="coachPauseBtn" title="Pause" aria-label="Pause" hidden>⏸<span class="coach-label"> Pause</span></button>
-      <button class="btn-ghost coach-btn" id="coachStopBtn" title="Arrêter" aria-label="Arrêter" hidden>⏹<span class="coach-label"> Arrêter</span></button>
+      <button class="btn-ghost coach-btn" id="coachPlayBtn" title="${d0.coachVocalLabel}">${coachPlayHtml()}</button>
+      <button class="btn-ghost coach-btn" id="coachPauseBtn" title="${d0.pauseLabel}" aria-label="${d0.pauseLabel}" hidden>⏸<span class="coach-label"> ${d0.pauseLabel}</span></button>
+      <button class="btn-ghost coach-btn" id="coachStopBtn" title="${d0.stopLabel}" aria-label="${d0.stopLabel}" hidden>⏹<span class="coach-label"> ${d0.stopLabel}</span></button>
     `;
     titleRow.appendChild(coachBar);
   }
@@ -373,14 +372,14 @@ function renderMoveList(reports) {
   const legendBtn = document.createElement("button");
   legendBtn.type = "button";
   legendBtn.className = "info-icon-btn legend-info-btn";
-  legendBtn.title = "Comment lire les coups";
-  legendBtn.setAttribute("aria-label", "Comment lire les coups");
+  legendBtn.title = d0.legendInfoTitle;
+  legendBtn.setAttribute("aria-label", d0.legendInfoTitle);
   legendBtn.textContent = "i";
   titleRow.appendChild(legendBtn);
   const tools = document.createElement("span");
   tools.className = "fullgame-tools";
-  tools.innerHTML = '<button type="button" class="btn-ghost fullgame-redo-btn" title="Refaire l\'analyse depuis le début" aria-label="Refaire l\'analyse">↻</button>'
-    + '<button type="button" class="side-close-btn fullgame-close-btn" aria-label="Refermer l\'analyse complète">▾</button>';
+  tools.innerHTML = `<button type="button" class="btn-ghost fullgame-redo-btn" title="${d0.redoTitle}" aria-label="${d0.redoTitle}">↻</button>`
+    + `<button type="button" class="side-close-btn fullgame-close-btn" aria-label="${d0.closeAria}">▾</button>`;
   titleRow.appendChild(tools);
   wrap.appendChild(titleRow);
   els.results.appendChild(wrap);
@@ -394,10 +393,11 @@ function wireCoachControls(reports) {
   const stopBtn = document.getElementById("coachStopBtn");
   let playing = false; // a reading is under way (playing OR paused)
 
+  const lang = getCoachLang();
+  const d = t(lang);
   const items = reports.map((report) => {
-    const numWord = report.color === "w" ? `Coup ${report.moveNumber}, les Blancs jouent` : `Coup ${report.moveNumber}, les Noirs jouent`;
-    let text = `${numWord} ${sanSpoken(report.san)}. ${report.explanation}`;
-    if (hasBetterMove(report)) text += " Il y avait un meilleur coup ici. Touche l'ampoule pour le voir.";
+    let text = `${d.moveSays(report.moveNumber, report.color)} ${sanSpoken(report.san, lang)}. ${report.explanation}`;
+    if (hasBetterMove(report)) text += " " + d.betterMoveHint;
     return { text };
   });
   const callbacks = {
@@ -414,7 +414,7 @@ function wireCoachControls(reports) {
       playing = false;
       setCoachState("idle");
       playBtn.hidden = false;
-      playBtn.innerHTML = COACH_PLAY_HTML;
+      playBtn.innerHTML = coachPlayHtml();
       pauseBtn.hidden = true;
       stopBtn.hidden = true;
     },
@@ -436,7 +436,7 @@ function wireCoachControls(reports) {
       stopBtn.hidden = false;
       const restart = coachNavigated;
       setCoachState("playing");
-      if (restart) playSequence(items, callbacks, indexFromBoard());
+      if (restart) playSequence(items, callbacks, indexFromBoard(), ttsLangFor(lang));
       else resumeSequence();
       return;
     }
@@ -445,7 +445,7 @@ function wireCoachControls(reports) {
     playBtn.hidden = true;
     pauseBtn.hidden = false;
     stopBtn.hidden = false;
-    playSequence(items, callbacks);
+    playSequence(items, callbacks, 0, ttsLangFor(lang));
   });
 
   pauseBtn.addEventListener("click", () => {
@@ -453,7 +453,7 @@ function wireCoachControls(reports) {
     setCoachState("paused");
     pauseBtn.hidden = true;
     playBtn.hidden = false;
-    playBtn.innerHTML = '▶<span class="coach-label"> Reprendre</span>';
+    playBtn.innerHTML = coachResumeHtml();
   });
 
   stopBtn.addEventListener("click", () => {
@@ -461,7 +461,7 @@ function wireCoachControls(reports) {
     playing = false;
     setCoachState("idle");
     playBtn.hidden = false;
-    playBtn.innerHTML = COACH_PLAY_HTML;
+    playBtn.innerHTML = coachPlayHtml();
     pauseBtn.hidden = true;
     stopBtn.hidden = true;
   });
@@ -487,16 +487,16 @@ function bestMoveSan(fenBefore, uci) {
 function explainBestMove(fenBefore, uci, bestSan, cpLoss, plyIndex) {
   if (!uci || uci.length < 4) return null;
   try {
+    const lang = getCoachLang();
+    const d = t(lang);
     const c = new Chess(fenBefore);
     const from = uci.slice(0, 2), to = uci.slice(2, 4), promo = uci.slice(4) || undefined;
     const r = c.move({ from, to, promotion: promo });
     if (!r) return null;
     const tags = buildHeuristicTags(r, plyIndex, { w: {}, b: {} });
-    const pros = tags.filter((t) => t.kind === "pro").map((t) => t.text);
-    const points = (cpLoss / 100).toFixed(1).replace(".", ",");
-    const parts = [`${bestSan} évitait de perdre environ ${points} point${cpLoss >= 200 ? "s" : ""} d'avantage.`];
-    if (pros.length) parts.push(`Ce coup ${pros.join(", ")}.`);
-    return parts.join(" ");
+    const pros = tags.filter((tag) => tag.kind === "pro").map((tag) => tag.text);
+    const points = (cpLoss / 100).toFixed(1).replace(".", decimalSeparator(lang));
+    return d.whyTemplate(bestSan, points, cpLoss >= 200, pros.join(", "));
   } catch (e) {
     return null;
   }
@@ -505,24 +505,24 @@ function explainBestMove(fenBefore, uci, bestSan, cpLoss, plyIndex) {
 // A move written for a beginner: piece letter, square it leaves, arrow, square
 // it reaches, then what happens — "F f8 → c5", "P d2 → c3 (prise)",
 // "C d6 → f7 (prise, échec)". Castling is spelt out.
-const PIECE_LETTER = { p: "P", n: "C", b: "F", r: "T", q: "D", k: "R" };
 function describeMove(fenBefore, uci) {
   if (!uci || uci.length < 4) return null;
   try {
+    const lang = getCoachLang();
     const c = new Chess(fenBefore);
     const r = c.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.slice(4) || undefined });
     if (!r) return null;
     const notes = [];
     if (r.flags.includes("k") || r.flags.includes("q")) {
       const isMate = r.san.endsWith("#"), isCheck = r.san.endsWith("+");
-      return (r.flags.includes("k") ? "Petit roque" : "Grand roque") + (isMate ? " (échec et mat)" : isCheck ? " (échec)" : "");
+      return castleNote(lang, r.flags.includes("k")) + (isMate ? ` (${checkmateWord(lang)})` : isCheck ? ` (${checkWord(lang)})` : "");
     }
-    if (r.flags.includes("e")) notes.push("prise en passant");
-    else if (r.captured) notes.push("prise");
-    if (r.promotion) notes.push("promotion en " + { q: "dame", r: "tour", b: "fou", n: "cavalier" }[r.promotion]);
-    if (r.san.endsWith("#")) notes.push("échec et mat");
-    else if (r.san.endsWith("+")) notes.push("échec");
-    return `${PIECE_LETTER[r.piece]} ${r.from} → ${r.to}${notes.length ? ` (${notes.join(", ")})` : ""}`;
+    if (r.flags.includes("e")) notes.push(enPassantNote(lang));
+    else if (r.captured) notes.push(captureNote(lang));
+    if (r.promotion) notes.push(promoNote(lang, r.promotion));
+    if (r.san.endsWith("#")) notes.push(checkmateWord(lang));
+    else if (r.san.endsWith("+")) notes.push(checkWord(lang));
+    return `${pieceLetter(r.piece, lang)} ${r.from} → ${r.to}${notes.length ? ` (${notes.join(", ")})` : ""}`;
   } catch (e) { return null; }
 }
 
@@ -532,12 +532,11 @@ function renderErrorCoach(reports) {
   const wrap = document.createElement("div");
   wrap.className = "phase-block coach-error-block";
 
+  const d0 = t(getCoachLang());
   if (mistakes.length === 0) {
     const perfectible = reports.filter(hasBetterMove).length;
     const p = document.createElement("p");
-    p.textContent = perfectible === 0
-      ? "Aucune erreur ni gaffe détectée."
-      : `Aucune erreur ni gaffe, mais ${perfectible} coup${perfectible > 1 ? "s" : ""} perfectible${perfectible > 1 ? "s" : ""}.`;
+    p.textContent = perfectible === 0 ? d0.noMistakes : d0.noMistakesPerfectible(perfectible);
     wrap.appendChild(p);
     els.results.appendChild(wrap);
     return;
@@ -558,34 +557,36 @@ function renderErrorCoach(reports) {
   // stays where the user is until he asks (◀ ▶, 👁 Voir).
   function render(moveBoard = true) {
     stopSpeech();
+    const lang = getCoachLang();
+    const d = t(lang);
     const m = mistakes[index];
-    const sideLabel = m.color === "w" ? "les Blancs" : "les Noirs";
+    const sideLabel = d.sideLabel(m.color, false);
     const bestSanEn = bestMoveSan(m.fenBefore, m.bestMoveUci);
-    const bestSan = bestSanEn ? sanFr(bestSanEn) : null;
-    const playedText = describeMove(m.fenBefore, m.playedUci) || sanFr(m.san);
+    const bestSan = bestSanEn ? sanDisplay(bestSanEn, lang) : null;
+    const playedText = describeMove(m.fenBefore, m.playedUci) || sanDisplay(m.san, lang);
     const bestText = describeMove(m.fenBefore, m.bestMoveUci) || bestSan;
 
     // The legend explains "E n / total" with the very numbers on this card.
     const legendItem = document.getElementById("legendErrorItem");
-    if (legendItem) legendItem.innerHTML = `<b>E ${index + 1} / ${mistakes.length}</b> : erreur n° ${index + 1} sur ${mistakes.length} repérées dans cette partie.`;
+    if (legendItem) legendItem.innerHTML = `<b>${d.errorWordShort}${d.errorWordRest} ${index + 1} / ${mistakes.length}</b> : ${d.legendErrorLine(index + 1, mistakes.length)}`;
 
     body.innerHTML = `
       <div class="coach-error-head">
-        <span class="coach-error-counter" title="Erreur ${index + 1} sur ${mistakes.length}">E<span class="err-word">rreur</span> ${index + 1} / ${mistakes.length}</span>
+        <span class="coach-error-counter" title="${d.errorCounterTitle(index + 1, mistakes.length)}">${d.errorWordShort}<span class="err-word">${d.errorWordRest}</span> ${index + 1} / ${mistakes.length}</span>
         <span class="coach-error-move">
           <span class="mv-symbol sym-${m.classification.key}">${m.classification.symbol}</span>
-          Coup ${m.moveNumber} — ${sideLabel} : <span class="mv-san">${playedText}</span>
+          ${d.moveHeadLine(m.moveNumber, sideLabel)} <span class="mv-san">${playedText}</span>
         </span>
       </div>
-      ${bestText ? `<p class="coach-error-best">Mieux : <span class="best-move">${bestText}</span></p>` : ""}
+      ${bestText ? `<p class="coach-error-best">${d.betterLabel} <span class="best-move">${bestText}</span></p>` : ""}
       ${bestSan ? `<p class="coach-error-why" id="errWhyText" hidden></p>` : ""}
       <div class="coach-error-actions">
-        <button class="btn-ghost" id="errPrevBtn" title="Erreur précédente" aria-label="Erreur précédente" ${index === 0 ? "disabled" : ""}>◀</button>
-        ${isVoiceSupported() ? '<button class="btn-ghost" id="errSpeakBtn" title="Écouter l\'explication" aria-label="Écouter l\'explication">🔊</button>' : ""}
-        ${bestSan ? `<button class="btn-ghost" id="errWhyBtn" title="Pourquoi ${bestSan} est meilleur ?" aria-label="Pourquoi ce coup est meilleur">💡</button>` : ""}
-        <button class="btn-ghost" id="errShowBtn" title="Voir sur le plateau" aria-label="Voir sur le plateau">👁</button>
-        <button class="btn-primary" id="errResumeBtn">↩ Reprendre ici</button>
-        <button class="btn-ghost" id="errIgnoreBtn" ${index === mistakes.length - 1 ? "" : 'title="Ignorer, aller à l\'erreur suivante" aria-label="Ignorer, aller à l\'erreur suivante"'}>${index === mistakes.length - 1 ? "Terminer" : "▶"}</button>
+        <button class="btn-ghost" id="errPrevBtn" title="${d.prevErrorTitle}" aria-label="${d.prevErrorTitle}" ${index === 0 ? "disabled" : ""}>◀</button>
+        ${isVoiceSupported() ? `<button class="btn-ghost" id="errSpeakBtn" title="${d.listenTitle}" aria-label="${d.listenTitle}">🔊</button>` : ""}
+        ${bestSan ? `<button class="btn-ghost" id="errWhyBtn" title="${d.whyTitle(bestSan)}" aria-label="${d.whyAria}">💡</button>` : ""}
+        <button class="btn-ghost" id="errShowBtn" title="${d.showBoardTitle}" aria-label="${d.showBoardTitle}">👁</button>
+        <button class="btn-primary" id="errResumeBtn">${d.resumeHereLabel}</button>
+        <button class="btn-ghost" id="errIgnoreBtn" ${index === mistakes.length - 1 ? "" : `title="${d.ignoreTitle}" aria-label="${d.ignoreTitle}"`}>${index === mistakes.length - 1 ? d.finishLabel : "▶"}</button>
       </div>
     `;
 
@@ -608,9 +609,8 @@ function renderErrorCoach(reports) {
     const speakBtn = body.querySelector("#errSpeakBtn");
     if (speakBtn) {
       speakBtn.onclick = () => {
-        const text = `Erreur ${index + 1} sur ${mistakes.length}. Coup ${m.moveNumber}, ${sideLabel}, ${sanSpoken(m.san)}. ${m.explanation}` +
-          (bestSanEn ? ` Le coup suggéré à la place était ${sanSpoken(bestSanEn)}.` : "");
-        speakOne(text);
+        const text = d.speakErrorTemplate(index + 1, mistakes.length, m.moveNumber, sideLabel, sanSpoken(m.san, lang), m.explanation, bestSanEn ? sanSpoken(bestSanEn, lang) : null);
+        speakOne(text, undefined, ttsLangFor(lang));
       };
     }
     const whyBtn = body.querySelector("#errWhyBtn");
@@ -621,7 +621,7 @@ function renderErrorCoach(reports) {
         const whyEl = body.querySelector("#errWhyText");
         whyEl.textContent = whyText;
         whyEl.hidden = false;
-        speakOne(whyText);
+        speakOne(whyText, undefined, ttsLangFor(lang));
       };
     }
 
@@ -661,6 +661,7 @@ export function estimateElo(reports, side) {
 
 function renderElo(reports) {
   const sides = ["w", "b"];
+  const d = t(getCoachLang());
 
   // Level of both sides, in the slot made by renderMoveList.
   const slot = document.getElementById("coachEloSlot");
@@ -671,22 +672,16 @@ function renderElo(reports) {
     const moves = reports.filter((r) => r.color === s);
     if (moves.length === 0) continue;
     let value = "—";
-    let tip = `Trop peu de coups pour estimer le niveau (il en faut au moins ${ELO_MIN_MOVES} par camp)`;
+    let tip = d.tooFewMoves(ELO_MIN_MOVES);
     if (moves.length >= ELO_MIN_MOVES) {
       const acpl = Math.round(moves.reduce((sum, r) => sum + r.cpLoss, 0) / moves.length);
       value = `≈ ${acplToElo(acpl)}`;
-      tip = "Niveau estimé d'après la qualité des coups joués";
+      tip = d.eloEstimateTip;
     }
     const item = document.createElement("span");
     item.className = "elo-inline";
     item.title = tip;
-    item.innerHTML = `<span class="elo-side">${s === "w" ? "Blancs" : "Noirs"}</span> <span class="elo-value">${value}</span>`;
+    item.innerHTML = `<span class="elo-side">${d.sideShort(s)}</span> <span class="elo-value">${value}</span>`;
     slot.appendChild(item);
   }
-}
-
-// --- Single-move "help" explanation, used by the Analyse tab's Aide button ---
-
-export function pieceNameFr(letter) {
-  return { p: "pion", n: "Cavalier", b: "Fou", r: "Tour", q: "Dame", k: "Roi" }[letter] || letter;
 }

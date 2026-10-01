@@ -8,6 +8,8 @@ import { isSoundEnabled, setSoundEnabled } from "./sounds.js";
 import { initLibraryView } from "./libraryView.js";
 import { initLayoutResize } from "./layoutResize.js";
 import { initAds } from "./ads.js";
+import { LANGUAGES, getCoachLang, cycleCoachLang } from "./i18n.js";
+import { stop as stopCoachSpeech } from "./voiceCoach.js";
 
 initLayoutResize();
 initAds(); // AdMob banner: Android app only, does nothing on the website
@@ -102,6 +104,21 @@ refreshSoundBtn();
 soundBtn.addEventListener("click", () => {
   setSoundEnabled(!isSoundEnabled());
   refreshSoundBtn();
+});
+
+// ---- Coach language (cycles on click, no dropdown) ----
+const coachLangBtn = document.getElementById("coachLangBtn");
+function refreshCoachLangBtn() {
+  const lang = LANGUAGES.find((l) => l.code === getCoachLang()) || LANGUAGES[0];
+  coachLangBtn.textContent = lang.flag;
+  coachLangBtn.title = `Langue du coach : ${lang.name}`;
+  coachLangBtn.setAttribute("aria-label", `Langue du coach : ${lang.name}`);
+}
+refreshCoachLangBtn();
+coachLangBtn.addEventListener("click", () => {
+  stopCoachSpeech();
+  cycleCoachLang();
+  refreshCoachLangBtn();
 });
 
 // ---- First-visit onboarding ----
