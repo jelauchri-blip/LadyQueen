@@ -264,7 +264,11 @@ body.layout-locked .move-grip {
   padding: 18px 20px 8px;
 }
 @media (min-width: 861px) {
-  .topbar { row-gap: 8px; padding: 10px 14px 8px; }
+  /* Left/right padding trimmed from 14px: at the default 195px sidebar
+     width, the 4 toolbar icons (🔊💾🏳️🎨, each ~38-44px) summed to just
+     3px more than the row had room for, which silently wrapped the last
+     one onto its own second line instead of all four sitting together. */
+  .topbar { row-gap: 8px; padding: 10px 10px 8px; }
 }
 /* Phone-only nav: replaces the horizontally-scrolling .tabs strip (a
    scrollbar for it kept showing on some Android browsers no matter what CSS
