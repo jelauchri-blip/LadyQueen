@@ -25,6 +25,15 @@ export function saveGame({ pgn, label, moveCount }) {
   return entry;
 }
 
+export function renameGame(id, label) {
+  const games = listGames();
+  const entry = games.find((g) => g.id === id);
+  if (!entry || !label) return false;
+  entry.label = label;
+  localStorage.setItem(KEY, JSON.stringify(games));
+  return true;
+}
+
 export function deleteGame(id) {
   const games = listGames().filter((g) => g.id !== id);
   localStorage.setItem(KEY, JSON.stringify(games));

@@ -842,6 +842,15 @@ body.game-finished .side-section-engine { display: none; }
   font-size: 11.5px; color: var(--ink-dim); margin: 0; line-height: 1.4;
 }
 .opponent-hint[hidden] { display: none; }
+/* At 230px flat, this bubble used to spill past the sidebar's right edge
+   and get silently clipped by .sidebar's overflow-x: hidden, truncating the
+   text instead of wrapping it — cap it to what the sidebar (minus its
+   padding/resize handle) actually has room for, whatever width the user
+   has dragged it to. Desktop-only: below 861px the sidebar isn't a fixed
+   narrow column, so the 100vw-based cap above is already correct there. */
+@media (min-width: 861px) {
+  .opponent-hint { max-width: min(calc(100vw - 64px), calc(var(--sidebar-w, 195px) - 26px)); }
+}
 .opponent-hint p { margin: 0; }
 .opponent-hint p + p { margin-top: 6px; }
 .opponent-hint a { color: var(--ink-dim); text-decoration: underline; }
@@ -1230,7 +1239,7 @@ body:not(.no-voice) .move-explanation.live-coach { display: none; }
 .library-card-label { font-family: var(--font-display); font-size: 16px; color: var(--ink); }
 .library-card-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-dim); }
 .library-card-actions { display: flex; gap: 8px; align-items: center; }
-.lib-delete-btn { padding: 9px 12px; }
+.lib-rename-btn, .lib-delete-btn { padding: 9px 12px; }
 /* The shared "Ouvrir et analyser" / 🗑 pair is for the phone only. */
 .library-actions { display: none; }
 @media (max-width: 760px) {

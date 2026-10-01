@@ -68,33 +68,6 @@ export function initLayoutResize() {
     confirmBar.hidden = true;
   };
 
-  // Manual escape hatch, always available (not just while there's a pending
-  // drag) — for when a size saved on a wider/older screen no longer fits
-  // and needs clearing out, without the user having to find and delete
-  // localStorage themselves. Clears the saved sizes AND the lock state (no
-  // point resetting the sizes but leaving the handles hidden).
-  const resetLayoutBtn = document.getElementById("resetLayoutBtn");
-  if (resetLayoutBtn) {
-    resetLayoutBtn.onclick = () => {
-      if (!confirm("Réinitialiser la disposition du plateau et des panneaux à leur taille par défaut ?")) return;
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-      applyVars({ ...DEFAULTS });
-      sessionStart = null;
-      confirmBar.hidden = true;
-      // Unconditional, not "if (locked)": the in-memory flag and the saved
-      // value can end up out of sync (e.g. a double-click landing while a
-      // page was already mid-navigation), which left the handles looking
-      // unlocked (visible) while every drag was still silently rejected —
-      // and reloading kept reviving the stale locked value from storage
-      // every time, since this button used to only clear it when the
-      // in-memory flag agreed there was something to clear.
-      locked = false;
-      try { localStorage.setItem(LOCK_KEY, "0"); } catch (e) {}
-      applyLockedClass();
-      positionGrips();
-    };
-  }
-
   // Double-clicking any handle locks the whole layout in place: saves
   // whatever's currently in effect (same as clicking "Valider"), then hides
   // every handle so nothing can be nudged by accident. Double-clicking again

@@ -1,4 +1,4 @@
-import { listGames, deleteGame } from "./gameLibrary.js";
+import { listGames, deleteGame, renameGame } from "./gameLibrary.js";
 import { exportData, importData, importGamesOnly, exportGamesText, importGamesText } from "./dataBackup.js";
 
 let els = {};
@@ -133,6 +133,12 @@ function wireCommonActions() {
     const g = listGames().find((x) => x.id === selectedId);
     if (g && onLoadGame) onLoadGame(g.pgn);
   });
+  document.getElementById("libRenameSelectedBtn").addEventListener("click", () => {
+    const g = listGames().find((x) => x.id === selectedId);
+    if (!g) return;
+    const label = prompt("Nouveau nom de cette partie :", g.label);
+    if (label && label.trim()) { renameGame(g.id, label.trim()); render(); }
+  });
   document.getElementById("libDeleteSelectedBtn").addEventListener("click", () => {
     const g = listGames().find((x) => x.id === selectedId);
     if (g && confirm(`Supprimer « ${g.label} » ?`)) {
@@ -168,13 +174,20 @@ function render() {
       </div>
       <div class="library-card-actions">
         <button class="btn-primary lib-open-btn">Ouvrir et analyser →</button>
+        <button class="btn-ghost lib-rename-btn" title="Renommer">✎</button>
         <button class="btn-ghost lib-delete-btn" title="Supprimer">🗑</button>
       </div>
     `;
     card.querySelector(".lib-open-btn").addEventListener("click", () => {
       if (onLoadGame) onLoadGame(g.pgn);
     });
-    card.querySelector(".lib-delete-btn").addEventListener("click", () => {
+    card.querySelector(".lib-rename-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const label = prompt("Nouveau nom de cette partie :", g.label);
+      if (label && label.trim()) { renameGame(g.id, label.trim()); render(); }
+    });
+    card.querySelector(".lib-delete-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
       if (confirm(`Supprimer « ${g.label} » ?`)) {
         deleteGame(g.id);
         render();
