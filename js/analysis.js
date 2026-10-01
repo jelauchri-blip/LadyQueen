@@ -11,7 +11,7 @@ import { createClock, formatClock } from "./chessClock.js";
 import { playMove, playCapture, playCheck, playGameEnd } from "./sounds.js";
 import { getPlayerName, getBotName } from "./playerNames.js";
 import { sanFr, sanSpoken } from "./notation.js";
-import { analyseSignal } from "./signals.js";
+import { analyseSignal, exchangeSignal } from "./signals.js";
 
 // The local copy is tried FIRST — it removes any dependency on an external
 // CDN being reachable, which is the most likely explanation for engine
@@ -46,6 +46,13 @@ let plyFens = [chess.fen()];
 let plyMoves = [];
 let currentPly = 0; // index into plyFens currently shown on the board (0..plyFens.length-1)
 let liveCoachEnabled = false;
+// Signaux tactiques (ampoule) : mat forcé fiable jusqu'à 6 coups (rouge) et
+// échange gagnant (vert). Activés par défaut ; "laisse une option pour si la
+// personne ne veut pas s'en servir" — persisté comme le thème du plateau.
+const TACTIC_SIGNALS_KEY = "echiquier_tactic_signals";
+let tacticSignalsEnabled = (() => {
+  try { return localStorage.getItem(TACTIC_SIGNALS_KEY) !== "off"; } catch (e) { return true; }
+})();
 let liveMoveCountByPieceType = { w: {}, b: {} };
 let vsComputerMode = false;
 let computerSide = null; // 'w' | 'b' — which side the ENGINE plays
@@ -177,7 +184,9 @@ function refreshBulb() {
   const btn = els.helpBtn;
   if (!btn) return;
   const active = signalActive();
-  btn.classList.toggle("bulb-mate", active);
+  // Rouge = mat forcé, vert = échange gagnant sans mat ; jamais les deux à la fois.
+  btn.classList.toggle("bulb-mate", active && signal.kind === "mate");
+  btn.classList.toggle("bulb-exchange", active && signal.kind === "exchange");
   btn.title = active ? `${signal.label} — touche pour l'aide` : "Aide : meilleur coup";
 }
 
@@ -384,6 +393,17 @@ export function initAnalysisView() {
       ensureEngine();
     }
   };
+
+  els.tacticSignalsToggle = document.getElementById("tacticSignalsToggle");
+  if (els.tacticSignalsToggle) {
+    els.tacticSignalsToggle.checked = tacticSignalsEnabled;
+    els.tacticSignalsToggle.onchange = () => {
+      tacticSignalsEnabled = els.tacticSignalsToggle.checked;
+      try { localStorage.setItem(TACTIC_SIGNALS_KEY, tacticSignalsEnabled ? "on" : "off"); } catch (e) {}
+      if (!tacticSignalsEnabled) { signal = null; refreshBulb(); }
+      else requestEval();
+    };
+  }
 
   // --- Opponent panel (always vs computer — see playerNames.js for the
   // Jelau/Ruben names, no mode picker needed since there's only one mode) ---
@@ -1409,12 +1429,36 @@ function requestEval() {
       lastScore = result.score;
       lastBestMove = result.bestMove;
       renderEval(true);
-      // Bulb signal (forced mate) for this position.
-      const found = analyseSignal({ fen: fenAtRequest, score: result.score, pv: result.pv });
-      signal = found ? { ...found, fen: fenAtRequest, consumed: false } : null;
-      refreshBulb();
+      refreshTacticSignal(fenAtRequest);
     } catch (e) { /* engine unavailable */ }
   }, 250);
+}
+
+// "Signaux tactiques" (ampoule) : échange gagnant d'abord (instantané, pas
+// besoin du moteur), puis un mat fiable jusqu'à 6 coups en arrière-plan sans
+// bloquer la barre d'évaluation ci-dessus — le mat, plus décisif, l'emporte
+// s'il est confirmé entre-temps.
+// "go mate N" peut prendre plusieurs secondes à prouver qu'il n'y a PAS de
+// mat ; tant qu'il tourne, le moteur (un seul worker, une seule file) ne peut
+// traiter aucune autre demande, y compris la barre d'éval normale du coup
+// suivant. Un second délai, plus long que celui de l'éval rapide, évite de
+// la lancer tant qu'on continue de naviguer — seulement une fois la position
+// stable, pour ne jamais faire la queue derrière une recherche en cours.
+let tacticTimeout = null;
+function refreshTacticSignal(fenAtRequest) {
+  clearTimeout(tacticTimeout);
+  if (!tacticSignalsEnabled) { signal = null; refreshBulb(); return; }
+  const exch = exchangeSignal({ fen: fenAtRequest });
+  signal = exch ? { ...exch, fen: fenAtRequest, consumed: false } : null;
+  refreshBulb();
+  tacticTimeout = setTimeout(() => {
+    if (fenAtRequest !== chess.fen() || !tacticSignalsEnabled) return; // already moved on
+    findMate(fenAtRequest, 6).then((result) => {
+      if (fenAtRequest !== chess.fen() || !tacticSignalsEnabled) return; // stale or toggled off meanwhile
+      const mate = analyseSignal({ fen: fenAtRequest, score: result.score, pv: result.pv });
+      if (mate) { signal = { ...mate, fen: fenAtRequest, consumed: false }; refreshBulb(); }
+    }).catch(() => {});
+  }, 700);
 }
 
 // Queued one-off evaluation used by the full-game analyzer. Resolves once
@@ -1454,6 +1498,43 @@ export function evaluateFen(fen, depth = 12) {
       pendingResolve = finish;
       engine.postMessage("position fen " + fen);
       engine.postMessage("go depth " + depth);
+    });
+  });
+}
+
+// Dedicated search for the "Signaux tactiques" bulb only: asks Stockfish
+// specifically for a forced mate within `maxMoves` full moves ("go mate N"),
+// instead of reading the regular LIVE_EVAL_DEPTH search's own pv — that one
+// only stumbles onto a mate line by chance, this one actually proves it (or
+// proves there is none, within that horizon). Shorter safety ceiling than
+// evaluateFen: this runs automatically after every move, so one stubborn
+// position must not stall the signal for everything that follows.
+export function findMate(fen, maxMoves = 6) {
+  ensureEngine();
+  return queueEngineTask(() => {
+    return new Promise((resolve) => {
+      if (!engine) { resolve({ score: null, pv: [] }); return; }
+      lastScore = null;
+      lastBestMove = null;
+      lastPv = [];
+      searchFen = fen;
+      let settled = false;
+      const finish = (value) => {
+        if (settled) return;
+        settled = true;
+        if (pendingResolve === finish) pendingResolve = null;
+        clearTimeout(timer);
+        resolve(value);
+      };
+      const timer = setTimeout(() => {
+        if (engine) { engine.terminate(); engine = null; }
+        engineIsReady = false;
+        engineState = "idle";
+        finish({ score: lastScore, pv: lastPv }); // treated as "no confirmed mate"
+      }, 6000);
+      pendingResolve = finish;
+      engine.postMessage("position fen " + fen);
+      engine.postMessage("go mate " + maxMoves);
     });
   });
 }

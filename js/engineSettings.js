@@ -34,6 +34,20 @@ export function eloSteps() {
   return steps;
 }
 
+// Stockfish's own UCI_Elo calibration (engine-vs-engine) plays noticeably
+// easier than same-numbered bots on sites like chess.com, which are tuned to
+// feel like real opponents at that rating rather than a weakened engine. To
+// match that perceived difficulty without changing the menu's Elo labels, we
+// ask the engine for a higher Elo than the one the player picked. The offset
+// shrinks near the top of the range, where there's little headroom left
+// before the engine's own 3190 ceiling.
+const CHESSCOM_ELO_OFFSET = 250;
+
+function toEngineElo(elo) {
+  const offset = CHESSCOM_ELO_OFFSET * (1 - (elo - ELO_CALIBRATED_MIN) / (3190 - ELO_CALIBRATED_MIN));
+  return Math.min(Math.max(Math.round(elo + offset), ELO_CALIBRATED_MIN), 3190);
+}
+
 // Returns the UCI "setoption" commands needed to configure the engine to
 // aim for the given approximate Elo. Only meaningful for elo >= ELO_CALIBRATED_MIN;
 // below that, analysis.js uses a hand-built "blunder mixing" approach instead
@@ -42,7 +56,7 @@ export function eloSteps() {
 export function uciOptionsForElo(elo) {
   return [
     "setoption name UCI_LimitStrength value true",
-    `setoption name UCI_Elo value ${Math.min(Math.max(elo, ELO_CALIBRATED_MIN), 3190)}`,
+    `setoption name UCI_Elo value ${toEngineElo(elo)}`,
   ];
 }
 

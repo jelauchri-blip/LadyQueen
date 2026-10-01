@@ -965,6 +965,7 @@ body.game-finished .side-section-engine { display: none; }
 /* Ampoule 💡 rouge en relecture quand le moteur voit un mat forcé
    (js/analysis.js refreshBulb). Le clic donne toujours l'aide habituelle. */
 #helpMoveBtn.bulb-mate { border-color: var(--error); background: rgba(192,106,92,0.30); box-shadow: 0 0 0 2px rgba(192,106,92,0.35); }
+#helpMoveBtn.bulb-exchange { border-color: var(--success); background: rgba(125,164,130,0.30); box-shadow: 0 0 0 2px rgba(125,164,130,0.35); }
 
 /* Suite de coups proposée (mat) : remplace la liste des coups sur
    téléphone le temps de la variation, s'affiche au-dessus sur grand écran. */
@@ -975,6 +976,7 @@ body.game-finished .side-section-engine { display: none; }
 .variation-strip[hidden] { display: none; }
 .variation-strip .var-label { font-weight: 700; }
 .variation-strip .var-mate { color: var(--error); }
+.variation-strip .var-exchange { color: var(--success); }
 .variation-strip .var-go {
   background: var(--brass); color: #201A08; border: none; border-radius: 6px;
   font-family: var(--font-body); font-weight: 700; font-size: 12px; padding: 5px 10px; cursor: pointer;
