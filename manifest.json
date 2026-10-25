@@ -4,7 +4,7 @@
   "short_name": "LadyQueen",
   "description": "Apprends les échecs, joue contre l'ordinateur et analyse tes parties avec un coach vocal.",
   "categories": ["games", "education"],
-  "start_url": "./index.html",
+  "start_url": "./jeu.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

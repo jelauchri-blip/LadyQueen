@@ -2,492 +2,328 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1B1F1D">
 <script>
-/* Android app (Capacitor): a launch screen with the big LadyQueen logo covers the page while it loads. */
+/* ===== Réglages de la page d'accueil ===== */
+// Adresse du groupe Google des testeurs Android (groupe ouvert : tout le monde peut le rejoindre).
+const TESTER_GROUP_EMAIL = "ladyqueen-testeurs@googlegroups.com";
+// Lien d'inscription au test fermé du Play Store.
+const PLAY_TESTING_URL = "https://play.google.com/apps/testing/com.jelaugames.ladyqueen";
+// Version web du jeu.
+const GAME_URL = "jeu.html";
+
 (function () {
+  // L'appli Android et la PWA installée doivent ouvrir directement le jeu, sans passer par l'accueil.
   try {
-    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-      document.documentElement.classList.add("is-native-app");
-      var hide = function () {
-        var el = document.getElementById("nativeSplash");
-        if (!el || el.classList.contains("gone")) return;
-        el.classList.add("gone");
-        setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
-      };
-      window.addEventListener("load", function () { setTimeout(hide, 1100); });
-      setTimeout(hide, 4000); // safety net
-    }
+    var native = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+    var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    if (native || standalone) { location.replace(GAME_URL); return; }
   } catch (e) {}
+  // Sur téléphone Android, le choix Android passe en premier ; ailleurs, la version web.
+  if (/Android/i.test(navigator.userAgent)) document.documentElement.classList.add("is-android");
 })();
 </script>
-<style>
-.native-splash { display: none; }
-.is-native-app .native-splash {
-  display: flex; align-items: center; justify-content: center;
-  position: fixed; inset: 0; z-index: 99999; background: #1B1F1D;
-  transition: opacity 0.45s ease;
-}
-.native-splash.gone { opacity: 0; pointer-events: none; }
-.native-splash img { width: min(70vw, 340px); height: auto; }
-</style>
-<title>Échiquier — Académie | Cours d'échecs gratuit en français, puzzles et analyse</title>
-<meta name="description" content="Apprends les échecs gratuitement en français : 12 leçons interactives, puzzles tactiques vérifiés, analyse de partie par moteur d'échecs, et une partie contre l'ordinateur au niveau réglable. Application installable, utilisable hors-ligne.">
-<link rel="canonical" href="https://flourishing-semolina-177de0.netlify.app/">
+<title>LadyQueen — Jeu d'échecs gratuit : leçons, puzzles et analyse Stockfish</title>
+<meta name="description" content="LadyQueen est un jeu d'échecs gratuit en français, sur Android et dans le navigateur : joue contre l'ordinateur, apprends avec 12 leçons interactives, résous des puzzles tactiques et analyse tes parties avec Stockfish et un coach vocal.">
+<link rel="canonical" href="https://jelauchri-blip.github.io/LadyQueen/">
 
 <!-- Open Graph / réseaux sociaux -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Échiquier — Académie">
-<meta property="og:title" content="Échiquier — Académie | Cours d'échecs gratuit en français">
-<meta property="og:description" content="Règles interactives, puzzles tactiques, analyse par moteur d'échecs et partie contre l'ordinateur — gratuit, en français, installable sur mobile.">
-<meta property="og:image" content="https://flourishing-semolina-177de0.netlify.app/icons/og-image.png">
+<meta property="og:site_name" content="LadyQueen">
+<meta property="og:url" content="https://jelauchri-blip.github.io/LadyQueen/">
+<meta property="og:title" content="LadyQueen — Jeu d'échecs gratuit en français">
+<meta property="og:description" content="Joue contre l'ordinateur, apprends avec des leçons interactives, résous des puzzles et analyse tes parties avec Stockfish et un coach vocal. Sur Android et sur ordinateur.">
+<meta property="og:image" content="https://jelauchri-blip.github.io/LadyQueen/icons/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LadyQueen, jeu d'échecs">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Échiquier — Académie">
-<meta name="twitter:description" content="Cours d'échecs gratuit en français : leçons, puzzles, analyse par moteur d'échecs.">
-<meta name="twitter:image" content="https://flourishing-semolina-177de0.netlify.app/icons/og-image.png">
+<meta name="twitter:title" content="LadyQueen — Jeu d'échecs gratuit en français">
+<meta name="twitter:description" content="Leçons, puzzles, analyse Stockfish et coach vocal. Sur Android et sur ordinateur.">
+<meta name="twitter:image" content="https://jelauchri-blip.github.io/LadyQueen/icons/og-image.png">
 
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  "name": "Échiquier — Académie",
-  "description": "Application pédagogique gratuite pour apprendre les échecs en français : règles, puzzles tactiques et analyse par moteur d'échecs.",
+  "@type": ["VideoGame", "SoftwareApplication"],
+  "name": "LadyQueen",
+  "alternateName": "LadyQueen — Échecs",
+  "url": "https://jelauchri-blip.github.io/LadyQueen/",
+  "image": "https://jelauchri-blip.github.io/LadyQueen/icons/og-image.png",
+  "description": "Jeu d'échecs gratuit en français : partie contre l'ordinateur, 12 leçons interactives, puzzles tactiques, analyse de partie par Stockfish et coach vocal.",
   "inLanguage": "fr",
-  "applicationCategory": "EducationalApplication"
+  "genre": ["Échecs", "Jeu de réflexion", "Éducation"],
+  "gamePlatform": ["Android", "Navigateur web"],
+  "operatingSystem": "Android, Windows, macOS, Linux",
+  "applicationCategory": "GameApplication",
+  "applicationSubCategory": "Échecs",
+  "playMode": "SinglePlayer",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "author": { "@type": "Organization", "name": "Jelau Games" },
+  "publisher": { "@type": "Organization", "name": "Jelau Games" }
 }
 </script>
+
+<style>
+:root {
+  --bg-deep: #1B1F1D;
+  --bg-panel: #242923;
+  --bg-panel-raised: #2B3129;
+  --wood-dark: #6E4A32;
+  --wood-light: #E8DCC3;
+  --brass: #C9A227;
+  --brass-soft: #E4C766;
+  --ink: #F3EEE1;
+  --ink-dim: #ABA492;
+  --ink-faint: #726C5E;
+  --success: #7DA482;
+  --border-soft: rgba(243, 238, 225, 0.10);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+  --radius: 10px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg-deep); color: var(--ink);
+  font: 17px/1.6 var(--font-body);
+}
+a { color: var(--brass-soft); }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+/* En-tête */
+.topbar { display: flex; align-items: center; gap: 10px; padding: 18px 0; }
+.brand-glyph {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brass); color: var(--bg-deep); font-size: 24px; line-height: 1;
+}
+.brand-name { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.01em; }
+
+/* Bandeau principal */
+.hero { padding: 28px 0 8px; text-align: center; }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 6vw, 48px);
+  line-height: 1.15; margin: 0 0 14px;
+}
+.hero h1 em { font-style: normal; color: var(--brass); }
+.hero p { max-width: 640px; margin: 0 auto; color: var(--ink-dim); font-size: 18px; }
+
+/* Choix de la version */
+.choices { display: flex; flex-wrap: wrap; gap: 16px; margin: 32px 0 12px; }
+.choice {
+  flex: 1 1 300px; display: flex; flex-direction: column;
+  background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 14px;
+  padding: 22px 20px;
+}
+.choice.web { order: 1; }
+.choice.android { order: 2; }
+.is-android .choice.android { order: 1; }
+.is-android .choice.web { order: 2; }
+.choice-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.choice-icon { font-size: 30px; line-height: 1; }
+.choice h2 { font-family: var(--font-display); font-size: 22px; margin: 0; }
+.choice .tag {
+  display: inline-block; margin-left: auto; padding: 2px 9px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: var(--bg-deep); background: var(--brass-soft);
+}
+.choice > p { color: var(--ink-dim); margin: 0 0 16px; }
+
+.btn {
+  display: block; text-align: center; text-decoration: none; cursor: pointer;
+  font: 600 17px var(--font-body); padding: 13px 18px; border-radius: var(--radius);
+  border: 1px solid transparent; transition: filter 0.15s, background 0.15s;
+}
+.btn-primary { background: var(--brass); color: var(--bg-deep); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: rgba(201, 162, 39, 0.55); }
+.btn-ghost:hover { background: rgba(201, 162, 39, 0.10); }
+.web .btn { margin-top: auto; }
+
+.steps { list-style: none; margin: 0 0 14px; padding: 0; counter-reset: step; }
+.steps li {
+  counter-increment: step; position: relative; padding: 0 0 18px 44px;
+}
+.steps li::before {
+  content: counter(step); position: absolute; left: 0; top: 0;
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--bg-panel-raised); border: 1px solid var(--brass); color: var(--brass-soft);
+  font-weight: 700; font-size: 15px;
+}
+.steps strong { display: block; margin-bottom: 2px; }
+.steps p { margin: 0 0 10px; color: var(--ink-dim); font-size: 15px; }
+.note { font-size: 14px; color: var(--ink-faint); margin: 0; }
+.group-addr { font-family: ui-monospace, monospace; font-size: 14px; color: var(--ink-dim); word-break: break-all; }
+
+/* Contenu */
+section.content { padding: 36px 0 8px; }
+section.content h2 { font-family: var(--font-display); font-size: 28px; margin: 0 0 12px; }
+section.content > p { color: var(--ink-dim); max-width: 760px; }
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 20px; }
+.feature {
+  background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
+  padding: 18px;
+}
+.feature h3 { font-family: var(--font-display); font-size: 19px; margin: 0 0 6px; }
+.feature h3 span { margin-right: 6px; }
+.feature p { margin: 0; color: var(--ink-dim); font-size: 16px; }
+
+.faq details {
+  background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: var(--radius);
+  padding: 14px 18px; margin-bottom: 10px;
+}
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { margin: 10px 0 0; color: var(--ink-dim); }
+
+footer {
+  margin-top: 40px; padding: 22px 0 36px; border-top: 1px solid var(--border-soft);
+  color: var(--ink-faint); font-size: 14px;
+}
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
+footer a { color: var(--ink-dim); }
+</style>
 </head>
 <body>
-<div class="native-splash" id="nativeSplash" aria-hidden="true"><img src="icons/splash-logo.png" alt=""></div>
 
-<div id="app">
-
-  <div class="sidebar">
-
+<div class="wrap">
   <header class="topbar">
-    <div class="brand">
-      <span class="brand-glyph">♞</span>
-      <div class="brand-text">
-        <h1>LadyQueen</h1>
-      </div>
-    </div>
-    <button id="installBtn" class="install-btn" hidden>Installer</button>
-    <button id="soundToggleBtn" class="theme-btn" title="Activer/couper le son" aria-label="Activer ou couper le son">🔊</button>
-    <button class="theme-btn" id="saveGameBtn" title="Enregistrer la partie" aria-label="Enregistrer la partie">💾</button>
-    <button class="theme-btn" id="coachLangBtn" title="Langue du coach : Français" aria-label="Langue du coach">🇫🇷</button>
-    <div class="theme-picker">
-      <button id="themeBtn" class="theme-btn" title="Thème du plateau" aria-label="Changer le thème du plateau">🎨</button>
-      <div id="themePanel" class="theme-panel" hidden>
-        <p class="theme-panel-title">Thème du plateau</p>
-        <div class="theme-swatch-row">
-          <button class="theme-swatch-btn" data-theme="noyer">
-            <span class="swatch"><i style="background:#E8DCC3"></i><i style="background:#6E4A32"></i></span> Noyer & laiton
-          </button>
-          <button class="theme-swatch-btn" data-theme="vert">
-            <span class="swatch"><i style="background:#EEEED2"></i><i style="background:#6F9152"></i></span> Tournoi vert
-          </button>
-          <button class="theme-swatch-btn" data-theme="bleu">
-            <span class="swatch"><i style="background:#DCE4EE"></i><i style="background:#3F5878"></i></span> Bleu marine
-          </button>
-          <button class="theme-swatch-btn" data-theme="rouge">
-            <span class="swatch"><i style="background:#F0E2D4"></i><i style="background:#7A3030"></i></span> Rouge
-          </button>
-        </div>
-        <div class="brightness-grid">
-          <div class="brightness-row">
-            <label for="brightnessSlider" title="Luminosité du plateau">Luminosité</label>
-            <input type="range" id="brightnessSlider" min="60" max="140" value="100" step="5">
-            <span class="brightness-value" id="brightnessValue">100%</span>
-          </div>
-          <div class="brightness-row">
-            <label for="coordSizeSlider" title="Taille des repères (a-h, 1-8)">Taille</label>
-            <input type="range" id="coordSizeSlider" min="7" max="16" value="9" step="1">
-            <span class="brightness-value" id="coordSizeValue">9px</span>
-          </div>
-          <div class="brightness-row">
-            <label for="coordContrastSlider" title="Contraste des repères">Contraste</label>
-            <input type="range" id="coordContrastSlider" min="30" max="100" value="55" step="5">
-            <span class="brightness-value" id="coordContrastValue">55%</span>
-          </div>
-        </div>
-        <p class="theme-panel-title" style="margin-top:10px;">Style des pièces</p>
-        <div class="piece-style-row">
-          <button class="piece-style-btn" data-style="cburnett-classic">Cburnett — classique</button>
-          <button class="piece-style-btn" data-style="cburnett-wood">Cburnett — bois</button>
-        </div>
-      </div>
-    </div>
+    <span class="brand-glyph" aria-hidden="true">♞</span>
+    <span class="brand-name">LadyQueen</span>
   </header>
 
-  <button type="button" class="top-panel-toggle" id="topPanelToggle" aria-label="Afficher ou masquer Force, Jouer et le menu" title="Afficher / masquer le menu et Jouer">▾</button>
-
-  <div class="sidebar-opponent" id="opponentSection">
-    <div class="opponent-panel">
-      <div id="opponentOptions" class="opponent-options">
-        <div id="vsComputerSetup">
-        <div class="opponent-row opponent-row-relative">
-          <span class="opponent-label-group">
-            <select id="mobileTabSelect" class="mobile-tab-select" aria-label="Navigation">
-              <option value="accueil">Accueil</option>
-              <option value="regles">Initiation</option>
-              <option value="tactique">Puzzle</option>
-              <option value="bibliotheque">Bibliothèque</option>
-              <option value="analyse">Analyse</option>
-              <option value="editor">✎ Créer une position</option>
-              <option value="pgn">Coller une partie</option>
-            </select>
-            Force
-          </span>
-          <span class="opponent-row-controls">
-            <select id="opponentEloSelect"></select>
-            <button type="button" class="info-icon-btn" id="eloInfoBtn" aria-label="Informations sur ce niveau">i</button>
-            <button type="button" class="info-icon-btn" id="creditsInfoBtn" aria-label="Crédits et licences">&copy;</button>
-          </span>
-          <p class="opponent-hint" id="opponentEloHint" hidden></p>
-          <div class="opponent-hint" id="creditsHint" hidden>
-            <p>Pièces d'échecs « Cburnett » : Colin M.L. Burnett, sous licence BSD 3 clauses / CC BY-SA 3.0 / GFDL — <a href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces" target="_blank" rel="noopener">source</a>.</p>
-            <p>Moteur d'analyse Stockfish, sous licence GPL-3.0 — <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noopener">code source</a>.</p>
-            <p><a href="https://jelauchri-blip.github.io/LadyQueen/confidentialite.html" target="_blank" rel="noopener">Politique de confidentialité</a></p>
-            <p id="adConsentRow" hidden><button type="button" class="btn-ghost" id="adConsentBtn">Gérer mes choix publicitaires</button></p>
-          </div>
-        </div>
-        <div class="opponent-vsmode-row">
-          <label title="Pas de retour en arrière"><input type="radio" name="vsComputerBehavior" value="defi" checked> Défi</label>
-          <label title="Retour en arrière possible"><input type="radio" name="vsComputerBehavior" value="coach"> Coach</label>
-        </div>
-        <div class="opponent-row">
-          <span>Chrono</span>
-          <div class="opponent-row-controls">
-            <select id="timeControlSelect">
-              <option value="0">Illimité</option>
-              <option value="1">1 min</option>
-              <option value="3">3 min</option>
-              <option value="5">5 min</option>
-              <option value="10">10 min</option>
-              <option value="15">15 min</option>
-              <option value="30">30 min</option>
-            </select>
-            <select id="incrementSelect">
-              <option value="0">+0 s</option>
-              <option value="1">+1 s</option>
-              <option value="2">+2 s</option>
-              <option value="3">+3 s</option>
-              <option value="4">+4 s</option>
-              <option value="5">+5 s</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn-primary" id="startVsComputerBtn">▶ Jouer</button>
-        </div>
-        <div class="clock-row" id="clockRow" hidden>
-          <div class="clock-box" id="clockWhite"><span class="clock-label">Blancs</span><span class="clock-time">—</span></div>
-          <div class="clock-box" id="clockBlack"><span class="clock-label">Noirs</span><span class="clock-time">—</span></div>
-        </div>
-      </div>
+  <main>
+    <div class="hero">
+      <h1>Le jeu d'échecs qui t'apprend <em>à mieux jouer</em></h1>
+      <p>Joue contre l'ordinateur, apprends les règles pas à pas, entraîne-toi sur des puzzles
+      et comprends tes erreurs grâce à l'analyse Stockfish et à un coach vocal. Gratuit, en français.</p>
     </div>
-  </div>
 
-  <nav class="tabs" aria-label="Navigation principale">
-    <button class="tab-btn active" data-tab="accueil">
-      Accueil
-    </button>
-    <button class="tab-btn" data-tab="regles">
-      Initiation
-    </button>
-    <button class="tab-btn" data-tab="tactique">
-      Puzzle
-    </button>
-    <button class="tab-btn" data-tab="bibliotheque">
-      Bibliothèque
-    </button>
-    <button class="tab-btn" data-tab="analyse">
-      Analyse
-    </button>
-    <button class="tab-btn sidebar-action-btn" id="openEditorBtn">
-      ✎ Créer une position
-    </button>
-    <details id="setupControls" class="setup-controls sidebar-action-group">
-      <summary class="tab-btn">Coller une partie</summary>
-      <div class="pgn-row">
-        <label for="pgnInput" class="sr-only">Coller une partie (PGN)</label>
-        <div class="pgn-input-row">
-          <textarea id="pgnInput" rows="2" spellcheck="false" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 ..."></textarea>
-          <button class="btn-ghost" id="loadPgnBtn">Charger</button>
+    <div class="choices">
+      <article class="choice web">
+        <div class="choice-head">
+          <span class="choice-icon" aria-hidden="true">💻</span>
+          <h2>Sur ordinateur</h2>
         </div>
-      </div>
-    </details>
-  </nav>
+        <p>La version web se lance tout de suite dans ton navigateur, sans rien installer
+        ni créer de compte. Elle marche aussi sur iPhone et iPad.</p>
+        <a class="btn btn-primary" href="jeu.html" data-game-link>Jouer dans le navigateur</a>
+      </article>
 
-  </div>
-
-  <div class="resize-handle resize-handle-sidebar" id="sidebarResizeHandle" title="Glisser pour redimensionner"></div>
-
-  <div class="content-col">
-
-  <main id="views">
-
-    <!-- ACCUEIL -->
-    <section id="view-accueil" class="view active">
-      <div class="home-layout">
-        <div class="game-panel">
-          <div id="homeBoardMount"></div>
+      <article class="choice android">
+        <div class="choice-head">
+          <span class="choice-icon" aria-hidden="true">📱</span>
+          <h2>Sur Android</h2>
+          <span class="tag">Test fermé</span>
         </div>
-      </div>
-    </section>
+        <p>L'appli est en test sur le Play Store. Pour l'installer, connecte-toi avec le même
+        compte Google que sur ton téléphone, puis suis ces deux étapes :</p>
+        <ol class="steps">
+          <li>
+            <strong>Rejoindre le groupe des testeurs</strong>
+            <p>Sur la page du groupe, clique sur « Rejoindre le groupe ».
+            <br><span class="group-addr" data-group-email></span></p>
+            <a class="btn btn-ghost" href="#" data-group-link target="_blank" rel="noopener">Rejoindre le groupe</a>
+          </li>
+          <li>
+            <strong>S'inscrire au test</strong>
+            <p>Clique sur « Devenir testeur », puis sur le lien pour télécharger
+            LadyQueen depuis le Play Store.</p>
+            <a class="btn btn-primary" href="#" data-play-link target="_blank" rel="noopener">S'inscrire au test Android</a>
+          </li>
+        </ol>
+        <p class="note">L'appli peut mettre quelques minutes à apparaître dans le Play Store après l'inscription.</p>
+      </article>
+    </div>
 
-    <!-- REGLES -->
-    <section id="view-regles" class="view">
-      <div class="lesson-layout">
-        <aside class="lesson-nav" id="lessonNav" aria-label="Liste des leçons"></aside>
-        <div class="lesson-content" id="lessonContent"></div>
-      </div>
-    </section>
+    <section class="content">
+      <h2>Qu'est-ce que LadyQueen ?</h2>
+      <p>LadyQueen est un jeu d'échecs gratuit en français, pensé pour progresser : que tu découvres
+      les règles ou que tu veuilles comprendre pourquoi tu as perdu ta dernière partie, il t'accompagne
+      à chaque coup. Il fonctionne sur téléphone Android et dans n'importe quel navigateur, sur
+      ordinateur comme sur tablette.</p>
 
-    <!-- TACTIQUE -->
-    <section id="view-tactique" class="view">
-      <div class="puzzle-header">
-        <div class="puzzle-filters" id="puzzleFilters">
-          <button class="filter-chip active" data-theme="all">Tous</button>
-          <button class="filter-chip" data-theme="mat1">Mat en 1</button>
-          <button class="filter-chip" data-theme="mat2">Mat en 2</button>
-          <button class="filter-chip" data-theme="fourchette">Fourchette</button>
+      <div class="features">
+        <div class="feature">
+          <h3><span aria-hidden="true">♟</span>Jouer contre l'ordinateur</h3>
+          <p>Choisis le niveau de ton adversaire, du débutant au joueur confirmé, avec ou sans pendule.
         </div>
-        <div class="puzzle-elo-filter">
-          <label for="puzzleEloFilter">Difficulté<span class="lbl-long"> (Elo max.)</span></label>
-          <select id="puzzleEloFilter"></select>
+        <div class="feature">
+          <h3><span aria-hidden="true">📘</span>12 leçons interactives</h3>
+          <p>Le déplacement des pièces, le roque, la prise en passant, la promotion, l'échec et mat :
+          chaque règle s'apprend en jouant sur l'échiquier.</p>
         </div>
-        <button class="btn-ghost" id="lichessLoadBtn">↓ Charger depuis Lichess</button>
-      </div>
-
-      <div class="puzzle-layout">
-        <div class="puzzle-board-col">
-          <div id="puzzleBoardMount"></div>
-          <div class="puzzle-status" id="puzzleStatus"></div>
+        <div class="feature">
+          <h3><span aria-hidden="true">🧩</span>Puzzles tactiques</h3>
+          <p>Fourchettes, mats en un ou deux coups : des exercices vérifiés, et de nouveaux
+          puzzles chargés depuis Lichess pour ne jamais en manquer.</p>
         </div>
-        <div class="puzzle-side-col">
-          <span class="theme-pill" id="puzzleTheme">—</span>
-          <p class="puzzle-instruction" id="puzzleInstruction">Chargement…</p>
-          <div class="puzzle-actions">
-            <button class="btn-ghost" id="hintBtn">Indice</button>
-            <button class="btn-ghost" id="resetPuzzleBtn">Recommencer</button>
-            <button class="btn-primary" id="nextPuzzleBtn">Puzzle suivant →</button>
-          </div>
-          <div class="puzzle-explanation" id="puzzleExplanation" hidden></div>
+        <div class="feature">
+          <h3><span aria-hidden="true">📈</span>Analyse Stockfish</h3>
+          <p>Le moteur Stockfish analyse ta partie coup par coup, repère les gaffes et les occasions
+          manquées, et te montre le meilleur coup.</p>
+        </div>
+        <div class="feature">
+          <h3><span aria-hidden="true">🎙</span>Coach vocal</h3>
+          <p>Un coach t'explique les coups à voix haute pendant l'analyse, en français et
+          en cinq autres langues.</p>
+        </div>
+        <div class="feature">
+          <h3><span aria-hidden="true">💾</span>Tes parties, chez toi</h3>
+          <p>Enregistre tes parties dans ta bibliothèque. Aucun compte à créer : tout reste sur ton appareil,
+          même hors connexion.</p>
         </div>
       </div>
     </section>
 
-    <!-- ANALYSE -->
-    <section id="view-analyse" class="view">
-      <div class="analyse-layout">
-        <div class="analyse-board-col">
-          <div class="board-wrap">
-            <div id="evalBarVert" class="eval-bar-vert" hidden title="Évaluation de la position">
-              <div class="eval-bar-vert-fill" id="evalBarVertFill"></div>
-            </div>
-            <div class="board-stage">
-              <div id="analyseBoardMount"></div>
-              <div class="board-confetti" aria-hidden="true">
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-                <span class="confetti-piece"></span>
-              </div>
-              <div id="gameResultBanner" class="game-result-banner" hidden></div>
-            </div>
-          </div>
-          <div class="board-actions-row">
-            <span class="material-count" id="materialWhite" title="Points capturés par les Blancs"></span>
-            <div class="nav-controls">
-              <button class="btn-ghost nav-btn resign-btn" id="resignBtn" title="Abandonner la partie" aria-label="Abandonner la partie" hidden>🏳</button>
-              <button class="btn-ghost nav-btn" id="navFirstBtn" title="Début">⏮</button>
-              <button class="btn-ghost nav-btn" id="navPrevBtn" title="Coup précédent">◀</button>
-              <button class="btn-ghost nav-btn" id="flipBtn" title="Retourner le plateau">↕</button>
-              <button class="btn-ghost nav-btn" id="navNextBtn" title="Coup suivant">▶</button>
-              <button class="btn-ghost nav-btn" id="navLastBtn" title="Dernier coup joué">⏭</button>
-              <button class="btn-ghost nav-btn" id="helpMoveBtn" title="Aide : meilleur coup" aria-label="Aide : quelle est la meilleure solution ?">💡</button>
-            </div>
-            <span class="material-count" id="materialBlack" title="Points capturés par les Noirs"></span>
-          </div>
-          <div class="alt-line-bar" id="altLineBar" hidden>
-            <span id="altLineText">Variante</span>
-            <button type="button" class="btn-ghost" id="altLineBackBtn" title="Revenir à la partie d'origine, à l'endroit où tu as dévié">↩ Revenir à la partie</button>
-          </div>
-          <div id="editorMount" class="editor-mount" hidden></div>
-        </div>
-
-        <div class="analyse-side-col">
-          <details class="side-section side-section-engine" name="sideAccordion">
-          <summary>Moteur &amp; coach</summary>
-          <div class="engine-main-row">
-            <span class="engine-main-label" title="Moteur d'analyse">Moteur</span>
-            <label class="switch">
-              <input type="checkbox" id="engineToggle" aria-label="Moteur d'analyse">
-              <span class="slider"></span>
-            </label>
-            <label class="engine-time-label" for="depthSelect" title="Temps de réflexion du moteur par position">Réflexion</label>
-            <select id="depthSelect">
-              <option value="rapide">1 s</option>
-              <option value="equilibre">3 s</option>
-              <option value="approfondi">10 s</option>
-            </select>
-            <button type="button" class="side-close-btn" id="engineCloseBtn" aria-label="Refermer Moteur et coach">▾</button>
-          </div>
-          <div class="engine-toggle-row">
-            <span title="Commente chaque coup">🎙️ Coach en direct</span>
-            <label class="switch">
-              <input type="checkbox" id="liveCoachToggle" aria-label="Coach en direct (commente chaque coup)">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="engine-toggle-row">
-            <span title="Allume l'ampoule quand un mat forcé (jusqu'à 6 coups) ou un échange gagnant est repéré">💡 Signaux tactiques</span>
-            <label class="switch">
-              <input type="checkbox" id="tacticSignalsToggle" checked aria-label="Signaux tactiques (mat forcé, échange gagnant)">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="engine-readout">
-            <div id="engineStatus" class="engine-status">Moteur désactivé</div>
-            <div id="evalBar" class="eval-bar" hidden>
-              <div class="eval-bar-fill" id="evalBarFill"></div>
-            </div>
-            <div id="engineOutput" class="engine-output"></div>
-          </div>
-          <div class="help-row">
-            <button class="btn-ghost coach-btn" id="helpSpeakBtn" hidden title="Écouter l'explication">🔊</button>
-          </div>
-          <div id="moveExplanation" class="move-explanation" hidden></div>
-          </details>
-
-          <details class="side-section" id="fullGameSection" name="sideAccordion">
-          <summary>Analyse complète de la partie</summary>
-          <div class="fullgame-panel">
-            <div class="fullgame-controls">
-              <button class="btn-primary" id="analyzeGameBtn">Analyser coup par coup</button>
-              <button type="button" class="side-close-btn" id="fullGameCloseBtn" aria-label="Refermer l'analyse complète">▾</button>
-            </div>
-            <div id="fullgameProgress" class="fullgame-progress" hidden></div>
-            <div id="fullgameResults" class="fullgame-results"></div>
-          </div>
-          </details>
-
-          <details id="editorControlsMount" class="side-section" name="sideAccordion" hidden>
-          <summary>Placer les pièces</summary>
-          </details>
-          <div class="resize-handle resize-handle-height" id="sideColHeightHandle" title="Glisser pour étirer"></div>
-        </div>
-
-        <div class="resize-handle resize-handle-analyse handle-side-movelist" id="sideMovelistResizeHandle" title="Glisser pour redimensionner"></div>
-
-        <div class="movelist-wrap">
-          <p class="eyebrow">Coups joués <button type="button" class="info-icon-btn legend-info-btn" aria-label="Comment lire les coups" title="Comment lire les coups">i</button></p>
-          <div id="variationStrip" class="variation-strip" hidden></div>
-          <ol id="moveList" class="movelist"></ol>
-        </div>
-      </div>
+    <section class="content faq">
+      <h2>Questions fréquentes</h2>
+      <details>
+        <summary>LadyQueen est-il gratuit ?</summary>
+        <p>Oui. La version web est gratuite et sans publicité. L'appli Android est gratuite et affiche des bannières publicitaires.</p>
+      </details>
+      <details>
+        <summary>Y a-t-il une version iPhone ?</summary>
+        <p>Pas d'appli iOS pour l'instant, mais la version web fonctionne dans Safari. Tu peux l'ajouter à ton écran d'accueil
+        avec « Partager », puis « Sur l'écran d'accueil ».</p>
+      </details>
+      <details>
+        <summary>Pourquoi faut-il rejoindre un groupe pour l'appli Android ?</summary>
+        <p>Pendant la phase de test, Google n'ouvre l'appli qu'aux membres de la liste des testeurs. Rejoindre le groupe
+        t'ajoute à cette liste ; il suffit ensuite de t'inscrire au test pour pouvoir l'installer depuis le Play Store.</p>
+      </details>
+      <details>
+        <summary>Faut-il créer un compte ?</summary>
+        <p>Non. LadyQueen ne demande ni compte ni adresse e-mail, et tes parties restent sur ton appareil.</p>
+      </details>
     </section>
-
-    <!-- BIBLIOTHEQUE -->
-    <section id="view-bibliotheque" class="view">
-      <p class="eyebrow">Parties enregistrées</p>
-      <div id="libraryActions" class="library-actions" hidden>
-        <button class="btn-primary" id="libOpenSelectedBtn">Ouvrir et analyser →</button>
-        <button class="btn-ghost" id="libRenameSelectedBtn" title="Renommer la partie sélectionnée" aria-label="Renommer la partie sélectionnée">✎</button>
-        <button class="btn-ghost" id="libDeleteSelectedBtn" title="Supprimer la partie sélectionnée" aria-label="Supprimer la partie sélectionnée">🗑</button>
-      </div>
-      <div id="libraryList" class="library-list"></div>
-
-      <div class="backup-panel">
-        <p class="eyebrow">Sauvegarde des données</p>
-        <p class="backup-desc">Progression des leçons, puzzles résolus, bibliothèque de parties et préférences — tout reste stocké uniquement sur cet appareil. Exporte un fichier de sauvegarde avant de changer de téléphone ou de vider ton navigateur.</p>
-        <div class="backup-actions">
-          <button class="btn-ghost" id="exportDataBtn">⬇ Exporter mes données</button>
-          <button class="btn-ghost" id="copyGamesBtn" title="Copie toutes tes parties sous forme de texte, à coller dans un message (WhatsApp, mail…)">📋 Copier mes parties</button>
-          <button class="btn-ghost" id="pasteGamesBtn" title="Colle ici le texte copié depuis un autre appareil pour ajouter ses parties">📥 Coller des parties</button>
-          <button class="btn-ghost" id="addGamesBtn" title="Ajoute les parties du fichier à celles de cet appareil, sans rien remplacer">➕ Ajouter les parties d'un fichier</button>
-          <button class="btn-ghost" id="importDataBtn" title="Remplace toutes les données de cet appareil par celles du fichier">⬆ Tout restaurer (remplace)</button>
-          <input type="file" id="importDataInput" accept="application/json" hidden>
-          <input type="file" id="addGamesInput" hidden>
-        </div>
-        <div class="paste-games" id="pasteGamesBox" hidden>
-          <textarea id="pasteGamesArea" rows="4" spellcheck="false" placeholder="Colle ici le texte copié (« LadyQueen-parties: … »)"></textarea>
-          <button class="btn-ghost" id="pasteGamesAddBtn">Ajouter</button>
-        </div>
-        <p class="backup-status" id="backupStatus"></p>
-      </div>
-    </section>
-
   </main>
-
-  <div id="legendBubble" class="legend-bubble" hidden role="dialog" aria-label="Comment lire les coups">
-    <button type="button" class="legend-close" id="legendCloseBtn" aria-label="Fermer">×</button>
-    <p class="legend-title">Comment lire les coups</p>
-    <ul>
-      <li><b>R D T F C P</b> : roi, dame, tour, fou, cavalier, pion. Dans la liste des coups, un pion n'a pas de lettre (« e4 »).</li>
-      <li><b>x</b> : prend (« Fxc5 » : le fou prend en c5).</li>
-      <li><b>+</b> : échec. <b>#</b> : échec et mat.</li>
-      <li id="legendErrorItem"><b>E</b> : erreur (« E 2 / 7 » = la 2e erreur sur 7 repérées dans la partie).</li>
-      <li>Note d'un coup : <b>!!</b> excellent · <b>?!</b> imprécision · <b>?</b> erreur · <b>??</b> gaffe.</li>
-    </ul>
-  </div>
-
-
-  </div>
-
-  <div id="onboardingOverlay" class="onboarding-overlay" hidden>
-    <div class="onboarding-card">
-      <div class="onboarding-brand"><span class="brand-glyph">♞</span> Bienvenue</div>
-      <h2>Échiquier — Académie</h2>
-      <p class="onboarding-intro">Une application complète pour apprendre, t'entraîner et progresser aux échecs, à ton rythme.</p>
-      <ul class="onboarding-list">
-        <li><b>Règles</b> — 12 leçons interactives, des bases aux règles spéciales.</li>
-        <li><b>Tactique</b> — des puzzles vérifiés, filtrables par niveau (Elo).</li>
-        <li><b>Analyse</b> — plateau libre, moteur d'échecs, coach vocal, et une partie contre l'ordinateur à la force réglable.</li>
-        <li><b>Bibliothèque</b> — retrouve tes parties enregistrées et sauvegarde tes données.</li>
-      </ul>
-      <button class="btn-primary" id="onboardingCloseBtn">Commencer →</button>
-    </div>
-  </div>
 </div>
 
-<div class="layout-confirm-bar" id="layoutConfirmBar" hidden>
-  <span>Nouvelle disposition</span>
-  <button class="btn-ghost" id="layoutResetBtn">↺ Annuler</button>
-  <button class="btn-primary" id="layoutValidateBtn">✓ Valider</button>
-</div>
+<footer>
+  <div class="wrap">
+    <span>LadyQueen · Jelau Games</span>
+    <span><a href="jeu.html" data-game-link>Jouer en ligne</a> · <a href="confidentialite.html">Confidentialité</a></span>
+  </div>
+</footer>
 
-<!-- Outside #app/.view on purpose: a .view's `animation: fadein` (which
-     animates `transform`) makes browsers treat it as a containing block for
-     position:fixed descendants, throwing off this grip's viewport-relative
-     coordinates by however far that .view sits from the real viewport
-     origin. Placed here, position:fixed math stays correct. -->
-<div class="resize-corner-grip" id="boardCornerGrip" title="Glisser pour agrandir/rétrécir le plateau"></div>
-<div class="move-grip" id="boardMoveGrip" title="Glisser pour déplacer le plateau"></div>
-<div class="move-grip" id="sideColMoveGrip" title="Glisser pour déplacer Moteur &amp; coach"></div>
-<div class="move-grip" id="movelistMoveGrip" title="Glisser pour déplacer Coups joués"></div>
-
-<script type="module" src="js/app.js"></script>
+<script>
+(function () {
+  var groupName = TESTER_GROUP_EMAIL.split("@")[0];
+  var groupUrl = "https://groups.google.com/g/" + encodeURIComponent(groupName);
+  document.querySelectorAll("[data-group-link]").forEach(function (a) { a.href = groupUrl; });
+  document.querySelectorAll("[data-group-email]").forEach(function (el) { el.textContent = TESTER_GROUP_EMAIL; });
+  document.querySelectorAll("[data-play-link]").forEach(function (a) { a.href = PLAY_TESTING_URL; });
+  document.querySelectorAll("[data-game-link]").forEach(function (a) { a.href = GAME_URL; });
+})();
+</script>
 </body>
 </html>
