@@ -152,6 +152,15 @@ export function goToPly(n, opts = {}) {
   } else {
     board.setInteractive(true);
   }
+
+  // The engine's reply is normally triggered by the player's own move, and by
+  // nothing else. So browsing back through the history and then returning to
+  // the live position on the engine's turn left it waiting forever, with the
+  // game stuck. Asking again here is safe: maybeTriggerComputerMove checks
+  // whose turn it is and refuses to start a second search.
+  if (vsComputerMode && !vsComputerGameOver && !mainLine && atLatest && chess.turn() === computerSide) {
+    maybeTriggerComputerMove();
+  }
 }
 
 function updateNavButtons() {
@@ -638,6 +647,7 @@ export function initAnalysisView() {
     els.moveExplanation.hidden = false;
     els.moveExplanation.textContent = "Réflexion en cours…";
     try {
+      await clearEngineHash(); // same position must always give the same hint
       const result = await evaluateFen(chess.fen(), getDepth());
       const lang = getCoachLang();
       if (!result.bestMove) {
@@ -955,6 +965,20 @@ function applyEngineStrength(elo) {
   });
 }
 
+// Stockfish keeps its transposition table between searches. At a FIXED depth
+// the stored entries still change move ordering, so two searches of the same
+// position can settle on different moves of near-equal value — which is why
+// asking for a hint twice in a row kept answering something else. The table is
+// especially polluted after the weakened opponent searches. Clearing it first
+// makes the hint reproducible: same position, same answer.
+function clearEngineHash() {
+  ensureEngine();
+  return queueEngineTask(() => {
+    if (!engine) return;
+    engine.postMessage("setoption name Clear Hash value true");
+  });
+}
+
 function deactivateComputerMode() {
   vsComputerMode = false;
   vsComputerGameOver = false;
@@ -1091,10 +1115,18 @@ function refreshTopPanel() {
 }
 MOBILE_BOARD_PROMOTE_MQ.addEventListener("change", refreshTopPanel);
 
+// True from the moment the engine is asked for a move until that move is on
+// the board. Without it, anything that can call this twice (returning to the
+// live position while the engine is already searching) would queue a second
+// search and play two moves in a row.
+let computerThinking = false;
+
 async function maybeTriggerComputerMove() {
   if (!vsComputerMode || vsComputerGameOver) return;
+  if (computerThinking) return;
   if (chess.turn() !== computerSide) return;
   if (chess.isGameOver()) return;
+  computerThinking = true;
   els.engineStatus.textContent = "L'ordinateur réfléchit…";
   try {
     const fenBefore = chess.fen();
@@ -1116,6 +1148,8 @@ async function maybeTriggerComputerMove() {
     recordMove(fenBefore, moveResult, { skipLiveCoach: true, skipEvalRefresh: true });
   } catch (e) {
     els.engineStatus.textContent = "L'ordinateur n'a pas pu jouer (moteur indisponible).";
+  } finally {
+    computerThinking = false;
   }
 }
 

@@ -20,10 +20,22 @@ function debugMsg(text) {
   if (!el) {
     el = document.createElement("div");
     el.id = "adDebug";
-    el.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99998;padding:2px 6px;font:11px/1.3 monospace;color:#fff;background:rgba(160,30,30,.85);pointer-events:none;";
+    // A discreet corner chip rather than a full-width red bar: it still says
+    // unmistakably that these are test ads (its absence is what tells you the
+    // build serves REAL ads, which must never be clicked), without disfiguring
+    // every screenshot taken during testing. Never shipped: debugMsg returns
+    // early when USE_TEST_ADS is false.
+    el.style.cssText = [
+      "position:fixed", "left:6px", "top:6px", "z-index:99998",
+      "max-width:60vw", "overflow:hidden", "text-overflow:ellipsis", "white-space:nowrap",
+      "padding:1px 7px", "border-radius:9px",
+      "font:10px/1.5 monospace", "color:#fff",
+      "background:rgba(160,30,30,.55)", "opacity:.75",
+      "pointer-events:none",
+    ].join(";") + ";";
     document.body.appendChild(el);
   }
-  el.textContent = "PUB (test) : " + text;
+  el.textContent = "test \u00b7 " + text;
 }
 
 function isNativeApp() {

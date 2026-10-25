@@ -1,6 +1,6 @@
 // Rendu d'un plateau d'échecs interactif à partir d'une instance chess.js
 // Usage : const board = createBoard(mountEl, chessInstance, { onUserMove, orientation, interactive });
-import { pieceHref, pieceViewBox } from "./pieceStyle.js";
+import { pieceHref, pieceViewBox, getPieceStyle } from "./pieceStyle.js";
 import { playMove, playCapture, playCheck, playGameEnd, playCheckWarning } from "./sounds.js";
 
 const FILES = ["a","b","c","d","e","f","g","h"];
@@ -53,48 +53,98 @@ export function createBoard(mountEl, chess, opts = {}) {
     state.legalTargets = [];
   }
 
-  function render() {
+  // The 64 squares are created once and then updated in place. Rebuilding
+  // them all on every render — and with them the 32 <use> SVGs, each one
+  // resolving an external sprite file — was cheap on a desktop but not on a
+  // large 120 Hz tablet, where the frame budget is 8 ms. That rebuild lands
+  // exactly at the end of each slide, so the stutter was caught by the eye
+  // mid-move. Only the squares that actually changed are touched now.
+  let gridBuilt = false;
+  let gridOrientation = null;
+  let gridCoords = null;
+  let gridStyle = null;
+  let delegated = false;
+  const squareEls = new Map();
+
+  function buildGrid() {
     gridEl.innerHTML = "";
+    squareEls.clear();
+    for (const sq of orderedSquares()) {
+      const el = document.createElement("div");
+      el.dataset.square = sq;
+      el.dataset.piece = "";
+      gridEl.appendChild(el);
+      squareEls.set(sq, el);
+    }
+    if (!delegated) {
+      // One delegated listener on the grid, instead of 64 re-attached on every
+      // single render.
+      gridEl.addEventListener("click", (e) => {
+        if (!state.interactive) return;
+        const target = e.target.closest && e.target.closest(".sq");
+        if (target && target.dataset.square) handleSquareClick(target.dataset.square);
+      });
+      delegated = true;
+    }
+    gridBuilt = true;
+    gridOrientation = state.orientation;
+  }
+
+  function makePieceSvg(piece, viewBox) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "piece");
+    svg.setAttribute("viewBox", viewBox);
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    const href = pieceHref(piece.color, piece.type);
+    use.setAttributeNS("http://www.w3.org/1999/xlink", "href", href);
+    use.setAttribute("href", href);
+    svg.appendChild(use);
+    return svg;
+  }
+
+  function render() {
+    if (!gridBuilt || gridOrientation !== state.orientation) buildGrid();
+
+    // Changing the piece set has to force every SVG to be rebuilt: the squares'
+    // cache key is the piece, not the style it is drawn in.
+    const style = getPieceStyle();
+    if (style !== gridStyle) {
+      gridStyle = style;
+      for (const el of squareEls.values()) el.dataset.piece = "\u0000";
+    }
+
     const board = state.chess.board(); // 8x8 array, board[0] = rank8
     const kingInCheckSquare = getCheckKingSquare(state.chess);
+    const viewBox = pieceViewBox(); // read once, not once per piece
 
-    for (const sq of orderedSquares()) {
+    for (const [sq, el] of squareEls) {
       const file = sq[0];
       const rank = parseInt(sq[1], 10);
-      const rowIdx = 8 - rank;
-      const colIdx = FILES.indexOf(file);
-      const piece = board[rowIdx][colIdx];
+      const piece = board[8 - rank][FILES.indexOf(file)];
+      const key = piece ? piece.color + piece.type : "";
 
-      const el = document.createElement("div");
-      el.className = "sq " + squareColor(file, rank);
-      el.dataset.square = sq;
+      let cls = "sq " + squareColor(file, rank);
+      if (piece) cls += piece.color === "w" ? " piece-white" : " piece-black";
+      if (state.lastMove && sq === state.lastMove.from) cls += " last-from";
+      if (state.lastMove && sq === state.lastMove.to) cls += " last-to";
+      if (state.hintMove && sq === state.hintMove.from) cls += " hint-from";
+      if (state.hintMove && sq === state.hintMove.to) cls += " hint-to";
+      if (state.selected === sq) cls += " selected";
+      if (state.legalTargets.includes(sq)) cls += " legal";
+      if (kingInCheckSquare === sq) cls += " check-king";
+      if (el.className !== cls) el.className = cls;
 
-      if (piece) {
-        el.classList.add(piece.color === "w" ? "piece-white" : "piece-black");
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", "piece");
-        svg.setAttribute("viewBox", pieceViewBox());
-        const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-        const href = pieceHref(piece.color, piece.type);
-        use.setAttributeNS("http://www.w3.org/1999/xlink", "href", href);
-        use.setAttribute("href", href);
-        svg.appendChild(use);
-        el.appendChild(svg);
+      if (el.dataset.piece !== key) {
+        el.dataset.piece = key;
+        const old = el.querySelector("svg.piece");
+        if (old) old.remove();
+        if (piece) el.appendChild(makePieceSvg(piece, viewBox));
+      } else if (piece) {
+        // animatePieceSlide hides the original while its clone flies; a square
+        // that kept its piece must never be left blank by that.
+        const svg = el.querySelector("svg.piece");
+        if (svg && svg.style.visibility) svg.style.visibility = "";
       }
-
-      if (state.lastMove && (sq === state.lastMove.from)) el.classList.add("last-from");
-      if (state.lastMove && (sq === state.lastMove.to)) el.classList.add("last-to");
-      if (state.hintMove && (sq === state.hintMove.from)) el.classList.add("hint-from");
-      if (state.hintMove && (sq === state.hintMove.to)) el.classList.add("hint-to");
-      if (state.selected === sq) el.classList.add("selected");
-      if (state.legalTargets.includes(sq)) el.classList.add("legal");
-      if (kingInCheckSquare === sq) el.classList.add("check-king");
-
-      if (state.interactive) {
-        el.addEventListener("click", () => handleSquareClick(sq));
-      }
-
-      gridEl.appendChild(el);
     }
 
     renderGutters();
@@ -103,7 +153,12 @@ export function createBoard(mountEl, chess, opts = {}) {
   // Coordinate labels drawn OUTSIDE the squares, in dedicated strips along
   // the left (ranks) and bottom (files) edges — matching the convention
   // used by chess.com/lichess, rather than tucked into square corners.
+  // Redrawn only when the orientation or the coords setting changes: they do
+  // not depend on the position.
   function renderGutters() {
+    const sig = state.showCoords ? state.orientation : "off";
+    if (sig === gridCoords) return;
+    gridCoords = sig;
     rankGutter.innerHTML = "";
     fileGutter.innerHTML = "";
     if (!state.showCoords) return;
@@ -211,18 +266,40 @@ export function createBoard(mountEl, chess, opts = {}) {
     clone.style.margin = "0";
     clone.style.zIndex = "20";
     clone.style.pointerEvents = "none";
-    clone.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.6, 0.3, 1)`;
+    clone.style.willChange = "transform";
     boardEl.appendChild(clone);
     pieceSvg.style.visibility = "hidden"; // avoid a duplicate while the clone flies
 
     const dx = toRect.left - fromRect.left;
     const dy = toRect.top - fromRect.top;
-    requestAnimationFrame(() => {
-      clone.style.transform = `translate(${dx}px, ${dy}px)`;
-    });
 
-    const timer = setTimeout(() => { clone.remove(); onDone(); }, duration + 20);
-    return { clone, timer };
+    // Force a layout pass so the starting position is committed BEFORE the
+    // transition is declared. A single requestAnimationFrame was not enough on
+    // the WebView: the insertion and the transform landed in the same style
+    // recalculation, so the slide started from a half-applied position and
+    // visibly juddered.
+    void clone.getBoundingClientRect().width;
+    clone.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.6, 0.3, 1)`;
+    clone.style.transform = `translate(${dx}px, ${dy}px)`;
+
+    let finished = false;
+    let timer = null;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      clone.removeEventListener("transitionend", finish);
+      // Redraw FIRST, remove the flying piece after. The other order left one
+      // frame with the piece drawn nowhere, which read as a flicker.
+      onDone();
+      clone.remove();
+    };
+    clone.addEventListener("transitionend", finish);
+    // Safety net: transitionend never fires if the transition is dropped
+    // (app backgrounded, frames skipped under load).
+    timer = setTimeout(finish, duration + 80);
+
+    return { clone, timer, finish };
   }
 
   // Slide started by setChess (navigation), kept so a NEWER navigation can

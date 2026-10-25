@@ -611,9 +611,26 @@ export function initLayoutResize() {
     window.addEventListener("resize", positionGrips);
     // Catches the editor opening/closing, switching tabs, and any other
     // change to the board area (a plain resize listener alone wouldn't fire
-    // for those) — recomputing the grips' position is cheap enough that
-    // there's no need to be selective about which mutation actually mattered.
-    new MutationObserver(positionGrips).observe(document.body, {
+    // for those). Two guards, because the unfiltered version ran on every
+    // single DOM change: a piece sliding appends then removes a flying SVG and
+    // render() rebuilds all 64 squares, so positionGrips fired dozens of times
+    // mid-animation, each one forcing a synchronous layout pass while the
+    // flying piece held pixel coordinates measured before it.
+    //   - mutations coming from inside a board are ignored outright: where a
+    //     piece sits has no bearing on where the grips go;
+    //   - the rest are coalesced into one call per frame.
+    let gripsQueued = false;
+    const insideBoard = (node) => {
+      const el = node && (node.nodeType === 1 ? node : node.parentElement);
+      return !!(el && el.closest && el.closest(".board"));
+    };
+    const queueGrips = (records) => {
+      if (gripsQueued) return;
+      if (!records.some(r => !insideBoard(r.target))) return;
+      gripsQueued = true;
+      requestAnimationFrame(() => { gripsQueued = false; positionGrips(); });
+    };
+    new MutationObserver(queueGrips).observe(document.body, {
       attributes: true, attributeFilter: ["hidden", "class"], subtree: true, childList: true,
     });
   }
