@@ -1319,3 +1319,81 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   .coach-title-row .info-icon-btn { flex: none; }
   .coach-reading .fullgame-redo-btn { display: none; }
 }
+
+/* ---------- PIÈGES D'OUVERTURE ---------- */
+/* Réutilise les classes existantes (filter-chip, nav-controls, btn-ghost,
+   eyebrow) : seules la mise en colonnes et la liste des coups sont neuves.
+   Les couleurs viennent des variables du thème déclarées en tête de fichier
+   (--bg-panel, --border-soft, --ink, --ink-dim, --radius) : toute autre
+   graphie laisse les lignes sans fond ni bordure. */
+.trap-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 250px) auto minmax(220px, 300px);
+  gap: 16px;
+  align-items: start;
+}
+.trap-list { display: flex; flex-direction: column; gap: 3px; max-height: 70vh; overflow-y: auto; }
+
+/* Une ligne par piège : le niveau Elo d'abord, le nom ensuite. */
+.trap-item {
+  display: flex; align-items: baseline; gap: 9px;
+  text-align: left; padding: 7px 10px;
+  background: var(--bg-panel); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); color: var(--ink);
+  cursor: pointer; font: inherit;
+}
+.trap-item:hover { border-color: var(--brass-soft); }
+.trap-item.active { background: rgba(201, 162, 39, 0.18); border-color: var(--brass); }
+.trap-item-elo {
+  font-family: var(--font-mono); font-size: 11px; color: var(--brass-soft);
+  width: 30px; flex-shrink: 0; text-align: right;
+}
+.trap-item-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+
+/* Le plateau prend la largeur de sa colonne, bordure et réglette comprises
+   (24 px de châssis + 6 px de marge), au lieu des 11vw de la formule
+   générale : sur un écran de 393 px celle-ci donnait 370 px de plateau dans
+   une colonne de 357, et les bords étaient rognés. */
+.trap-board-col {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  min-width: 0; container-type: inline-size;
+}
+.trap-board-col .board { --sq: min(72px, calc((100cqw - 30px) / 8)); }
+.trap-mode-row { display: flex; gap: 6px; }
+
+.trap-title { font-family: var(--font-display); font-size: 18px; margin: 0 0 4px; }
+.trap-summary { font-size: 13px; color: var(--ink-dim); margin: 0 0 10px; line-height: 1.45; }
+
+.trap-moves {
+  display: flex; flex-wrap: wrap; gap: 3px 6px;
+  font-family: var(--font-mono); font-size: 13px;
+  padding: 8px; background: var(--bg-panel); border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+.trap-move-num { color: var(--ink-faint); }
+.trap-move { color: var(--ink-dim); padding: 0 2px; border-radius: 3px; }
+.trap-move.played { color: var(--ink); cursor: pointer; }
+.trap-move.current { background: rgba(201, 162, 39, 0.25); color: var(--brass-soft); font-weight: 600; }
+.trap-move.failed { background: rgba(192, 106, 92, 0.35); color: #fff; }
+
+.trap-note { font-size: 13px; line-height: 1.5; margin: 0 0 8px; min-height: 2.6em; }
+.trap-note-good { color: var(--success); }
+.trap-note-bad { color: var(--error); }
+.trap-lesson {
+  font-size: 12px; line-height: 1.5; color: var(--ink-dim);
+  border-left: 3px solid var(--brass); padding-left: 10px; margin: 0;
+}
+
+/* Sous 1000 px les trois colonnes s'empilent, la liste reste verticale mais
+   plafonnée pour que le plateau reste à portée de pouce.
+   Attention : une piste `1fr` ne descend jamais sous son min-content, donc
+   la grille doit être déclarée minmax(0, 1fr) — sinon une colonne plus large
+   que l'écran repousse le plateau, centré, hors du cadre visible, où il est
+   à la fois invisible et inatteignable puisque body a overflow-x: hidden. */
+@media (max-width: 1000px) {
+  .trap-layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .trap-list-col, .trap-board-col, .trap-side-col { min-width: 0; }
+  .trap-list { max-height: 29vh; }
+  .trap-item { padding: 8px 10px; }
+  .trap-title { font-size: 16px; }
+}

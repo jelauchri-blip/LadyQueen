@@ -144,6 +144,7 @@
               <option value="tactique">Puzzle</option>
               <option value="bibliotheque">Bibliothèque</option>
               <option value="analyse">Analyse</option>
+              <option value="pieges">Pièges</option>
               <option value="editor">✎ Créer une position</option>
               <option value="pgn">Coller une partie</option>
             </select>
@@ -213,6 +214,9 @@
     </button>
     <button class="tab-btn" data-tab="analyse">
       Analyse
+    </button>
+    <button class="tab-btn" data-tab="pieges">
+      Pièges
     </button>
     <button class="tab-btn sidebar-action-btn" id="openEditorBtn">
       ✎ Créer une position
@@ -284,6 +288,39 @@
             <button class="btn-primary" id="nextPuzzleBtn">Puzzle suivant →</button>
           </div>
           <div class="puzzle-explanation" id="puzzleExplanation" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIÈGES D'OUVERTURE -->
+    <section id="view-pieges" class="view">
+      <div class="trap-layout">
+        <aside class="trap-list-col">
+          <p class="eyebrow">Pièges d'ouverture</p>
+          <div id="trapList" class="trap-list"></div>
+        </aside>
+
+        <div class="trap-board-col">
+          <div id="trapBoardMount"></div>
+          <div class="trap-mode-row">
+            <button class="filter-chip active" id="trapModeDemo">Démonstration</button>
+            <button class="filter-chip" id="trapModePlay">À toi de jouer</button>
+          </div>
+          <div class="nav-controls" id="trapNav">
+            <button class="btn-ghost nav-btn" id="trapFirstBtn" title="Début">⏮</button>
+            <button class="btn-ghost nav-btn" id="trapPrevBtn" title="Coup précédent">◀</button>
+            <button class="btn-ghost nav-btn" id="trapNextBtn" title="Coup suivant">▶</button>
+            <button class="btn-ghost nav-btn" id="trapLastBtn" title="Fin du piège">⏭</button>
+          </div>
+          <button class="btn-ghost" id="trapRestartBtn" hidden>Recommencer</button>
+        </div>
+
+        <div class="trap-side-col">
+          <h2 class="trap-title" id="trapTitle">—</h2>
+          <p class="trap-summary" id="trapSummary"></p>
+          <div class="trap-moves" id="trapMoves"></div>
+          <p class="trap-note" id="trapNote"></p>
+          <p class="trap-lesson" id="trapLesson" hidden></p>
         </div>
       </div>
     </section>

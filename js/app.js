@@ -2,6 +2,7 @@ import { Chess } from "./chess.js";
 import { createBoard } from "./board.js";
 import { initLessonsView } from "./lessons.js";
 import { initPuzzlesView } from "./puzzles.js";
+import { initTrapsView } from "./traps.js";
 import { initAnalysisView, loadPgnString } from "./analysis.js";
 import { getPieceStyle, setPieceStyle } from "./pieceStyle.js";
 import { isSoundEnabled, setSoundEnabled } from "./sounds.js";
@@ -17,7 +18,7 @@ initAds(); // AdMob banner: Android app only, does nothing on the website
 const tabButtons = document.querySelectorAll(".tab-btn");
 const views = document.querySelectorAll(".view");
 const mobileTabSelect = document.getElementById("mobileTabSelect");
-const initialized = { regles: false, tactique: false, analyse: false, bibliotheque: false };
+const initialized = { regles: false, tactique: false, analyse: false, bibliotheque: false, pieges: false };
 
 function showTab(name) {
   tabButtons.forEach(b => b.classList.toggle("active", b.dataset.tab === name));
@@ -34,6 +35,10 @@ function showTab(name) {
   if (name === "tactique" && !initialized.tactique) {
     initialized.tactique = true;
     initPuzzlesView();
+  }
+  if (name === "pieges" && !initialized.pieges) {
+    initialized.pieges = true;
+    initTrapsView();
   }
   if (name === "bibliotheque" && !initialized.bibliotheque) {
     initialized.bibliotheque = true;

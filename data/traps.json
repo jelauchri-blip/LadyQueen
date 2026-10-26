@@ -1,0 +1,2817 @@
+[
+  {
+    "id": "trap-fou",
+    "name": "Le mat du sot",
+    "eco": "A00",
+    "side": "b",
+    "elo": 100,
+    "summary": "Le mat le plus court possible aux échecs : deux coups. À connaître pour ne jamais le subir.",
+    "lesson": "Les pions f et g gardent la diagonale du roi. Les avancer tous les deux au début, c'est ouvrir sa propre porte.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "f3",
+        "annot": "?",
+        "from": "f2",
+        "to": "f3",
+        "note": "Un coup inutile qui ouvre déjà la diagonale e1-h4."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Vous ouvrez le centre et libérez votre dame."
+      },
+      {
+        "san": "g4",
+        "annot": "??",
+        "from": "g2",
+        "to": "g4",
+        "note": "Le second pion part : la diagonale est grande ouverte, et plus rien ne peut la fermer."
+      },
+      {
+        "san": "Qh4#",
+        "annot": "",
+        "from": "d8",
+        "to": "h4",
+        "note": "Mat en deux coups. Le roi blanc n'a aucune case et aucune pièce ne peut s'interposer."
+      }
+    ]
+  },
+  {
+    "id": "trap-berger",
+    "name": "Le mat du Berger",
+    "eco": "C20",
+    "side": "w",
+    "elo": 400,
+    "summary": "Le piège le plus connu : la dame et le fou visent f7, le point faible des Noirs.",
+    "lesson": "f7 n'est défendu que par le roi en début de partie. Deux pièces qui le visent suffisent à mater.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Les Blancs ouvrent le centre."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Réponse symétrique, la plus naturelle."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou prend la diagonale a2-g8 et vise déjà f7."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Les Noirs développent sans se méfier."
+      },
+      {
+        "san": "Qh5",
+        "annot": "",
+        "from": "d1",
+        "to": "h5",
+        "note": "La dame sort tôt et attaque f7 une seconde fois, ainsi que e5."
+      },
+      {
+        "san": "Nf6",
+        "annot": "??",
+        "from": "g8",
+        "to": "f6",
+        "note": "L'erreur. Ce coup naturel défend e5 mais oublie f7."
+      },
+      {
+        "san": "Qxf7#",
+        "annot": "",
+        "from": "h5",
+        "to": "f7",
+        "note": "Mat. La dame est protégée par le fou c4, le roi n'a aucune fuite."
+      }
+    ]
+  },
+  {
+    "id": "trap-berger-refutation",
+    "name": "Réfuter le mat du Berger",
+    "eco": "C20",
+    "side": "b",
+    "elo": 500,
+    "summary": "Comment punir l'adversaire qui sort sa dame trop tôt.",
+    "lesson": "Contre une dame sortie tôt, défendez f7 sans bouger vos pions : la dame adverse deviendra une cible.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "L'adversaire ouvre."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Vous répondez au centre."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou vise f7."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Vous développez."
+      },
+      {
+        "san": "Qh5",
+        "annot": "",
+        "from": "d1",
+        "to": "h5",
+        "note": "La dame sort : la menace de mat en f7 est là."
+      },
+      {
+        "san": "Qe7",
+        "annot": "",
+        "from": "d8",
+        "to": "e7",
+        "note": "La défense propre. La dame garde f7 et laisse le cavalier g8 libre."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Les Blancs doivent renoncer et développer normalement."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Vous développez à votre tour, avec une position saine."
+      }
+    ]
+  },
+  {
+    "id": "trap-damiano",
+    "name": "Le mat de Damiano",
+    "eco": "C40",
+    "side": "w",
+    "elo": 600,
+    "summary": "Le deuxième coup des Noirs, f6, affaiblit la diagonale du roi. Un sacrifice de cavalier suffit à le punir.",
+    "lesson": "Défendre un pion avec le pion f en début de partie ouvre la diagonale e8-h5. C'est l'une des erreurs les plus chères des échecs.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture classique."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Réponse symétrique."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Le cavalier attaque e5."
+      },
+      {
+        "san": "f6",
+        "annot": "??",
+        "from": "f7",
+        "to": "f6",
+        "note": "L'erreur. Les Noirs défendent e5 du mauvais côté et ouvrent la diagonale de leur roi."
+      },
+      {
+        "san": "Nxe5",
+        "annot": "!",
+        "from": "f3",
+        "to": "e5",
+        "note": "Le sacrifice. Le cavalier se donne pour ouvrir la position."
+      },
+      {
+        "san": "fxe5",
+        "annot": "",
+        "from": "f6",
+        "to": "e5",
+        "note": "Accepté. Les Noirs ont une pièce de plus pour un instant."
+      },
+      {
+        "san": "Qh5+",
+        "annot": "",
+        "from": "d1",
+        "to": "h5",
+        "note": "Échec sur la diagonale que f6 vient d'ouvrir."
+      },
+      {
+        "san": "g6",
+        "annot": "",
+        "from": "g7",
+        "to": "g6",
+        "note": "L'autre défense, Ke7, mène à une chasse au roi encore pire."
+      },
+      {
+        "san": "Qxe5+",
+        "annot": "",
+        "from": "h5",
+        "to": "e5",
+        "note": "La dame récupère le pion avec échec et attaque la tour h8."
+      },
+      {
+        "san": "Qe7",
+        "annot": "",
+        "from": "d8",
+        "to": "e7",
+        "note": "Les Noirs doivent s'interposer."
+      },
+      {
+        "san": "Qxh8",
+        "annot": "",
+        "from": "e5",
+        "to": "h8",
+        "note": "La tour tombe. Les Blancs ont une qualité et une position gagnante."
+      }
+    ]
+  },
+  {
+    "id": "trap-caro-kann-4",
+    "name": "Le piège de Réti",
+    "eco": "B15",
+    "side": "w",
+    "elo": 700,
+    "summary": "Un mat étouffé en six coups, si les Noirs développent sans voir la colonne e.",
+    "lesson": "Méfiez-vous des coups de développement automatiques quand la colonne du roi est ouverte.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "c6",
+        "annot": "",
+        "from": "c7",
+        "to": "c6",
+        "note": "La défense Caro-Kann."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Les Blancs prennent le centre."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "Les Noirs contestent."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Développement et pression sur d5."
+      },
+      {
+        "san": "dxe4",
+        "annot": "",
+        "from": "d5",
+        "to": "e4",
+        "note": "Les Noirs prennent."
+      },
+      {
+        "san": "Nxe4",
+        "annot": "",
+        "from": "c3",
+        "to": "e4",
+        "note": "Reprise."
+      },
+      {
+        "san": "Nd7",
+        "annot": "?",
+        "from": "b8",
+        "to": "d7",
+        "note": "Un coup jouable en soi, mais ici il laisse e8 sans défense après l'échec."
+      },
+      {
+        "san": "Qe2",
+        "annot": "",
+        "from": "d1",
+        "to": "e2",
+        "note": "Discret. La dame se place sur la colonne e, face au roi noir."
+      },
+      {
+        "san": "Ngf6",
+        "annot": "??",
+        "from": "g8",
+        "to": "f6",
+        "note": "L'erreur fatale : le cavalier bloque la défense."
+      },
+      {
+        "san": "Nd6#",
+        "annot": "",
+        "from": "e4",
+        "to": "d6",
+        "note": "Mat étouffé. Le roi noir est enfermé par ses propres pièces."
+      }
+    ]
+  },
+  {
+    "id": "trap-tennison",
+    "name": "Le gambit Tennison",
+    "eco": "A06",
+    "side": "w",
+    "elo": 800,
+    "summary": "Les Blancs ouvrent au cavalier, offrent le pion e4, et matent en six coups si les Noirs se servent.",
+    "lesson": "Un cavalier en e5 tient à lui seul d7 et f7. Tant qu'il est là, le roi noir n'a aucune case : c'est lui le vrai mateur, pas la dame.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Les Blancs commencent au cavalier plutôt qu'au pion, pour contrôler le centre sans s'engager."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "Les Noirs prennent le centre, la réponse la plus naturelle."
+      },
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Le gambit Tennison : les Blancs offrent le pion e4."
+      },
+      {
+        "san": "dxe4",
+        "annot": "",
+        "from": "d5",
+        "to": "e4",
+        "note": "Accepté. Les Noirs ont un pion de plus, et un retard de développement."
+      },
+      {
+        "san": "Ne5",
+        "annot": "",
+        "from": "f3",
+        "to": "e5",
+        "note": "Le cavalier saute au centre et vise déjà d7 et f7."
+      },
+      {
+        "san": "f6",
+        "annot": "",
+        "from": "f7",
+        "to": "f6",
+        "note": "Les Noirs attaquent le cavalier… en ouvrant la diagonale de leur propre roi."
+      },
+      {
+        "san": "Qh5+",
+        "annot": "",
+        "from": "d1",
+        "to": "h5",
+        "note": "Échec. Le roi noir n'a aucune case : il doit bloquer."
+      },
+      {
+        "san": "g6",
+        "annot": "",
+        "from": "g7",
+        "to": "g6",
+        "note": "Forcé. Le pion s'interpose, en attaquant la dame."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Les Blancs ignorent la menace et développent le fou sur f7. La dame est offerte."
+      },
+      {
+        "san": "gxh5",
+        "annot": "??",
+        "from": "g6",
+        "to": "h5",
+        "note": "La gourmandise. Il fallait jouer e6, en laissant la dame."
+      },
+      {
+        "san": "Bf7#",
+        "annot": "",
+        "from": "c4",
+        "to": "f7",
+        "note": "Mat. Le fou donne échec, le cavalier e5 couvre d7 et f7, et les pièces noires bouchent le reste."
+      }
+    ]
+  },
+  {
+    "id": "trap-legal",
+    "name": "Le mat de Légal",
+    "eco": "C41",
+    "side": "w",
+    "elo": 900,
+    "summary": "Le sacrifice de dame le plus célèbre : ignorer le clouage pour mater avec les pièces mineures.",
+    "lesson": "Un clouage n'est absolu que contre le roi. Contre la dame, la pièce clouée peut bouger si le gain est suffisant.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture classique."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Réponse symétrique."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Le cavalier attaque e5."
+      },
+      {
+        "san": "d6",
+        "annot": "",
+        "from": "d7",
+        "to": "d6",
+        "note": "La défense Philidor : les Noirs soutiennent e5 par un pion."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou prend la diagonale vers f7."
+      },
+      {
+        "san": "Bg4",
+        "annot": "",
+        "from": "c8",
+        "to": "g4",
+        "note": "Les Noirs clouent le cavalier f3 contre la dame."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Développement tranquille. Le piège se met en place."
+      },
+      {
+        "san": "g6",
+        "annot": "?",
+        "from": "g7",
+        "to": "g6",
+        "note": "Un coup lent de trop. Les Noirs devaient jouer Nf6 ou Be7."
+      },
+      {
+        "san": "Nxe5",
+        "annot": "!",
+        "from": "f3",
+        "to": "e5",
+        "note": "Le sacrifice. Le cavalier cloué bouge quand même."
+      },
+      {
+        "san": "Bxd1",
+        "annot": "",
+        "from": "g4",
+        "to": "d1",
+        "note": "Les Noirs prennent la dame, convaincus d'avoir gagné."
+      },
+      {
+        "san": "Bxf7+",
+        "annot": "",
+        "from": "c4",
+        "to": "f7",
+        "note": "Échec. Le roi noir est tiré de sa case."
+      },
+      {
+        "san": "Ke7",
+        "annot": "",
+        "from": "e8",
+        "to": "e7",
+        "note": "Forcé : Kf8 permettrait aussi la suite."
+      },
+      {
+        "san": "Nd5#",
+        "annot": "",
+        "from": "c3",
+        "to": "d5",
+        "note": "Mat avec deux cavaliers et un fou, sans dame."
+      }
+    ]
+  },
+  {
+    "id": "trap-reti-tartakover",
+    "name": "La partie Réti–Tartakover",
+    "eco": "B15",
+    "side": "w",
+    "elo": 1000,
+    "summary": "Vienne, 1910. Un sacrifice de dame suivi d'un mat des deux fous, en onze coups.",
+    "lesson": "Une dame vaut toutes les pièces, sauf quand elle achète un mat forcé. Avant de refuser un sacrifice, cherchez d'abord pourquoi l'adversaire le propose.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "c6",
+        "annot": "",
+        "from": "c7",
+        "to": "c6",
+        "note": "La défense Caro-Kann."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Les Blancs prennent le centre."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "Les Noirs contestent."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Développement et pression sur d5."
+      },
+      {
+        "san": "dxe4",
+        "annot": "",
+        "from": "d5",
+        "to": "e4",
+        "note": "Les Noirs prennent."
+      },
+      {
+        "san": "Nxe4",
+        "annot": "",
+        "from": "c3",
+        "to": "e4",
+        "note": "Reprise."
+      },
+      {
+        "san": "Nf6",
+        "annot": "?",
+        "from": "g8",
+        "to": "f6",
+        "note": "Naturel, mais il fallait Bf5 ou Nd7 : le cavalier invite l'échange qui ouvre la colonne."
+      },
+      {
+        "san": "Qd3",
+        "annot": "",
+        "from": "d1",
+        "to": "d3",
+        "note": "La dame se place discrètement sur la diagonale b1-h7."
+      },
+      {
+        "san": "e5",
+        "annot": "?",
+        "from": "e7",
+        "to": "e5",
+        "note": "Les Noirs ouvrent le centre alors que leur roi y est encore."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d4",
+        "to": "e5",
+        "note": "Les Blancs prennent."
+      },
+      {
+        "san": "Qa5+",
+        "annot": "",
+        "from": "d8",
+        "to": "a5",
+        "note": "Échec, pour récupérer le pion."
+      },
+      {
+        "san": "Bd2",
+        "annot": "",
+        "from": "c1",
+        "to": "d2",
+        "note": "Les Blancs s'interposent en développant."
+      },
+      {
+        "san": "Qxe5",
+        "annot": "",
+        "from": "a5",
+        "to": "e5",
+        "note": "Le pion est repris, mais la dame noire s'expose sur la colonne ouverte."
+      },
+      {
+        "san": "O-O-O",
+        "annot": "!",
+        "from": "e1",
+        "to": "c1",
+        "note": "Le grand roque : la tour arrive d1 face à la dame noire, et le roi blanc est à l'abri."
+      },
+      {
+        "san": "Nxe4",
+        "annot": "??",
+        "from": "f6",
+        "to": "e4",
+        "note": "La prise fatale. Elle ouvre la diagonale d8 à la dame blanche."
+      },
+      {
+        "san": "Qd8+",
+        "annot": "!!",
+        "from": "d3",
+        "to": "d8",
+        "note": "Le sacrifice de dame, qui n'a qu'un but : attirer le roi sur d8."
+      },
+      {
+        "san": "Kxd8",
+        "annot": "",
+        "from": "e8",
+        "to": "d8",
+        "note": "Forcé."
+      },
+      {
+        "san": "Bg5+",
+        "annot": "",
+        "from": "d2",
+        "to": "g5",
+        "note": "Échec double sur la colonne d. Le roi n'a que c7."
+      },
+      {
+        "san": "Kc7",
+        "annot": "",
+        "from": "d8",
+        "to": "c7",
+        "note": "Forcé. Ke8 permet Rd8 mat."
+      },
+      {
+        "san": "Bd8#",
+        "annot": "",
+        "from": "g5",
+        "to": "d8",
+        "note": "Mat. Deux fous et une tour suffisent : la dame n'était pas nécessaire."
+      }
+    ]
+  },
+  {
+    "id": "trap-blackburne-shilling",
+    "name": "Le gambit Blackburne-Shilling",
+    "eco": "C50",
+    "side": "b",
+    "elo": 1000,
+    "summary": "Un piège de rue : les Noirs offrent un pion que les Blancs gourmands ne devraient pas prendre.",
+    "lesson": "Quand l'adversaire offre un pion au cinquième coup, demandez-vous toujours ce qu'il voit et que vous ne voyez pas.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Défense."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Partie italienne."
+      },
+      {
+        "san": "Nd4",
+        "annot": "?!",
+        "from": "c6",
+        "to": "d4",
+        "note": "Le coup provocateur. Objectivement douteux, mais redoutable en blitz."
+      },
+      {
+        "san": "Nxe5",
+        "annot": "??",
+        "from": "f3",
+        "to": "e5",
+        "note": "La gourmandise. Les Blancs prennent le pion e5 et attaquent f7."
+      },
+      {
+        "san": "Qg5",
+        "annot": "!",
+        "from": "d8",
+        "to": "g5",
+        "note": "Double attaque : le cavalier e5 et le pion g2."
+      },
+      {
+        "san": "Nxf7",
+        "annot": "",
+        "from": "e5",
+        "to": "f7",
+        "note": "Les Blancs fourchettent dame et tour, persuadés de gagner."
+      },
+      {
+        "san": "Qxg2",
+        "annot": "",
+        "from": "g5",
+        "to": "g2",
+        "note": "Les Noirs ignorent et prennent g2, attaquant la tour h1."
+      },
+      {
+        "san": "Rf1",
+        "annot": "",
+        "from": "h1",
+        "to": "f1",
+        "note": "Forcé pour sauver la tour."
+      },
+      {
+        "san": "Qxe4+",
+        "annot": "",
+        "from": "g2",
+        "to": "e4",
+        "note": "Échec, et la dame récupère tout avec un avantage décisif."
+      }
+    ]
+  },
+  {
+    "id": "trap-philidor-e6",
+    "name": "Le piège de Philidor",
+    "eco": "C41",
+    "side": "w",
+    "elo": 1000,
+    "summary": "Un sacrifice de fou sur f7 suivi d'un cavalier en e6 : la dame noire tombe.",
+    "lesson": "Un cavalier en e6 fourchette la dame et les deux tours. Quand ce saut existe, un fou vaut largement la peine d'être donné.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "d6",
+        "annot": "",
+        "from": "d7",
+        "to": "d6",
+        "note": "La défense Philidor."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Les Blancs ouvrent le centre."
+      },
+      {
+        "san": "Nd7",
+        "annot": "",
+        "from": "b8",
+        "to": "d7",
+        "note": "Les Noirs soutiennent e5 du cavalier."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou prend la diagonale de f7."
+      },
+      {
+        "san": "c6",
+        "annot": "",
+        "from": "c7",
+        "to": "c6",
+        "note": "Les Noirs solidifient, sans voir ce qui arrive."
+      },
+      {
+        "san": "Ng5",
+        "annot": "!",
+        "from": "f3",
+        "to": "g5",
+        "note": "Le cavalier saute sur f7."
+      },
+      {
+        "san": "Nh6",
+        "annot": "??",
+        "from": "g8",
+        "to": "h6",
+        "note": "La défense naturelle, et la pire. Il fallait Ne7 ou Qe7."
+      },
+      {
+        "san": "Bxf7+",
+        "annot": "",
+        "from": "c4",
+        "to": "f7",
+        "note": "Le sacrifice, qui dégage la case e6."
+      },
+      {
+        "san": "Nxf7",
+        "annot": "",
+        "from": "h6",
+        "to": "f7",
+        "note": "Forcé."
+      },
+      {
+        "san": "Ne6",
+        "annot": "",
+        "from": "g5",
+        "to": "e6",
+        "note": "La fourchette : la dame d8 est attaquée, et le cavalier ne peut pas être pris."
+      }
+    ]
+  },
+  {
+    "id": "trap-fegatello",
+    "name": "L'attaque Fegatello",
+    "eco": "C57",
+    "side": "w",
+    "elo": 1100,
+    "summary": "Le « foie frit » : un cavalier se sacrifie sur f7 pour traîner le roi noir au centre.",
+    "lesson": "Un roi tiré au centre au septième coup ne roquera plus jamais. L'attaque vaut souvent la pièce.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture du roi."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Défense naturelle."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Partie italienne : le fou vise f7."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Les Noirs contre-attaquent e4 : la défense des deux cavaliers."
+      },
+      {
+        "san": "Ng5",
+        "annot": "",
+        "from": "f3",
+        "to": "g5",
+        "note": "Le cavalier saute sur f7. Agressif et discutable, mais redoutable."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "La meilleure réponse : les Noirs bloquent la diagonale."
+      },
+      {
+        "san": "exd5",
+        "annot": "",
+        "from": "e4",
+        "to": "d5",
+        "note": "Le pion est pris."
+      },
+      {
+        "san": "Nxd5",
+        "annot": "?",
+        "from": "f6",
+        "to": "d5",
+        "note": "L'erreur classique. Il fallait jouer Na5 et accepter un pion de retard."
+      },
+      {
+        "san": "Nxf7",
+        "annot": "!",
+        "from": "g5",
+        "to": "f7",
+        "note": "Le sacrifice. Le cavalier se donne pour attirer le roi."
+      },
+      {
+        "san": "Kxf7",
+        "annot": "",
+        "from": "e8",
+        "to": "f7",
+        "note": "Forcé, sinon les Noirs perdent la qualité pour rien."
+      },
+      {
+        "san": "Qf3+",
+        "annot": "",
+        "from": "d1",
+        "to": "f3",
+        "note": "Échec, et la dame attaque le cavalier d5 cloué."
+      }
+    ]
+  },
+  {
+    "id": "trap-stafford",
+    "name": "Le gambit Stafford",
+    "eco": "C42",
+    "side": "b",
+    "elo": 1100,
+    "summary": "Les Noirs sacrifient un pion dès le troisième coup pour une attaque immédiate sur f2.",
+    "lesson": "Un gambit douteux reste redoutable quand l'adversaire ne connaît pas la réfutation. Ici, deux coups naturels des Blancs suffisent à perdre.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "L'adversaire ouvre."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Vous répondez au centre."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Le cavalier attaque e5."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "La défense russe."
+      },
+      {
+        "san": "Nxe5",
+        "annot": "",
+        "from": "f3",
+        "to": "e5",
+        "note": "Les Blancs prennent le pion."
+      },
+      {
+        "san": "Nc6",
+        "annot": "!?",
+        "from": "b8",
+        "to": "c6",
+        "note": "Le gambit Stafford : vous offrez le second cavalier pour le développement."
+      },
+      {
+        "san": "Nxc6",
+        "annot": "",
+        "from": "e5",
+        "to": "c6",
+        "note": "Accepté."
+      },
+      {
+        "san": "dxc6",
+        "annot": "",
+        "from": "d7",
+        "to": "c6",
+        "note": "Vous reprenez du pion d, qui ouvre la colonne pour la dame et la diagonale pour le fou c8."
+      },
+      {
+        "san": "d3",
+        "annot": "?",
+        "from": "d2",
+        "to": "d3",
+        "note": "Naturel mais trop lent. Il fallait d4 ou Be2."
+      },
+      {
+        "san": "Bc5",
+        "annot": "",
+        "from": "f8",
+        "to": "c5",
+        "note": "Le fou se braque sur f2."
+      },
+      {
+        "san": "Bg5",
+        "annot": "??",
+        "from": "c1",
+        "to": "g5",
+        "note": "L'erreur décisive : le fou quitte la défense de f2 et cloue un cavalier qui ne l'est pas vraiment."
+      },
+      {
+        "san": "Nxe4",
+        "annot": "!",
+        "from": "f6",
+        "to": "e4",
+        "note": "Le cavalier cloué bouge : la dame blanche n'est pas le roi."
+      },
+      {
+        "san": "Bxd8",
+        "annot": "",
+        "from": "g5",
+        "to": "d8",
+        "note": "Les Blancs prennent la dame, persuadés de gagner."
+      },
+      {
+        "san": "Bxf2+",
+        "annot": "",
+        "from": "c5",
+        "to": "f2",
+        "note": "Échec. Le roi blanc n'a pas roqué."
+      },
+      {
+        "san": "Ke2",
+        "annot": "",
+        "from": "e1",
+        "to": "e2",
+        "note": "Forcé."
+      },
+      {
+        "san": "Bg4#",
+        "annot": "",
+        "from": "c8",
+        "to": "g4",
+        "note": "Mat. Le fou, le cavalier et le second fou enferment le roi au centre."
+      }
+    ]
+  },
+  {
+    "id": "trap-opera",
+    "name": "La partie de l'Opéra",
+    "eco": "C41",
+    "side": "w",
+    "elo": 1200,
+    "summary": "Morphy contre le duc de Brunswick, Paris 1858, pendant une représentation du Barbier de Séville. La partie la plus célèbre de l'histoire.",
+    "lesson": "Développer toutes ses pièces avant d'attaquer, et ne jamais laisser son roi au centre : Morphy gagne avec seulement quatre pièces sorties contre un adversaire qui n'en a presque aucune.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "d6",
+        "annot": "",
+        "from": "d7",
+        "to": "d6",
+        "note": "La défense Philidor."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Les Blancs ouvrent."
+      },
+      {
+        "san": "Bg4",
+        "annot": "?",
+        "from": "c8",
+        "to": "g4",
+        "note": "Le clouage est prématuré : il permet aux Blancs de gagner du temps."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d4",
+        "to": "e5",
+        "note": "Les Blancs ouvrent la position."
+      },
+      {
+        "san": "Bxf3",
+        "annot": "",
+        "from": "g4",
+        "to": "f3",
+        "note": "Forcé, sinon les Noirs perdent un pion pour rien."
+      },
+      {
+        "san": "Qxf3",
+        "annot": "",
+        "from": "d1",
+        "to": "f3",
+        "note": "Reprise, et la dame vise déjà f7."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d6",
+        "to": "e5",
+        "note": "Les Noirs récupèrent le pion."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou se braque sur f7 : deux pièces visent le point faible."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Les Noirs défendent."
+      },
+      {
+        "san": "Qb3",
+        "annot": "",
+        "from": "f3",
+        "to": "b3",
+        "note": "Double attaque : f7 et b7."
+      },
+      {
+        "san": "Qe7",
+        "annot": "",
+        "from": "d8",
+        "to": "e7",
+        "note": "La seule défense qui tienne."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Morphy renonce au pion b7 et développe. Chaque coup sort une pièce."
+      },
+      {
+        "san": "c6",
+        "annot": "",
+        "from": "c7",
+        "to": "c6",
+        "note": "Les Noirs colmatent."
+      },
+      {
+        "san": "Bg5",
+        "annot": "",
+        "from": "c1",
+        "to": "g5",
+        "note": "La dernière pièce sort, en clouant le cavalier f6."
+      },
+      {
+        "san": "b5",
+        "annot": "?",
+        "from": "b7",
+        "to": "b5",
+        "note": "Les Noirs contre-attaquent, mais leur roi est toujours au centre."
+      },
+      {
+        "san": "Nxb5",
+        "annot": "!",
+        "from": "c3",
+        "to": "b5",
+        "note": "Le sacrifice commence. Le cavalier se donne pour ouvrir les lignes."
+      },
+      {
+        "san": "cxb5",
+        "annot": "",
+        "from": "c6",
+        "to": "b5",
+        "note": "Accepté."
+      },
+      {
+        "san": "Bxb5+",
+        "annot": "",
+        "from": "c4",
+        "to": "b5",
+        "note": "Échec. Tout est forcé à partir d'ici."
+      },
+      {
+        "san": "Nbd7",
+        "annot": "",
+        "from": "b8",
+        "to": "d7",
+        "note": "Les Noirs s'interposent."
+      },
+      {
+        "san": "O-O-O",
+        "annot": "",
+        "from": "e1",
+        "to": "c1",
+        "note": "Le grand roque, qui amène la tour sur le cavalier cloué."
+      },
+      {
+        "san": "Rd8",
+        "annot": "",
+        "from": "a8",
+        "to": "d8",
+        "note": "Les Noirs surdéfendent."
+      },
+      {
+        "san": "Rxd7",
+        "annot": "!",
+        "from": "d1",
+        "to": "d7",
+        "note": "La tour se donne à son tour."
+      },
+      {
+        "san": "Rxd7",
+        "annot": "",
+        "from": "d8",
+        "to": "d7",
+        "note": "Forcé."
+      },
+      {
+        "san": "Rd1",
+        "annot": "",
+        "from": "h1",
+        "to": "d1",
+        "note": "La seconde tour prend la place de la première."
+      },
+      {
+        "san": "Qe6",
+        "annot": "",
+        "from": "e7",
+        "to": "e6",
+        "note": "Les Noirs tentent de défendre."
+      },
+      {
+        "san": "Bxd7+",
+        "annot": "",
+        "from": "b5",
+        "to": "d7",
+        "note": "Le fou prend avec échec."
+      },
+      {
+        "san": "Nxd7",
+        "annot": "",
+        "from": "f6",
+        "to": "d7",
+        "note": "Forcé."
+      },
+      {
+        "san": "Qb8+",
+        "annot": "!!",
+        "from": "b3",
+        "to": "b8",
+        "note": "Le coup immortel : la dame se sacrifie pour dévier le cavalier."
+      },
+      {
+        "san": "Nxb8",
+        "annot": "",
+        "from": "d7",
+        "to": "b8",
+        "note": "Forcé."
+      },
+      {
+        "san": "Rd8#",
+        "annot": "",
+        "from": "d1",
+        "to": "d8",
+        "note": "Mat. La tour et le fou suffisent."
+      }
+    ]
+  },
+  {
+    "id": "trap-englund",
+    "name": "Le piège d'Englund",
+    "eco": "A40",
+    "side": "b",
+    "elo": 1200,
+    "summary": "Les Noirs donnent un pion dès le premier coup et tendent un mat sur la case c1.",
+    "lesson": "Une dame qui part chasser les pions b2 doit toujours vérifier sa case de retour. Ici, c'est le fou blanc qui bouche sa propre fuite.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "L'adversaire ouvre de la dame."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Le gambit Englund : vous offrez un pion pour ouvrir la colonne e."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d4",
+        "to": "e5",
+        "note": "Accepté."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Vous attaquez le pion e5."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Les Blancs le défendent."
+      },
+      {
+        "san": "Qe7",
+        "annot": "",
+        "from": "d8",
+        "to": "e7",
+        "note": "La dame se place sur la colonne ouverte et vise e5."
+      },
+      {
+        "san": "Bf4",
+        "annot": "",
+        "from": "c1",
+        "to": "f4",
+        "note": "Les Blancs surdéfendent."
+      },
+      {
+        "san": "Qb4+",
+        "annot": "",
+        "from": "e7",
+        "to": "b4",
+        "note": "Échec, et la dame vise b2 et b4 en même temps."
+      },
+      {
+        "san": "Bd2",
+        "annot": "",
+        "from": "f4",
+        "to": "d2",
+        "note": "La parade naturelle."
+      },
+      {
+        "san": "Qxb2",
+        "annot": "",
+        "from": "b4",
+        "to": "b2",
+        "note": "Le pion tombe, et la dame attaque la tour a1."
+      },
+      {
+        "san": "Bc3",
+        "annot": "",
+        "from": "d2",
+        "to": "c3",
+        "note": "Les Blancs sauvent la tour en piégeant apparemment la dame."
+      },
+      {
+        "san": "Bb4",
+        "annot": "!",
+        "from": "f8",
+        "to": "b4",
+        "note": "Le coup du piège : le fou cloue le fou c3."
+      },
+      {
+        "san": "Qd2",
+        "annot": "?",
+        "from": "d1",
+        "to": "d2",
+        "note": "L'erreur. Il fallait Qd5 pour tenir."
+      },
+      {
+        "san": "Bxc3",
+        "annot": "",
+        "from": "b4",
+        "to": "c3",
+        "note": "Vous prenez."
+      },
+      {
+        "san": "Qxc3",
+        "annot": "",
+        "from": "d2",
+        "to": "c3",
+        "note": "Reprise forcée."
+      },
+      {
+        "san": "Qc1#",
+        "annot": "",
+        "from": "b2",
+        "to": "c1",
+        "note": "Mat. Le roi blanc n'a aucune case, ses propres pièces l'étouffent."
+      }
+    ]
+  },
+  {
+    "id": "trap-halosar",
+    "name": "Le sacrifice de Halosar",
+    "eco": "B01",
+    "side": "w",
+    "elo": 1200,
+    "summary": "Deux pièces offertes coup sur coup pour attirer le roi noir et prendre la dame.",
+    "lesson": "Un roi qu'on peut attirer case par case finit toujours par croiser une fourchette ou un échec à la découverte. Comptez les coups forcés avant de refuser un sacrifice.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "La défense scandinave."
+      },
+      {
+        "san": "Nf3",
+        "annot": "!?",
+        "from": "g1",
+        "to": "f3",
+        "note": "Les Blancs entrent dans le gambit Tennison plutôt que de prendre."
+      },
+      {
+        "san": "dxe4",
+        "annot": "",
+        "from": "d5",
+        "to": "e4",
+        "note": "Les Noirs acceptent le pion."
+      },
+      {
+        "san": "Ng5",
+        "annot": "",
+        "from": "f3",
+        "to": "g5",
+        "note": "Le cavalier file vers f7."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Développement naturel."
+      },
+      {
+        "san": "d3",
+        "annot": "",
+        "from": "d2",
+        "to": "d3",
+        "note": "Les Blancs offrent un second pion pour ouvrir le fou f1."
+      },
+      {
+        "san": "exd3",
+        "annot": "",
+        "from": "e4",
+        "to": "d3",
+        "note": "Accepté."
+      },
+      {
+        "san": "Bxd3",
+        "annot": "",
+        "from": "f1",
+        "to": "d3",
+        "note": "Le fou prend la diagonale b1-h7."
+      },
+      {
+        "san": "h6",
+        "annot": "??",
+        "from": "h7",
+        "to": "h6",
+        "note": "L'erreur : chasser le cavalier ouvre tout. Il fallait e6 ou Bf5."
+      },
+      {
+        "san": "Nxf7",
+        "annot": "!",
+        "from": "g5",
+        "to": "f7",
+        "note": "Premier sacrifice : le cavalier se donne pour tirer le roi."
+      },
+      {
+        "san": "Kxf7",
+        "annot": "",
+        "from": "e8",
+        "to": "f7",
+        "note": "Forcé."
+      },
+      {
+        "san": "Bg6+",
+        "annot": "!!",
+        "from": "d3",
+        "to": "g6",
+        "note": "Second sacrifice, sur une case défendue trois fois. L'idée est de dévier le roi."
+      },
+      {
+        "san": "Kxg6",
+        "annot": "",
+        "from": "f7",
+        "to": "g6",
+        "note": "Si le roi recule, les Blancs gagnent la dame de la même façon."
+      },
+      {
+        "san": "Qxd8",
+        "annot": "",
+        "from": "d1",
+        "to": "d8",
+        "note": "La dame tombe. Les Blancs ont donné deux pièces et gagné la dame."
+      }
+    ]
+  },
+  {
+    "id": "trap-noahs-ark",
+    "name": "Le piège de l'Arche de Noé",
+    "eco": "C70",
+    "side": "b",
+    "elo": 1300,
+    "summary": "Dans l'Espagnole, les pions noirs enferment le fou blanc qui ne peut plus s'échapper.",
+    "lesson": "Un fou avancé derrière des pions ennemis mobiles peut se retrouver sans issue. Comptez ses cases de fuite avant de l'exposer.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Défense."
+      },
+      {
+        "san": "Bb5",
+        "annot": "",
+        "from": "f1",
+        "to": "b5",
+        "note": "La partie espagnole."
+      },
+      {
+        "san": "a6",
+        "annot": "",
+        "from": "a7",
+        "to": "a6",
+        "note": "Les Noirs repoussent le fou."
+      },
+      {
+        "san": "Ba4",
+        "annot": "",
+        "from": "b5",
+        "to": "a4",
+        "note": "Le fou garde la diagonale."
+      },
+      {
+        "san": "d6",
+        "annot": "",
+        "from": "d7",
+        "to": "d6",
+        "note": "Les Noirs solidifient."
+      },
+      {
+        "san": "d4",
+        "annot": "?",
+        "from": "d2",
+        "to": "d4",
+        "note": "Trop tôt. Les Blancs ouvrent le centre avant d'avoir roqué."
+      },
+      {
+        "san": "b5",
+        "annot": "",
+        "from": "b7",
+        "to": "b5",
+        "note": "Le fou est repoussé une nouvelle fois."
+      },
+      {
+        "san": "Bb3",
+        "annot": "",
+        "from": "a4",
+        "to": "b3",
+        "note": "Il recule encore."
+      },
+      {
+        "san": "Nxd4",
+        "annot": "",
+        "from": "c6",
+        "to": "d4",
+        "note": "Le cavalier prend au centre."
+      },
+      {
+        "san": "Nxd4",
+        "annot": "",
+        "from": "f3",
+        "to": "d4",
+        "note": "Reprise."
+      },
+      {
+        "san": "exd4",
+        "annot": "",
+        "from": "e5",
+        "to": "d4",
+        "note": "Reprise."
+      },
+      {
+        "san": "Qxd4",
+        "annot": "",
+        "from": "d1",
+        "to": "d4",
+        "note": "La dame reprend, apparemment sans problème."
+      },
+      {
+        "san": "c5",
+        "annot": "",
+        "from": "c7",
+        "to": "c5",
+        "note": "Le piège se referme : le pion attaque la dame."
+      },
+      {
+        "san": "Qd5",
+        "annot": "",
+        "from": "d4",
+        "to": "d5",
+        "note": "La dame doit bouger."
+      },
+      {
+        "san": "Be6",
+        "annot": "",
+        "from": "c8",
+        "to": "e6",
+        "note": "Le fou gagne un temps en attaquant la dame."
+      },
+      {
+        "san": "Qc6+",
+        "annot": "",
+        "from": "d5",
+        "to": "c6",
+        "note": "Échec forcé."
+      },
+      {
+        "san": "Bd7",
+        "annot": "",
+        "from": "e6",
+        "to": "d7",
+        "note": "Les Noirs interposent."
+      },
+      {
+        "san": "Qd5",
+        "annot": "",
+        "from": "c6",
+        "to": "d5",
+        "note": "La dame revient."
+      },
+      {
+        "san": "c4",
+        "annot": "",
+        "from": "c5",
+        "to": "c4",
+        "note": "Et le fou b3 est pris au piège : plus aucune case."
+      }
+    ]
+  },
+  {
+    "id": "trap-elephant",
+    "name": "Le piège de l'Éléphant",
+    "eco": "D51",
+    "side": "b",
+    "elo": 1300,
+    "summary": "Dans le gambit dame, les Blancs croient gagner un pion en d5 et perdent une pièce entière.",
+    "lesson": "Avant de prendre une pièce clouée, comptez ce que l'adversaire récupère avec échec. Un échec intercalé renverse n'importe quel calcul.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Ouverture de la dame."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "Réponse classique."
+      },
+      {
+        "san": "c4",
+        "annot": "",
+        "from": "c2",
+        "to": "c4",
+        "note": "Le gambit dame."
+      },
+      {
+        "san": "e6",
+        "annot": "",
+        "from": "e7",
+        "to": "e6",
+        "note": "Vous refusez et solidifiez."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Développement."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Développement."
+      },
+      {
+        "san": "Bg5",
+        "annot": "",
+        "from": "c1",
+        "to": "g5",
+        "note": "Le fou cloue votre cavalier f6."
+      },
+      {
+        "san": "Nbd7",
+        "annot": "",
+        "from": "b8",
+        "to": "d7",
+        "note": "Le coup du piège : votre cavalier d7 semble laisser d5 sans défense."
+      },
+      {
+        "san": "cxd5",
+        "annot": "",
+        "from": "c4",
+        "to": "d5",
+        "note": "Les Blancs ouvrent."
+      },
+      {
+        "san": "exd5",
+        "annot": "",
+        "from": "e6",
+        "to": "d5",
+        "note": "Vous reprenez."
+      },
+      {
+        "san": "Nxd5",
+        "annot": "??",
+        "from": "c3",
+        "to": "d5",
+        "note": "La gourmandise. Les Blancs croient gagner un pion grâce au clouage."
+      },
+      {
+        "san": "Nxd5",
+        "annot": "!",
+        "from": "f6",
+        "to": "d5",
+        "note": "Vous prenez quand même : le cavalier n'est cloué que contre la dame."
+      },
+      {
+        "san": "Bxd8",
+        "annot": "",
+        "from": "g5",
+        "to": "d8",
+        "note": "Les Blancs prennent la dame."
+      },
+      {
+        "san": "Bb4+",
+        "annot": "",
+        "from": "f8",
+        "to": "b4",
+        "note": "L'échec intercalé, qui change tout."
+      },
+      {
+        "san": "Qd2",
+        "annot": "",
+        "from": "d1",
+        "to": "d2",
+        "note": "Forcé."
+      },
+      {
+        "san": "Bxd2+",
+        "annot": "",
+        "from": "b4",
+        "to": "d2",
+        "note": "Vous prenez avec échec."
+      },
+      {
+        "san": "Kxd2",
+        "annot": "",
+        "from": "e1",
+        "to": "d2",
+        "note": "Reprise forcée."
+      },
+      {
+        "san": "Kxd8",
+        "annot": "",
+        "from": "e8",
+        "to": "d8",
+        "note": "Vous récupérez le fou : une pièce nette de gagnée."
+      }
+    ]
+  },
+  {
+    "id": "trap-kieninger",
+    "name": "Le piège de Kieninger",
+    "eco": "A52",
+    "side": "b",
+    "elo": 1400,
+    "summary": "Dans le gambit Budapest, un mat étouffé en huit coups si les Blancs prennent le fou.",
+    "lesson": "Un cavalier en d3 devant un roi non roqué est souvent mat tout seul. Vérifiez-le avant de ramasser une pièce ailleurs.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Ouverture de la dame."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Défense indienne."
+      },
+      {
+        "san": "c4",
+        "annot": "",
+        "from": "c2",
+        "to": "c4",
+        "note": "Les Blancs prennent l'espace."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Le gambit Budapest : vous offrez un pion."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d4",
+        "to": "e5",
+        "note": "Accepté."
+      },
+      {
+        "san": "Ng4",
+        "annot": "",
+        "from": "f6",
+        "to": "g4",
+        "note": "Le cavalier part récupérer le pion."
+      },
+      {
+        "san": "Bf4",
+        "annot": "",
+        "from": "c1",
+        "to": "f4",
+        "note": "Les Blancs défendent e5."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Vous ajoutez un attaquant."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Développement."
+      },
+      {
+        "san": "Bb4+",
+        "annot": "",
+        "from": "f8",
+        "to": "b4",
+        "note": "Échec, qui gêne le roque."
+      },
+      {
+        "san": "Nbd2",
+        "annot": "",
+        "from": "b1",
+        "to": "d2",
+        "note": "Les Blancs s'interposent."
+      },
+      {
+        "san": "Qe7",
+        "annot": "",
+        "from": "d8",
+        "to": "e7",
+        "note": "La dame vise e5 et la colonne e."
+      },
+      {
+        "san": "a3",
+        "annot": "",
+        "from": "a2",
+        "to": "a3",
+        "note": "Les Blancs attaquent le fou, croyant gagner un temps."
+      },
+      {
+        "san": "Ngxe5",
+        "annot": "",
+        "from": "g4",
+        "to": "e5",
+        "note": "Vous reprenez enfin le pion, et le cavalier d3 devient possible."
+      },
+      {
+        "san": "axb4",
+        "annot": "??",
+        "from": "a3",
+        "to": "b4",
+        "note": "L'erreur. Il fallait Nxe5 d'abord."
+      },
+      {
+        "san": "Nd3#",
+        "annot": "",
+        "from": "e5",
+        "to": "d3",
+        "note": "Mat étouffé. Le roi blanc est enfermé par ses propres pièces."
+      }
+    ]
+  },
+  {
+    "id": "trap-lasker-albin",
+    "name": "Le piège de Lasker",
+    "eco": "D08",
+    "side": "b",
+    "elo": 1400,
+    "summary": "Dans le contre-gambit Albin, un pion promeut en cavalier — un sous-promotion qui gagne la partie.",
+    "lesson": "Promouvoir en dame n'est pas toujours le meilleur choix. Ici, seul le cavalier donne échec et sauve la position.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Ouverture de la dame."
+      },
+      {
+        "san": "d5",
+        "annot": "",
+        "from": "d7",
+        "to": "d5",
+        "note": "Réponse classique."
+      },
+      {
+        "san": "c4",
+        "annot": "",
+        "from": "c2",
+        "to": "c4",
+        "note": "Le gambit dame."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Le contre-gambit Albin : les Noirs offrent un pion pour l'initiative."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d4",
+        "to": "e5",
+        "note": "Accepté."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d5",
+        "to": "d4",
+        "note": "Le pion noir file et gêne le développement blanc."
+      },
+      {
+        "san": "e3",
+        "annot": "?",
+        "from": "e2",
+        "to": "e3",
+        "note": "L'erreur naturelle : les Blancs veulent éliminer le pion d4."
+      },
+      {
+        "san": "Bb4+",
+        "annot": "",
+        "from": "f8",
+        "to": "b4",
+        "note": "Échec, qui force une réponse."
+      },
+      {
+        "san": "Bd2",
+        "annot": "",
+        "from": "c1",
+        "to": "d2",
+        "note": "La parade habituelle."
+      },
+      {
+        "san": "dxe3",
+        "annot": "!",
+        "from": "d4",
+        "to": "e3",
+        "note": "Le pion prend et menace déjà."
+      },
+      {
+        "san": "Bxb4",
+        "annot": "?",
+        "from": "d2",
+        "to": "b4",
+        "note": "Les Blancs reprennent le fou, c'est perdant."
+      },
+      {
+        "san": "exf2+",
+        "annot": "",
+        "from": "e3",
+        "to": "f2",
+        "note": "Le pion avance en donnant échec."
+      },
+      {
+        "san": "Ke2",
+        "annot": "",
+        "from": "e1",
+        "to": "e2",
+        "note": "Forcé."
+      },
+      {
+        "san": "fxg1=N+",
+        "annot": "",
+        "from": "f2",
+        "to": "g1",
+        "note": "La sous-promotion ! Cavalier, pas dame, avec échec."
+      }
+    ]
+  },
+  {
+    "id": "trap-magnus-smith",
+    "name": "Le piège de Magnus Smith",
+    "eco": "B57",
+    "side": "w",
+    "elo": 1400,
+    "summary": "Dans la sicilienne, un fianchetto joué un coup trop tôt coûte la dame.",
+    "lesson": "Avant de jouer g6, vérifiez que f7 n'est pas déjà visé. Le fianchetto affaiblit cette case tant que le fou n'est pas arrivé en g7.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "c5",
+        "annot": "",
+        "from": "c7",
+        "to": "c5",
+        "note": "La défense sicilienne."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Développement."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Développement."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Les Blancs ouvrent."
+      },
+      {
+        "san": "cxd4",
+        "annot": "",
+        "from": "c5",
+        "to": "d4",
+        "note": "Les Noirs prennent."
+      },
+      {
+        "san": "Nxd4",
+        "annot": "",
+        "from": "f3",
+        "to": "d4",
+        "note": "Reprise."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Développement, avec attaque sur e4."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Défense."
+      },
+      {
+        "san": "d6",
+        "annot": "",
+        "from": "d7",
+        "to": "d6",
+        "note": "Les Noirs solidifient."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou vise f7 : c'est l'attaque Sozin."
+      },
+      {
+        "san": "g6",
+        "annot": "??",
+        "from": "g7",
+        "to": "g6",
+        "note": "L'erreur. Le fianchetto est bon ici, mais pas avant d'avoir neutralisé le fou c4."
+      },
+      {
+        "san": "Nxc6",
+        "annot": "",
+        "from": "d4",
+        "to": "c6",
+        "note": "Les Blancs échangent d'abord, pour dégager la diagonale de leur dame."
+      },
+      {
+        "san": "bxc6",
+        "annot": "",
+        "from": "b7",
+        "to": "c6",
+        "note": "Reprise."
+      },
+      {
+        "san": "e5",
+        "annot": "!",
+        "from": "e4",
+        "to": "e5",
+        "note": "Le pion attaque le cavalier f6, seul défenseur du point f7."
+      },
+      {
+        "san": "dxe5",
+        "annot": "",
+        "from": "d6",
+        "to": "e5",
+        "note": "Les Noirs prennent, le cavalier n'a plus de soutien."
+      },
+      {
+        "san": "Bxf7+",
+        "annot": "",
+        "from": "c4",
+        "to": "f7",
+        "note": "Le sacrifice."
+      },
+      {
+        "san": "Kxf7",
+        "annot": "",
+        "from": "e8",
+        "to": "f7",
+        "note": "Forcé."
+      },
+      {
+        "san": "Qxd8",
+        "annot": "",
+        "from": "d1",
+        "to": "d8",
+        "note": "La dame tombe."
+      }
+    ]
+  },
+  {
+    "id": "trap-siberian",
+    "name": "Le mat Sibérien",
+    "eco": "B21",
+    "side": "b",
+    "elo": 1500,
+    "summary": "Dans le gambit Smith-Morra, un mat en h2 que les Blancs ne voient presque jamais venir.",
+    "lesson": "Quand une dame est en c7 et un cavalier en g4, la case h2 est déjà à moitié perdue. Repoussez le cavalier avant d'ouvrir la diagonale.",
+    "endsInMate": true,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "c5",
+        "annot": "",
+        "from": "c7",
+        "to": "c5",
+        "note": "La défense sicilienne."
+      },
+      {
+        "san": "d4",
+        "annot": "",
+        "from": "d2",
+        "to": "d4",
+        "note": "Le gambit Smith-Morra commence."
+      },
+      {
+        "san": "cxd4",
+        "annot": "",
+        "from": "c5",
+        "to": "d4",
+        "note": "Vous prenez."
+      },
+      {
+        "san": "c3",
+        "annot": "",
+        "from": "c2",
+        "to": "c3",
+        "note": "Les Blancs offrent un second pion pour le développement."
+      },
+      {
+        "san": "dxc3",
+        "annot": "",
+        "from": "d4",
+        "to": "c3",
+        "note": "Accepté."
+      },
+      {
+        "san": "Nxc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Reprise."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Développement."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Développement."
+      },
+      {
+        "san": "e6",
+        "annot": "",
+        "from": "e7",
+        "to": "e6",
+        "note": "Vous solidifiez."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Le fou vise f7, comme toujours dans ce gambit."
+      },
+      {
+        "san": "Qc7",
+        "annot": "",
+        "from": "d8",
+        "to": "c7",
+        "note": "La dame se place sur la colonne c, face au fou — et vise discrètement h2."
+      },
+      {
+        "san": "O-O",
+        "annot": "",
+        "from": "e1",
+        "to": "g1",
+        "note": "Les Blancs roquent."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Développement."
+      },
+      {
+        "san": "Qe2",
+        "annot": "",
+        "from": "d1",
+        "to": "e2",
+        "note": "Les Blancs préparent Rd1."
+      },
+      {
+        "san": "Ng4",
+        "annot": "!",
+        "from": "f6",
+        "to": "g4",
+        "note": "Le cavalier saute sur h2."
+      },
+      {
+        "san": "h3",
+        "annot": "??",
+        "from": "h2",
+        "to": "h3",
+        "note": "L'erreur naturelle : repousser le cavalier. Il fallait défendre h2."
+      },
+      {
+        "san": "Nd4",
+        "annot": "!",
+        "from": "c6",
+        "to": "d4",
+        "note": "Double attaque sur la dame, qui ne peut plus garder h2."
+      },
+      {
+        "san": "Nxd4",
+        "annot": "??",
+        "from": "f3",
+        "to": "d4",
+        "note": "La prise perd immédiatement."
+      },
+      {
+        "san": "Qh2#",
+        "annot": "",
+        "from": "c7",
+        "to": "h2",
+        "note": "Mat. La dame prend en h2, protégée par le cavalier g4."
+      }
+    ]
+  },
+  {
+    "id": "trap-mortimer",
+    "name": "Le piège de Mortimer",
+    "eco": "C65",
+    "side": "b",
+    "elo": 1500,
+    "summary": "Dans l'Espagnole, les Noirs jouent un coup qui semble perdre un pion et gagnent une pièce.",
+    "lesson": "Un coup qui offre du matériel sans raison apparente cache presque toujours un échec à la découverte. Cherchez-le avant de prendre.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "Ouverture."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Défense."
+      },
+      {
+        "san": "Bb5",
+        "annot": "",
+        "from": "f1",
+        "to": "b5",
+        "note": "La partie espagnole."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Défense berlinoise."
+      },
+      {
+        "san": "d3",
+        "annot": "",
+        "from": "d2",
+        "to": "d3",
+        "note": "Les Blancs solidifient."
+      },
+      {
+        "san": "Ne7",
+        "annot": "!?",
+        "from": "c6",
+        "to": "e7",
+        "note": "Le coup de Mortimer. Le cavalier recule et abandonne e5 : une invitation."
+      },
+      {
+        "san": "Nxe5",
+        "annot": "??",
+        "from": "f3",
+        "to": "e5",
+        "note": "Les Blancs se servent."
+      },
+      {
+        "san": "c6",
+        "annot": "",
+        "from": "c7",
+        "to": "c6",
+        "note": "Le piège se referme : le pion attaque le fou, qui n'a plus de bonne case."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "b5",
+        "to": "c4",
+        "note": "Le fou se sauve sur la diagonale habituelle."
+      },
+      {
+        "san": "Qa5+",
+        "annot": "",
+        "from": "d8",
+        "to": "a5",
+        "note": "L'échec à la découverte, que Ne7 avait préparé en dégageant la diagonale."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "Les Blancs s'interposent."
+      },
+      {
+        "san": "Qxe5",
+        "annot": "",
+        "from": "a5",
+        "to": "e5",
+        "note": "La dame ramasse le cavalier : une pièce nette de gagnée."
+      }
+    ]
+  },
+  {
+    "id": "trap-rubinstein-4n",
+    "name": "Le piège de Rubinstein",
+    "eco": "C48",
+    "side": "b",
+    "elo": 1500,
+    "summary": "Dans la partie des quatre cavaliers, les Noirs avancent un cavalier au centre et gagnent une pièce.",
+    "lesson": "Un cavalier avancé qui semble en prise attend souvent une contre-attaque sur le fou. Vérifiez toujours ce que l'adversaire reprend après l'échange.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "L'adversaire ouvre."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Vous répondez."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Développement."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Développement."
+      },
+      {
+        "san": "Nc3",
+        "annot": "",
+        "from": "b1",
+        "to": "c3",
+        "note": "La partie des quatre cavaliers."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "Symétrie."
+      },
+      {
+        "san": "Bb5",
+        "annot": "",
+        "from": "f1",
+        "to": "b5",
+        "note": "Le fou cloue votre cavalier c6."
+      },
+      {
+        "san": "Nd4",
+        "annot": "!",
+        "from": "c6",
+        "to": "d4",
+        "note": "Le coup de Rubinstein. Le cavalier saute au centre et semble se donner."
+      },
+      {
+        "san": "Nxe5",
+        "annot": "??",
+        "from": "f3",
+        "to": "e5",
+        "note": "Les Blancs se servent. Il fallait Nxd4 ou Ba4."
+      },
+      {
+        "san": "Qe7",
+        "annot": "!",
+        "from": "d8",
+        "to": "e7",
+        "note": "La dame attaque le cavalier e5 et prépare la reprise sur e4."
+      },
+      {
+        "san": "f4",
+        "annot": "??",
+        "from": "f2",
+        "to": "f4",
+        "note": "Les Blancs tentent de tenir le cavalier. Nf3 était obligatoire."
+      },
+      {
+        "san": "Nxb5",
+        "annot": "",
+        "from": "d4",
+        "to": "b5",
+        "note": "Vous éliminez le fou."
+      },
+      {
+        "san": "Nxb5",
+        "annot": "",
+        "from": "c3",
+        "to": "b5",
+        "note": "Reprise."
+      },
+      {
+        "san": "d6",
+        "annot": "",
+        "from": "d7",
+        "to": "d6",
+        "note": "Le cavalier e5 n'a plus aucune case : il est perdu. Une pièce nette."
+      }
+    ]
+  },
+  {
+    "id": "trap-traxler",
+    "name": "La contre-attaque Traxler",
+    "eco": "C57",
+    "side": "b",
+    "elo": 1600,
+    "summary": "Les Noirs ignorent la menace sur f7 et offrent leur fou : l'une des lignes les plus sauvages des échecs.",
+    "lesson": "Face à une attaque, la meilleure défense est parfois une contre-attaque plus rapide. Encore faut-il avoir compté les coups forcés jusqu'au bout.",
+    "endsInMate": false,
+    "moves": [
+      {
+        "san": "e4",
+        "annot": "",
+        "from": "e2",
+        "to": "e4",
+        "note": "L'adversaire ouvre."
+      },
+      {
+        "san": "e5",
+        "annot": "",
+        "from": "e7",
+        "to": "e5",
+        "note": "Vous répondez."
+      },
+      {
+        "san": "Nf3",
+        "annot": "",
+        "from": "g1",
+        "to": "f3",
+        "note": "Attaque sur e5."
+      },
+      {
+        "san": "Nc6",
+        "annot": "",
+        "from": "b8",
+        "to": "c6",
+        "note": "Défense."
+      },
+      {
+        "san": "Bc4",
+        "annot": "",
+        "from": "f1",
+        "to": "c4",
+        "note": "Partie italienne, le fou vise f7."
+      },
+      {
+        "san": "Nf6",
+        "annot": "",
+        "from": "g8",
+        "to": "f6",
+        "note": "La défense des deux cavaliers."
+      },
+      {
+        "san": "Ng5",
+        "annot": "",
+        "from": "f3",
+        "to": "g5",
+        "note": "Le cavalier saute sur f7. La menace est réelle."
+      },
+      {
+        "san": "Bc5",
+        "annot": "!!",
+        "from": "f8",
+        "to": "c5",
+        "note": "La contre-attaque Traxler : vous ignorez f7 et visez f2 à votre tour."
+      },
+      {
+        "san": "Nxf7",
+        "annot": "?",
+        "from": "g5",
+        "to": "f7",
+        "note": "Les Blancs se servent. Bxf7+ était le coup prudent."
+      },
+      {
+        "san": "Bxf2+",
+        "annot": "!",
+        "from": "c5",
+        "to": "f2",
+        "note": "Le fou se donne pour tirer le roi blanc hors de son abri."
+      },
+      {
+        "san": "Kxf2",
+        "annot": "",
+        "from": "e1",
+        "to": "f2",
+        "note": "Accepté. Kf1 laisse aussi les Noirs très bien."
+      },
+      {
+        "san": "Nxe4+",
+        "annot": "",
+        "from": "f6",
+        "to": "e4",
+        "note": "Échec à la découverte, et le cavalier est intouchable."
+      },
+      {
+        "san": "Kg1",
+        "annot": "",
+        "from": "f2",
+        "to": "g1",
+        "note": "Le roi se réfugie."
+      },
+      {
+        "san": "Qh4",
+        "annot": "",
+        "from": "d8",
+        "to": "h4",
+        "note": "La dame arrive, menaçant mat en f2."
+      },
+      {
+        "san": "g3",
+        "annot": "",
+        "from": "g2",
+        "to": "g3",
+        "note": "Forcé pour parer le mat."
+      },
+      {
+        "san": "Nxg3",
+        "annot": "",
+        "from": "e4",
+        "to": "g3",
+        "note": "Le cavalier se donne pour rouvrir la ligne."
+      },
+      {
+        "san": "hxg3",
+        "annot": "",
+        "from": "h2",
+        "to": "g3",
+        "note": "Forcé."
+      },
+      {
+        "san": "Qxg3+",
+        "annot": "",
+        "from": "h4",
+        "to": "g3",
+        "note": "Échec. Le roi blanc est à découvert."
+      },
+      {
+        "san": "Kf1",
+        "annot": "",
+        "from": "g1",
+        "to": "f1",
+        "note": "La seule case."
+      },
+      {
+        "san": "Rf8",
+        "annot": "",
+        "from": "h8",
+        "to": "f8",
+        "note": "La tour entre dans la partie et cloue le cavalier f7. L'attaque est décisive."
+      }
+    ]
+  }
+]
